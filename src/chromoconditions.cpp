@@ -63,7 +63,7 @@ double ChromoConditions::columnLength() const {
     return mColumnLength;
 }
 
-void ChromoConditions::setColumnLength(double newColumnLength) const {
+void ChromoConditions::setColumnLength(double newColumnLength) {
     mColumnLength = newColumnLength;
 }
 
@@ -71,7 +71,7 @@ double ChromoConditions::columnDiameter() const {
     return mColumnDiameter;
 }
 
-void ChromoConditions::setColumnDiameter(double newColumnDiameter) const {
+void ChromoConditions::setColumnDiameter(double newColumnDiameter) {
     mColumnDiameter = newColumnDiameter;
 }
 
@@ -79,7 +79,7 @@ double ChromoConditions::columnPoreSize() const {
     return mColumnPoreSize;
 }
 
-void ChromoConditions::setColumnPoreSize(double newColumnPoreSize) const {
+void ChromoConditions::setColumnPoreSize(double newColumnPoreSize) {
     mColumnPoreSize = newColumnPoreSize;
 }
 
@@ -87,7 +87,7 @@ double ChromoConditions::columnVpToVtot() const {
     return mColumnVpToVtot;
 }
 
-void ChromoConditions::setColumnVpToVtot(double newColumnVpToVtot) const {
+void ChromoConditions::setColumnVpToVtot(double newColumnVpToVtot) {
     mColumnVpToVtot = newColumnVpToVtot;
 }
 
@@ -95,7 +95,7 @@ double ChromoConditions::columnPorosity() const {
     return mColumnPorosity;
 }
 
-void ChromoConditions::setColumnPorosity(double newColumnPorosity) const {
+void ChromoConditions::setColumnPorosity(double newColumnPorosity) {
     mColumnPorosity = newColumnPorosity;
 }
 
@@ -103,7 +103,7 @@ double ChromoConditions::temperature() const {
     return mTemperature;
 }
 
-void ChromoConditions::setTemperature(double newTemperature) const {
+void ChromoConditions::setTemperature(double newTemperature) {
     mTemperature = newTemperature;
 }
 
@@ -111,8 +111,7 @@ double ChromoConditions::calibrationParameter() const {
     return mCalibrationParameter;
 }
 
-void ChromoConditions::setCalibrationParameter(
-                       double newCalibrationParameter) const {
+void ChromoConditions::setCalibrationParameter(double newCalibrationParameter) {
     mCalibrationParameter = newCalibrationParameter;
 }
 
@@ -120,7 +119,7 @@ double ChromoConditions::flowRate() const {
     return mFlowRate;
 }
 
-void ChromoConditions::setFlowRate(double newFlowRate) const {
+void ChromoConditions::setFlowRate(double newFlowRate) {
     mFlowRate = newFlowRate;
 }
 
@@ -128,7 +127,7 @@ double ChromoConditions::dV() const {
     return mDV;
 }
 
-void ChromoConditions::setDV(double newDV) const {
+void ChromoConditions::setDV(double newDV) {
     mDV = newDV;
 }
 
@@ -136,7 +135,7 @@ double ChromoConditions::delayTime() const {
     return mDelayTime;
 }
 
-void ChromoConditions::setDelayTime(double newDelayTime) const {
+void ChromoConditions::setDelayTime(double newDelayTime) {
     mDelayTime = newDelayTime;
 }
 
@@ -152,10 +151,12 @@ double ChromoConditions::secondSolventConcentrationB() const {
     return mSecondSolventConcentrationB;
 }
 
-std::vector<std::pair<double,double> >::const_iterator ChromoConditions::beginGradient() const {
+std::vector<std::pair<double,double> >::const_iterator 
+ChromoConditions::beginGradient() const {
     return mGradient.begin();
 }
 
-std::vector<std::pair<double,double> >::const_iterator ChromoConditions::endGradient() const {
+std::vector<std::pair<double,double> >::const_iterator 
+ChromoConditions::endGradient() const {
     return mGradient.end();
 }

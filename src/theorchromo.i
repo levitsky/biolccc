@@ -6,6 +6,7 @@
 #include "aminoacid.h"
 #include "terminus.h"
 #include "chromoconditions.h"
+#include "chemicalbasis.h"
 #include "peptidemethods.h"
 %}
 
@@ -13,6 +14,7 @@
 %include "aminoacid.h"
 %include "terminus.h"
 %include "chromoconditions.h"
+%include "chemicalbasis.h"
 %include "peptidemethods.h"
 
 // Instantiate some templates
