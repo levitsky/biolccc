@@ -7,7 +7,7 @@
 
 //! This class encapsulates all parameters of chromatographic equipment.
 typedef std::pair<double,double>     gradientPoint;
-typedef std::vector< gradientPoint > gradientProfile;
+typedef std::vector<gradientPoint > gradientProfile;
 
 class ChromoConditions {  
     public:
@@ -17,20 +17,19 @@ class ChromoConditions {
             gradient conditions setted by default.
         */
         ChromoConditions(double iColumnLength = 150.0,
-                        double iColumnDiameter = 0.075,
-                        double iColumnPoreSize = 100.0,
-                        gradientProfile iGradient = gradientProfile(),
-                        double iSecondSolventConcentrationA = 2.0,
-                        double iSecondSolventConcentrationB = 80.0,
-                        double iDelayTime = 0.0,
-                        std::string iSecondSolvent = std::string("ACN"),
-                        double iFlowRate = 0.0003,
-                        double iDV = 0.0,
-                        double iCalibrationParameter = 1.0,
-                        double iColumnVpToVtot = 0.5,
-                        double iColumnPorosity = 0.9,
-                        double iTemperature = 293.0);
-
+                         double iColumnDiameter = 0.075,
+                         double iColumnPoreSize = 100.0,
+                         gradientProfile iGradient = gradientProfile(),
+                         double iSecondSolventConcentrationA = 2.0,
+                         double iSecondSolventConcentrationB = 80.0,
+                         double iDelayTime = 0.0,
+                         std::string iSecondSolvent = std::string("ACN"),
+                         double iFlowRate = 0.0003,
+                         double iDV = 0.0,
+                         double iCalibrationParameter = 1.0,
+                         double iColumnVpToVtot = 0.5,
+                         double iColumnPorosity = 0.9,
+                         double iTemperature = 293.0);
         
         /*!
             Returns a length of a column in mm.

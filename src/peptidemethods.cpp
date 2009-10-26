@@ -90,9 +90,9 @@ double PeptideMethods::calculateRTBioLCCC(
         }
         convertedGradient.push_back(std::pair<int,double>(
             currentGradientPoint->first * conditions.flowRate() / dV,
-            (100.0 - currentGradientPoint->second) *
+            (100.0 - currentGradientPoint->second) / 100.0 *
             conditions.secondSolventConcentrationA() + 
-            currentGradientPoint->second *
+            currentGradientPoint->second / 100.0 *
             conditions.secondSolventConcentrationB()));
         
         previousTimePoint = currentGradientPoint->first;
@@ -110,13 +110,13 @@ double PeptideMethods::calculateRTBioLCCC(
         convertedGradient.begin();
     std::vector<std::pair<int, double> >::const_iterator previousGradientPoint =
         convertedGradient.begin();
-    while ( S < 1.0 ) {
+    while (S < 1.0) {
         j++;
-        if ( j > currentGradientPoint->first ) {
+        if (j > currentGradientPoint->first) {
             // If j exceeds the last point of a gradient, the value of the 
             // second solvent concentration is calculated by a prolongation of
             // the last gradient section.
-            if ( currentGradientPoint != --convertedGradient.end() ) {
+            if (currentGradientPoint != --convertedGradient.end()) {
                 previousGradientPoint = currentGradientPoint;
                 ++currentGradientPoint;
                 
@@ -276,7 +276,7 @@ double PeptideMethods::calculateKdBioLCCC(
     
     // PoreSteps is a number of nodes in a lattice between two walls. Because of
     // the features of a following calculation it should be more than 2.
-    const int poreSteps = (int) columnPoreSize / 10.0 + 1;
+    const int poreSteps = (int) columnPoreSize / 10.0;
     if (poreSteps <=2) {
         return PORESIZE_ERROR;
     }
