@@ -20,16 +20,16 @@ class ChromoConditions {
                         double iColumnDiameter = 0.075,
                         double iColumnPoreSize = 100.0,
                         gradientProfile iGradient = gradientProfile(),
-                        double iSecondSolventConcentrationA = 2,
-                        double iSecondSolventConcentrationB = 80,
-                        double iDelayTime = 0,
+                        double iSecondSolventConcentrationA = 2.0,
+                        double iSecondSolventConcentrationB = 80.0,
+                        double iDelayTime = 0.0,
                         std::string iSecondSolvent = std::string("ACN"),
                         double iFlowRate = 0.0003,
-                        double iDV = 0,
+                        double iDV = 0.0,
                         double iCalibrationParameter = 1.0,
                         double iColumnVpToVtot = 0.5,
                         double iColumnPorosity = 0.9,
-                        double iTemperature = 293);
+                        double iTemperature = 293.0);
 
         
         /*!

@@ -20,19 +20,19 @@
 // }
 
 ChromoConditions::ChromoConditions(double iColumnLength,
-                                double iColumnDiameter,
-                                double iColumnPoreSize,
-                                gradientProfile iGradient,
-                                double iSecondSolventConcentrationA,
-                                double iSecondSolventConcentrationB,
-                                double iDelayTime,
-                                std::string iSecondSolvent,
-                                double iFlowRate,
-                                double iDV,
-                                double iCalibrationParameter,
-                                double iColumnVpToVtot,
-                                double iColumnPorosity,
-                                double iTemperature
+                                   double iColumnDiameter,
+                                   double iColumnPoreSize,
+                                   gradientProfile iGradient,
+                                   double iSecondSolventConcentrationA,
+                                   double iSecondSolventConcentrationB,
+                                   double iDelayTime,
+                                   std::string iSecondSolvent,
+                                   double iFlowRate,
+                                   double iDV,
+                                   double iCalibrationParameter,
+                                   double iColumnVpToVtot,
+                                   double iColumnPorosity,
+                                   double iTemperature
 ) {
     mColumnLength = iColumnLength;
     mColumnDiameter = iColumnDiameter;
@@ -51,8 +51,8 @@ ChromoConditions::ChromoConditions(double iColumnLength,
     //setting default gradient.
     if (iGradient.empty()) {
         mGradient = gradientProfile();
-        mGradient.push_back(gradientPoint(0,0));
-        mGradient.push_back(gradientPoint(60,50));
+        mGradient.push_back(gradientPoint(0.0, 0.0));
+        mGradient.push_back(gradientPoint(60.0, 50.0));
     }
     else {
         mGradient = iGradient;

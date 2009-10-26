@@ -24,9 +24,9 @@ double PeptideMethods :: calculateRTBioLCCC(const std::string &sequence,
                     &CTerminus,
                     &peptideEnergyProfile))
     {
-        return calculateRTBioLCCC (peptideEnergyProfile,
-                                chemBasis,
-                                conditions);
+        return calculateRTBioLCCC(peptideEnergyProfile,
+                                  chemBasis,
+                                  conditions);
     }
     else {
         return PARSING_ERROR;
@@ -63,7 +63,7 @@ double PeptideMethods::calculateRTBioLCCC(
     }
 
     // A gradient should start at time 0.
-    if ( conditions.beginGradient()->first != 0 ) {
+    if (conditions.beginGradient()->first != 0) {
         return GRADIENT_ERROR;
     }
     
@@ -73,7 +73,8 @@ double PeptideMethods::calculateRTBioLCCC(
         return GRADIENT_ERROR;
     }
     
-    // Converting an x-coordinate of gradient to the dimension of iterations.
+    // Converting the x-coordinate of the gradient to the scale of iterations
+    // and the y-coordinate to the scale of second solvent concentration.
     std::vector<std::pair<int, double> > convertedGradient;
     double previousTimePoint = conditions.beginGradient()->first;
     
@@ -88,8 +89,11 @@ double PeptideMethods::calculateRTBioLCCC(
             return GRADIENT_ERROR;
         }
         convertedGradient.push_back(std::pair<int,double>(
-            currentGradientPoint-> first * conditions.flowRate() / dV,
-            currentGradientPoint -> second));
+            currentGradientPoint->first * conditions.flowRate() / dV,
+            (100.0 - currentGradientPoint->second) *
+            conditions.secondSolventConcentrationA() + 
+            currentGradientPoint->second *
+            conditions.secondSolventConcentrationB()));
         
         previousTimePoint = currentGradientPoint->first;
     }
