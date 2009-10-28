@@ -1,4 +1,4 @@
-SET(theorchromo_SRCS 
+SET(BioLCCC_SRCS 
    main.cpp
    chemicalbasis.cpp
    aminoacid.cpp
@@ -7,7 +7,7 @@ SET(theorchromo_SRCS
    peptidemethods.cpp
 )
 
-SET(theorchromo_HDRS
+SET(BioLCCC_HDRS
    chemicalbasis.h
    aminoacid.h
    terminus.h
@@ -15,7 +15,7 @@ SET(theorchromo_HDRS
    peptidemethods.h
 )
 
-ADD_EXECUTABLE(theorchromo ${theorchromo_SRCS} ${theorchromo_HDRS})
+ADD_EXECUTABLE(BioLCCC_bin ${BioLCCC_SRCS} ${BioLCCC_HDRS})
 
 IF(UNIX)
     add_definitions(-Wall -O2)
@@ -35,9 +35,9 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(CMAKE_SWIG_FLAGS "")
 
-SET_SOURCE_FILES_PROPERTIES(theorchromo.i PROPERTIES CPLUSPLUS ON)
-SWIG_ADD_MODULE(theorchromo_lib python
-                theorchromo.i
-                ${theorchromo_SRCS})
-SWIG_LINK_LIBRARIES(theorchromo_lib ${PYTHON_LIBRARIES})
+SET_SOURCE_FILES_PROPERTIES(pyBioLCCC.i PROPERTIES CPLUSPLUS ON)
+SWIG_ADD_MODULE(pyBioLCCC python
+                pyBioLCCC.i
+                ${BioLCCC_SRCS})
+SWIG_LINK_LIBRARIES(pyBioLCCC ${PYTHON_LIBRARIES})
 
