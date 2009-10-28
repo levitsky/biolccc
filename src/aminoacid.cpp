@@ -1,13 +1,13 @@
 #include "aminoacid.h"
 
-Aminoacid :: Aminoacid(std::string Name,
-    std::string Label,
+Aminoacid :: Aminoacid(std::string name,
+    std::string label,
     double bindEnergy,
     double averageMass,
     double monoisotopicMass
 ) {
-    mName = Name;
-    mLabel = Label;
+    mName = name;
+    mLabel = label;
     mAverageMass = averageMass;
     mMonoisotopicMass = monoisotopicMass;
     mBindEnergy = bindEnergy;
