@@ -1,5 +1,5 @@
-// pyBioLCCC.i - SWIG interface
-%module pyBioLCCC 
+// csBioLCCC.i - SWIG interface
+%module csBioLCCC 
 %include "std_string.i"
 
 %{
