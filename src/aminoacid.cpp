@@ -1,6 +1,6 @@
 #include "aminoacid.h"
 
-Aminoacid :: Aminoacid(std::string name,
+Aminoacid::Aminoacid(std::string name,
     std::string label,
     double bindEnergy,
     double averageMass,

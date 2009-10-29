@@ -13,8 +13,8 @@ class ChromoConditions {
     public:
         
         /*!
-            Constructs a custom ChromoConditions object with the standard Dionex
-            gradient conditions setted by default.
+            Constructs a custom ChromoConditions object with the standard 
+            Dionex gradient conditions.
         */
         ChromoConditions(double iColumnLength = 150.0,
                          double iColumnDiameter = 0.075,
@@ -32,128 +32,140 @@ class ChromoConditions {
                          double iTemperature = 293.0);
         
         /*!
-            Returns a length of a column in mm.
+            Returns the length of the column in mm.
         */
         double columnLength() const;
         
         /*!
-            Sets a length of a column in mm.
+            Sets the length of the column in mm.
         */
         void setColumnLength(double newColumnLength);
         
         /*!
-            Returns an internal diameter of a column in mm.
+            Returns the internal diameter of the column in mm.
         */
         double columnDiameter() const;
         
         /*!
-            Sets an internal diameter of a column in mm.
+            Sets the internal diameter of the column in mm.
         */
         void setColumnDiameter(double newColumnDiameter);
         
         /*!
-            Returns a size of pores in angstroms.
+            Returns the size of the pores in angstroms.
         */
         double columnPoreSize() const;
         
         /*!
-            Sets a size of pores in angstroms.
+            Sets the size of the pores in angstroms.
         */
         void setColumnPoreSize(double newColumnPoreSize);
         
         /*!
-            Returns a volume of pores divided by a total column volume 
+            Returns the volume of pores divided by the total column volume 
             (Pi * r^2 * l).
         */
         double columnVpToVtot() const;
         
         /*!
-            Sets a volume of pores divided by a total column volume 
+            Sets the volume of the pores divided by the total column volume 
             (Pi * r^2 * l).
         */
         void setColumnVpToVtot(double newColumnVpToVtot);
         
         /*!
-            Returns a ( volume of pores + volume of liquid phase ) / 
+            Returns ( volume of pores + volume of liquid phase ) / 
             total column volume ( PI * r^2 * l)
         */
         double columnPorosity() const;
         
         /*!
-            Sets a ( volume of pores + volume of liquid phase ) / 
+            Sets ( volume of pores + volume of liquid phase ) / 
             total column volume ( PI * r^2 * l)
         */
         void setColumnPorosity(double newColumnPorosity);
         
         /*!
-            Returns a temperature in kelvin degrees.
+            Returns the temperature in degrees of Kelvin.
         */
         double temperature() const;
         
         /*!
-            Sets a temperature in kelvin degrees.
+            Sets the temperature in degrees of Kelvin.
         */
         void setTemperature(double newTemperature);
         
         /*!
-            Returns a calibration parameter.
+            Returns the calibration parameter.
         */
         double calibrationParameter() const;
         
         /*!
-            Sets a calibration parameter.
+            Sets the calibration parameter.
         */
         void setCalibrationParameter(double newCalibrationParameter);
         
         /*!
-            Returns a flow rate in ml/min.
+            Returns the flow rate in ml/min.
         */
         double flowRate() const;
         
         /*!
-            Sets a flow rate in ml/min.
+            Sets the flow rate in ml/min.
         */
         void setFlowRate(double newFlowRate);
         
         /*!
-            Returns a volume of a pump mixer, ml.
+            Returns the volume of the pump mixer, ml.
         */
         double dV() const;
         
         /*!
-            Sets a volume of a pump mixer, ml.
+            Sets the volume of the pump mixer, ml.
         */
         void setDV(double newDV);
         
         /*!
-            Returns a delay time;
+            Returns the delay time;
         */
         double delayTime() const;
         
         /*!
-            Sets a delay time;
+            Sets the delay time;
         */
         void setDelayTime(double newDelayTime);
         
         /*!
-            Returns a name of a second solvent.
+            Returns the name of the second solvent.
         */
         std::string secondSolvent() const;
         
         /*!
-            Sets a name of a second solvent.
+            Sets the name of the second solvent.
         */
         //std::string setSecondSolvent(std::string);
         
         /*!
-            Returns a concentration of second solvent in the component A.
+            Returns the concentration of the second solvent in the component A.
         */
         double secondSolventConcentrationA() const;
 
         /*!
-            Returns a concentration of second solvent in the component B.
+            Sets the concentration of the second solvent in the component A.
+        */
+        void setSecondSolventConcentrationA(
+            double newSecondSolventConcentrationA) const;
+
+        /*!
+            Returns the concentration of the second solvent in the component B.
         */
         double secondSolventConcentrationB() const;
+
+        /*!
+            Sets the concentration of the second solvent in the component B.
+        */
+        void setSecondSolventConcentrationB(
+            double newSecondSolventConcentrationB) const;
         
         /*!
             Returns an interator to the first point of the gradient. The first 

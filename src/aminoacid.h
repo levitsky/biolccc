@@ -5,7 +5,6 @@
 
 //! The Aminoacid class encapsulates all physical properties of an aminoacid.
 
-
 class Aminoacid {
     
     public:
