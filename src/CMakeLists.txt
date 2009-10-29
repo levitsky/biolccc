@@ -2,17 +2,21 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(BioLCCC_SRCS 
    main.cpp
-   chemicalbasis.cpp
    aminoacid.cpp
    terminus.cpp
+   chemicalbasis.cpp
+   gradientpoint.cpp
+   gradient.cpp
    chromoconditions.cpp
    peptidemethods.cpp
 )
 
 SET(BioLCCC_HDRS
-   chemicalbasis.h
    aminoacid.h
    terminus.h
+   chemicalbasis.h
+   gradientpoint.h
+   gradient.h
    chromoconditions.h
    peptidemethods.h
 )

@@ -10,8 +10,8 @@ class GradientPoint {
             Constructs a point of a gradient with the given time and the
             concentration of the solvent B.
         */
-        GradientPoint(double time,
-                      double concentrationB
+        GradientPoint(double iTime,
+                      double iConcentrationB
         );
 
         /*

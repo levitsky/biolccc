@@ -22,7 +22,7 @@
 ChromoConditions::ChromoConditions(double iColumnLength,
                                    double iColumnDiameter,
                                    double iColumnPoreSize,
-                                   gradientProfile iGradient,
+                                   Gradient iGradient,
                                    double iSecondSolventConcentrationA,
                                    double iSecondSolventConcentrationB,
                                    double iDelayTime,
@@ -37,6 +37,7 @@ ChromoConditions::ChromoConditions(double iColumnLength,
     mColumnLength = iColumnLength;
     mColumnDiameter = iColumnDiameter;
     mColumnPoreSize = iColumnPoreSize;
+    mGradient = iGradient;
     mColumnVpToVtot = iColumnVpToVtot;
     mColumnPorosity = iColumnPorosity;
     mTemperature = iTemperature;
@@ -47,16 +48,6 @@ ChromoConditions::ChromoConditions(double iColumnLength,
     mSecondSolvent = iSecondSolvent;
     mSecondSolventConcentrationA = iSecondSolventConcentrationA;
     mSecondSolventConcentrationB = iSecondSolventConcentrationB;
-    
-    //setting default gradient.
-    if (iGradient.empty()) {
-        mGradient = gradientProfile();
-        mGradient.push_back(gradientPoint(0.0, 0.0));
-        mGradient.push_back(gradientPoint(60.0, 50.0));
-    }
-    else {
-        mGradient = iGradient;
-    }
 }
  
 double ChromoConditions::columnLength() const {
@@ -147,16 +138,27 @@ double ChromoConditions::secondSolventConcentrationA() const {
     return mSecondSolventConcentrationA;
 }
 
+void ChromoConditions::setSecondSolventConcentrationA(
+    double newSecondSolventConcentrationA
+) {
+    mSecondSolventConcentrationA = newSecondSolventConcentrationA;
+}
+
 double ChromoConditions::secondSolventConcentrationB() const {
     return mSecondSolventConcentrationB;
 }
 
-std::vector<std::pair<double,double> >::const_iterator 
-ChromoConditions::beginGradient() const {
-    return mGradient.begin();
+void ChromoConditions::setSecondSolventConcentrationB(
+    double newSecondSolventConcentrationB
+) {
+    mSecondSolventConcentrationB = newSecondSolventConcentrationB;
 }
 
-std::vector<std::pair<double,double> >::const_iterator 
-ChromoConditions::endGradient() const {
-    return mGradient.end();
+Gradient ChromoConditions::gradient() const {
+    return mGradient;
 }
+
+void ChromoConditions::setGradient(Gradient newGradient) {
+    mGradient = newGradient;
+}
+

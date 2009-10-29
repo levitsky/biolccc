@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "boost/foreach.hpp"
+
 #include "peptidemethods.h"
 #include "math.h"
 
@@ -49,53 +51,41 @@ double PeptideMethods::calculateRTBioLCCC(
     
     // Recalculating dV. By default dV is calculated as flow rate divided by 20.
     double dV;
-    if ( conditions.dV()!= 0 ) {
+    if ( conditions.dV()!= 0.0 ) {
         dV = conditions.dV();
     }
     else {
         dV = conditions.flowRate() / 20.0;
     }
 
-    // Because of the features of the BioLCCC model, size of a pore should be 
+    // Because of the features of the BioLCCC model, size of the pore should be 
     // more than 20A.
-    if (conditions.columnPoreSize() <=15) {
+    if (conditions.columnPoreSize() <= 15) {
         return PORESIZE_ERROR;
     }
 
     // A gradient should start at time 0.
-    if (conditions.beginGradient()->first != 0) {
+    if (conditions.gradient().begin()->time() != 0.0) {
         return GRADIENT_ERROR;
     }
     
     // A gradient should contain at least two points.
-    if ((conditions.beginGradient() == conditions.endGradient()) || 
-        (conditions.beginGradient() == --conditions.endGradient())) {
+    if (conditions.gradient().size() < 2) {
         return GRADIENT_ERROR;
     }
     
     // Converting the x-coordinate of the gradient to the scale of iterations
     // and the y-coordinate to the scale of second solvent concentration.
     std::vector<std::pair<int, double> > convertedGradient;
-    double previousTimePoint = conditions.beginGradient()->first;
     
-    for (std::vector<std::pair<double, double> >::const_iterator 
-        currentGradientPoint = conditions.beginGradient();
-        currentGradientPoint < conditions.endGradient();
-        currentGradientPoint++
-    ) {
-        // Gradient should be ascending in a time.
-        if ((previousTimePoint != conditions.beginGradient()->first) && 
-            (previousTimePoint >= currentGradientPoint->first)) {
-            return GRADIENT_ERROR;
-        }
-        convertedGradient.push_back(std::pair<int,double>(
-            currentGradientPoint->first * conditions.flowRate() / dV,
-            (100.0 - currentGradientPoint->second) / 100.0 *
-            conditions.secondSolventConcentrationA() + 
-            currentGradientPoint->second / 100.0 *
-            conditions.secondSolventConcentrationB()));
-        
-        previousTimePoint = currentGradientPoint->first;
+    BOOST_FOREACH(GradientPoint currentGradientPoint, conditions.gradient()) {
+        convertedGradient.push_back(
+                std::pair<int,double>(
+                    currentGradientPoint.time() * conditions.flowRate() / dV,
+                    (100.0 - currentGradientPoint.concentrationB()) / 100.0 *
+                        conditions.secondSolventConcentrationA() + 
+                        currentGradientPoint.concentrationB() / 100.0 *
+                        conditions.secondSolventConcentrationB()));
     }
     
      // The part of a column passed by molecules. When it exceeds 1.0,

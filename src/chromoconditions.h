@@ -5,9 +5,9 @@
 #include <utility>
 #include <vector>
 
+#include "gradient.h"
+
 //! This class encapsulates all parameters of chromatographic equipment.
-typedef std::pair<double,double>     gradientPoint;
-typedef std::vector<gradientPoint > gradientProfile;
 
 class ChromoConditions {  
     public:
@@ -19,7 +19,8 @@ class ChromoConditions {
         ChromoConditions(double iColumnLength = 150.0,
                          double iColumnDiameter = 0.075,
                          double iColumnPoreSize = 100.0,
-                         gradientProfile iGradient = gradientProfile(),
+                         Gradient iGradient =
+                            Gradient().addPoint(0.0,0.0).addPoint(60.0,50.0),
                          double iSecondSolventConcentrationA = 2.0,
                          double iSecondSolventConcentrationB = 80.0,
                          double iDelayTime = 0.0,
@@ -154,7 +155,7 @@ class ChromoConditions {
             Sets the concentration of the second solvent in the component A.
         */
         void setSecondSolventConcentrationA(
-            double newSecondSolventConcentrationA) const;
+            double newSecondSolventConcentrationA);
 
         /*!
             Returns the concentration of the second solvent in the component B.
@@ -165,23 +166,17 @@ class ChromoConditions {
             Sets the concentration of the second solvent in the component B.
         */
         void setSecondSolventConcentrationB(
-            double newSecondSolventConcentrationB) const;
+            double newSecondSolventConcentrationB);
         
         /*!
-            Returns an interator to the first point of the gradient. The first 
-            value in the pair is time and the second is concentration of
-            the component B.
+            Returns the elution gradient.
         */
-        std::vector<std::pair<double,double> >::const_iterator beginGradient()
-        const;
-        
+        Gradient gradient() const;
+
         /*!
-            Returns an interator to the next to the last point of the gradient.
-            The first value in the pair is time and the second is concentration
-            of the component B.
+            Sets the elution gradient.
         */
-        std::vector<std::pair<double,double> >::const_iterator endGradient()
-        const;
+        void setGradient(Gradient newGradient);
         
     private:
         double mColumnLength;
@@ -194,7 +189,7 @@ class ChromoConditions {
         double mFlowRate;
         double mDV;
         double mDelayTime;
-        gradientProfile mGradient;
+        Gradient mGradient;
         std::string mSecondSolvent;
         double mSecondSolventConcentrationA;
         double mSecondSolventConcentrationB;
