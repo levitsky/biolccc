@@ -1,5 +1,7 @@
 #include "gradient.h" 
 
+namespace BioLCCC {
+
 Gradient::Gradient() {
 }
 
@@ -23,5 +25,7 @@ Gradient Gradient::addPoint(GradientPoint iPoint) {
 Gradient Gradient::addPoint(double iTime, double iConcentrationB) {
     this->addPoint(GradientPoint(iTime, iConcentrationB));
     return (*this);
+}
+
 }
 

@@ -9,7 +9,7 @@
 #include "gradientpoint.h"
 #include "gradient.h"
 #include "chromoconditions.h"
-#include "peptidemethods.h"
+#include "BioLCCC.h"
 %}
 
 // Parse the original header file
@@ -19,7 +19,7 @@
 %include "gradientpoint.h"
 %include "gradient.h"
 %include "chromoconditions.h"
-%include "peptidemethods.h"
+%include "BioLCCC.h"
 
 // Instantiate some templates
 

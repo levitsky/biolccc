@@ -1,5 +1,7 @@
 #include "gradientpoint.h"
 
+namespace BioLCCC {
+
 GradientPoint::GradientPoint(double time,
     double concentrationB
 ) {
@@ -17,5 +19,7 @@ double GradientPoint::time() const{
 
 double GradientPoint::concentrationB() const{
     return mConcentrationB;
+}
+
 }
 

@@ -5,16 +5,20 @@
 %{
 #include "aminoacid.h"
 #include "terminus.h"
-#include "chromoconditions.h"
 #include "chemicalbasis.h"
+#include "gradientpoint.h"
+#include "gradient.h"
+#include "chromoconditions.h"
 #include "peptidemethods.h"
 %}
 
 // Parse the original header file
 %include "aminoacid.h"
 %include "terminus.h"
-%include "chromoconditions.h"
 %include "chemicalbasis.h"
+%include "gradientpoint.h"
+%include "gradient.h"
+%include "chromoconditions.h"
 %include "peptidemethods.h"
 
 // Instantiate some templates

@@ -8,7 +8,7 @@ SET(BioLCCC_SRCS
    gradientpoint.cpp
    gradient.cpp
    chromoconditions.cpp
-   peptidemethods.cpp
+   BioLCCC.cpp
 )
 
 SET(BioLCCC_HDRS
@@ -18,7 +18,7 @@ SET(BioLCCC_HDRS
    gradientpoint.h
    gradient.h
    chromoconditions.h
-   peptidemethods.h
+   BioLCCC.h
 )
 
 ADD_EXECUTABLE(BioLCCC_bin ${BioLCCC_SRCS} ${BioLCCC_HDRS})

@@ -1,5 +1,7 @@
 #include "aminoacid.h"
 
+namespace BioLCCC {
+
 Aminoacid::Aminoacid(std::string name,
     std::string label,
     double bindEnergy,
@@ -32,3 +34,6 @@ double Aminoacid::averageMass() const{
 double Aminoacid::monoisotopicMass() const{
     return mMonoisotopicMass;
 }
+
+}
+

@@ -4,6 +4,8 @@
 //! The GradientPoint class encapsulates all properties of a point of a
 //gradient.
 
+namespace BioLCCC {
+
 class GradientPoint {
     public:
         /*!
@@ -30,4 +32,7 @@ class GradientPoint {
         double mConcentrationB;
 };
 
+}
+
 #endif
+

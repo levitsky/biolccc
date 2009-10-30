@@ -9,6 +9,8 @@
 
 //! This class encapsulates all parameters of chromatographic equipment.
 
+namespace BioLCCC {
+
 class ChromoConditions {  
     public:
         
@@ -193,5 +195,7 @@ class ChromoConditions {
         double mSecondSolventConcentrationA;
         double mSecondSolventConcentrationB;
 };
+
+}
 
 #endif

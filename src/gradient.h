@@ -6,6 +6,8 @@
 
 //! The Gradient class encapsulates all properties of an elution gradient.
 
+namespace BioLCCC {
+
 class Gradient: public std::vector<GradientPoint> {
     public:
         /*!
@@ -34,5 +36,7 @@ class Gradient: public std::vector<GradientPoint> {
         double mTime;
         double mConcentrationB;
 };
+
+}
 
 #endif

@@ -1,23 +1,6 @@
 #include "chromoconditions.h"
 
-// ChromoConditions::ChromoConditions() {
-//      // Setting a protocol "Pilot".
-//     mColumnLength = 150;
-//     mColumnDiameter = 0.075;
-//     mColumnPoreSize = 100;
-//     mColumnVpToVtot = 0.5;
-//     mColumnPorosity = 0.9;
-//     mTemperature = 293;
-//     mCalibrationParameter = 1;
-//     mFlowRate = 0.0003;
-//     mDV = 0;
-//     mDelayTime = 0; 
-//     mSecondSolventConcentrationA = 2;
-//     mSecondSolventConcentrationB = 80;
-//     mSecondSolvent = std::string("ACN");
-//     mGradient.push_back(gradientPoint(0,0));
-//     mGradient.push_back(gradientPoint(60,50));
-// }
+namespace BioLCCC {
 
 ChromoConditions::ChromoConditions(double iColumnLength,
                                    double iColumnDiameter,
@@ -160,5 +143,7 @@ Gradient ChromoConditions::gradient() const {
 
 void ChromoConditions::setGradient(Gradient newGradient) {
     mGradient = newGradient;
+}
+
 }
 

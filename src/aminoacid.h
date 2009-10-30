@@ -5,6 +5,8 @@
 
 //! The Aminoacid class encapsulates all physical properties of an aminoacid.
 
+namespace BioLCCC {
+
 class Aminoacid {
     
     public:
@@ -79,5 +81,7 @@ class Aminoacid {
         double mAverageMass;
         double mMonoisotopicMass;
 };
+
+}
 
 #endif

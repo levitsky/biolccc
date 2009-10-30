@@ -1,13 +1,14 @@
 #include "terminus.h"
 
-Terminus :: Terminus(std::string Name,
-                    std::string Label,
+namespace BioLCCC {
+Terminus :: Terminus(std::string name,
+                    std::string label,
                     double bindEnergy,
                     double averageMass,
                     double monoisotopicMass
 ) {
-    mName = Name;
-    mLabel = Label;
+    mName = name;
+    mLabel = label;
     mAverageMass = averageMass;
     mMonoisotopicMass = monoisotopicMass;
     mBindEnergy = bindEnergy;
@@ -31,4 +32,5 @@ double Terminus::averageMass() const{
 
 double Terminus::monoisotopicMass() const{
     return mMonoisotopicMass;
+}
 }

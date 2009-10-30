@@ -1,6 +1,8 @@
 #include "chemicalbasis.h"
 
-ChemicalBasis :: ChemicalBasis() {
+namespace BioLCCC {
+
+ChemicalBasis::ChemicalBasis() {
     
     //adding standard aminoacids, masses set to zero.
     mAminoacids["A"] = Aminoacid ("Alanine",
@@ -130,36 +132,24 @@ ChemicalBasis :: ChemicalBasis() {
     mSecondSolventBindEnergy = 2.3979;
 }
 
-std::map<std::string,Aminoacid>::const_iterator ChemicalBasis::beginAminoacid() const{
-    return mAminoacids.begin();
+const std::map<std::string,Aminoacid> & ChemicalBasis::aminoacids() const{
+    return mAminoacids;
 }
 
-std::map<std::string,Aminoacid>::const_iterator ChemicalBasis::endAminoacid() const{
-    return mAminoacids.end();
+const std::map<std::string,Terminus> & ChemicalBasis::NTermini() const{
+    return mNTermini;
 }
 
-std::map<std::string,Terminus>::const_iterator ChemicalBasis::beginNTerminus() const{
-    return mNTermini.begin();
+const std::map<std::string,Terminus> & ChemicalBasis::CTermini() const{
+    return mCTermini;
 }
 
-std::map<std::string,Terminus>::const_iterator ChemicalBasis::endNTerminus() const{
-    return mNTermini.end();
+const Terminus & ChemicalBasis::defaultNTerminus() const {
+    return mNTermini.find("H-")->second;
 }
 
-std::map<std::string,Terminus>::const_iterator ChemicalBasis::beginCTerminus() const{
-    return mCTermini.begin();
-}
-
-std::map<std::string,Terminus>::const_iterator ChemicalBasis::endCTerminus() const{
-    return mCTermini.end();
-}
-
-std::map<std::string,Terminus>::const_iterator ChemicalBasis::defaultNTerminus() const {
-    return mNTermini.find("H-");
-}
-
-std::map<std::string,Terminus>::const_iterator ChemicalBasis::defaultCTerminus() const{
-    return mCTermini.find("-COOH");
+const Terminus & ChemicalBasis::defaultCTerminus() const{
+    return mCTermini.find("-COOH")->second;
 }
 
 double ChemicalBasis::secondSolventBindEnergy() const{
@@ -168,4 +158,6 @@ double ChemicalBasis::secondSolventBindEnergy() const{
 
 void ChemicalBasis::setSecondSolventBindEnergy(double newEnergy) {
     mSecondSolventBindEnergy = newEnergy;
+}
+
 }

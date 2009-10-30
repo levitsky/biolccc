@@ -63,17 +63,18 @@
  
 #include <iostream>
 
-#include "peptidemethods.h"
+#include "BioLCCC.h"
 
 int main(int argc, char* argv[]) {
     std::string name;
 
-    ChemicalBasis standardChemicalBasis;
-    ChromoConditions chromatograph;
+    BioLCCC::ChemicalBasis standardChemicalBasis;
+    BioLCCC::ChromoConditions chromatograph;
     //std::cout << PeptideMethods::calculateMonoisotopicMass("FFF", 
     //             standardChemicalBasis) << "\n";
-    std::cout << "RT: " << PeptideMethods::calculateRTBioLCCC("FFRSDK", 
-                           standardChemicalBasis, chromatograph) << "\n";
+    std::cout << "RT: " << BioLCCC::calculateRT("FFRSDK", 
+                            chromatograph, standardChemicalBasis) << "\n";
 
     return 1;
 }
+
