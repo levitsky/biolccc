@@ -14,6 +14,13 @@ class Gradient: public std::vector<GradientPoint> {
         Gradient();
 
         /*!
+            Constructs linear elution gradient.
+        */
+        Gradient(double initialConcentrationB,
+                 double finalConcentrationB,
+                 double time);
+
+        /*!
             Adds a new point to the gradient.
         */
         Gradient addPoint(GradientPoint iPoint);

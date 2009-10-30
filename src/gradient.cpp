@@ -3,6 +3,13 @@
 Gradient::Gradient() {
 }
 
+Gradient::Gradient(double initialConcentrationB,
+         double finalConcentrationB,
+         double time) {
+    this->addPoint(GradientPoint(0.0, initialConcentrationB));
+    this->addPoint(GradientPoint(time, finalConcentrationB));
+}
+
 Gradient Gradient::addPoint(GradientPoint iPoint) {
     //TODO: add exceptions here!!
     // Each new point should be later than the previous one.

@@ -19,8 +19,7 @@ class ChromoConditions {
         ChromoConditions(double iColumnLength = 150.0,
                          double iColumnDiameter = 0.075,
                          double iColumnPoreSize = 100.0,
-                         Gradient iGradient =
-                            Gradient().addPoint(0.0,0.0).addPoint(60.0,50.0),
+                         Gradient iGradient = Gradient(0.0, 50.0, 60.0),
                          double iSecondSolventConcentrationA = 2.0,
                          double iSecondSolventConcentrationB = 80.0,
                          double iDelayTime = 0.0,
