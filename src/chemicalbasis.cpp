@@ -2,6 +2,7 @@
 
 namespace BioLCCC {
 
+//TODO: make addAminoacid method!
 ChemicalBasis::ChemicalBasis() {
     
     //adding standard aminoacids, masses set to zero.
@@ -15,6 +16,11 @@ ChemicalBasis::ChemicalBasis() {
                                 1.2955,
                                 103.1388,
                                 103.00919);
+    mAminoacids["camC"] = Aminoacid ("Carboxyamidomethylated cysteine",
+                                "camC",
+                                0.77,
+                                160.1901,
+                                160.03065);
     mAminoacids["D"] = Aminoacid ("Aspartic_acid",
                                 "D",
                                 0.7805,
@@ -85,11 +91,21 @@ ChemicalBasis::ChemicalBasis() {
                                 0.6975,
                                 87.0782,
                                 87.03203);
+    mAminoacids["pS"] = Aminoacid ("Phosphorylated serine",
+                                "pS",
+                                0.45,
+                                167.0581,
+                                166.99836);
     mAminoacids["T"] = Aminoacid ("Threonine",
                                 "T",
                                 0.8755,
                                 101.1051,
                                 101.04768);
+    mAminoacids["pT"] = Aminoacid ("Phosphorylated threonine",
+                                "pT",
+                                0.74,
+                                181.085,
+                                181.01401);
     mAminoacids["V"] = Aminoacid ("Valine",
                                 "V",
                                 1.7505,
@@ -105,6 +121,11 @@ ChemicalBasis::ChemicalBasis() {
                                 1.6855,
                                 163.176,
                                 163.06333);
+    mAminoacids["pY"] = Aminoacid ("Phosphorylated tyrosine",
+                                "Y",
+                                1.32,
+                                243.1559,
+                                243.02966);
                                     
     //adding standard terminal groups
     mNTermini["H-"] = Terminus ("N-terminal hydrogen",

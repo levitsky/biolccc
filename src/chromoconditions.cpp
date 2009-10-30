@@ -9,7 +9,6 @@ ChromoConditions::ChromoConditions(double iColumnLength,
                                    double iSecondSolventConcentrationA,
                                    double iSecondSolventConcentrationB,
                                    double iDelayTime,
-                                   std::string iSecondSolvent,
                                    double iFlowRate,
                                    double iDV,
                                    double iCalibrationParameter,
@@ -28,7 +27,8 @@ ChromoConditions::ChromoConditions(double iColumnLength,
     mFlowRate = iFlowRate;
     mDV = iDV;
     mDelayTime = iDelayTime; 
-    mSecondSolvent = iSecondSolvent;
+    //TODO: change the behaviour of the second solvent.
+    mSecondSolvent = "nothing";
     mSecondSolventConcentrationA = iSecondSolventConcentrationA;
     mSecondSolventConcentrationB = iSecondSolventConcentrationB;
 }

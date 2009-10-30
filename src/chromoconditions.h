@@ -25,7 +25,6 @@ class ChromoConditions {
                          double iSecondSolventConcentrationA = 2.0,
                          double iSecondSolventConcentrationB = 80.0,
                          double iDelayTime = 0.0,
-                         std::string iSecondSolvent = std::string("ACN"),
                          double iFlowRate = 0.0003,
                          double iDV = 0.0,
                          double iCalibrationParameter = 1.0,
