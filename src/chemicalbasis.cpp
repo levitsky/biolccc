@@ -122,7 +122,7 @@ ChemicalBasis::ChemicalBasis() {
                                 163.176,
                                 163.06333);
     mAminoacids["pY"] = Aminoacid ("Phosphorylated tyrosine",
-                                "Y",
+                                "pY",
                                 1.32,
                                 243.1559,
                                 243.02966);
