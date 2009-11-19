@@ -376,7 +376,8 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
     BOOST_FOREACH(GradientPoint currentGradientPoint, conditions.gradient()) {
         convertedGradient.push_back(
                 std::pair<int,double>(
-                    currentGradientPoint.time() * conditions.flowRate() / dV,
+                    floor(currentGradientPoint.time() * conditions.flowRate()
+                        / dV),
                     (100.0 - currentGradientPoint.concentrationB()) / 100.0 *
                         conditions.secondSolventConcentrationA() + 
                         currentGradientPoint.concentrationB() / 100.0 *
@@ -408,12 +409,12 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                 // We could calculate the isocratic part of gradient more 
                 // efficiently due to the constancy of Kd.
                 if (currentGradientPoint->second == 
-                    previousGradientPoint -> second) {
+                    previousGradientPoint->second) {
                     // One case is that a peptide elutes during this section or
                     // the section is the last.
-                    if (((1 - S) / dV * 
+                    if (((1.0 - S) / dV * 
                         calculateKd(peptideEnergyProfile, 
-                            secondSolventConcentration, 
+                            currentGradientPoint->second, 
                             chemBasis, 
                             conditions.columnPoreSize(), 
                             conditions.calibrationParameter(),
@@ -422,25 +423,26 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                         
                         (currentGradientPoint == --convertedGradient.end()))
                     {
-                        j += ceil((1 - S) / dV * 
-                                 calculateKd(peptideEnergyProfile, 
-                                     secondSolventConcentration,
-                                     chemBasis,
-                                     conditions.columnPoreSize(),
-                                     conditions.calibrationParameter(),
-                                     conditions.temperature())*volumePore) - 1;
+                        j += ceil((1.0 - S) / dV * 
+                            calculateKd(peptideEnergyProfile, 
+                                currentGradientPoint->second,
+                                chemBasis,
+                                conditions.columnPoreSize(),
+                                conditions.calibrationParameter(),
+                                conditions.temperature()) * volumePore);
                          break;
                     }
-                    // Another case is that this section is not enough for 
+                    // Another case is that this section is not long enough for 
                     // a peptide to elute.
                     else {
                         S += dV / calculateKd(peptideEnergyProfile,
-                                      secondSolventConcentration, 
+                                      currentGradientPoint->second, 
                                       chemBasis,
                                       conditions.columnPoreSize(), 
                                       conditions.calibrationParameter(),
                                       conditions.temperature()) /
-                             volumePore * (currentGradientPoint->first - j + 1);
+                             volumePore * (currentGradientPoint->first -
+                                           previousGradientPoint->first);
                         j = currentGradientPoint->first;
                     }
                 }
