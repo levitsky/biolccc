@@ -300,7 +300,7 @@ double calculateKd(
         for (int i = 0; i < poreSteps; i++) {
             for (int j = 0; j < poreSteps; j++) {
                 densityBuffer[i] = densityBuffer[i] + density[j] * 
-                    transitionMatrix[ j + i * poreSteps];
+                    transitionMatrix[j + i * poreSteps];
             }
         } 
 
