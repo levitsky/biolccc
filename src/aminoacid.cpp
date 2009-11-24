@@ -35,5 +35,8 @@ double Aminoacid::monoisotopicMass() const{
     return mMonoisotopicMass;
 }
 
+void Aminoacid::setBindEnergy(double newBindEnergy){
+    mBindEnergy = newBindEnergy;
+}
 }
 

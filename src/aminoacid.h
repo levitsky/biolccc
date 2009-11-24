@@ -73,6 +73,11 @@ class Aminoacid {
             part of code will be rewrited.
         */
         double bindEnergy() const;
+
+        /*!
+            Set the binding energy value.
+        */
+        void setBindEnergy(double newBindEnergy);
     
     private:
         std::string mName;

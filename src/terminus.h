@@ -68,6 +68,11 @@ class Terminus {
             part of code will be rewrited.
         */
         double bindEnergy() const;
+
+        /*!
+            Sets the binding energy value.
+        */
+        void setBindEnergy(double newBindEnergy);
     
     private:
         std::string mName;

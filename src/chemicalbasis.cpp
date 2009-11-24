@@ -204,4 +204,25 @@ bool ChemicalBasis::removeNTerminus(std::string label){
 bool ChemicalBasis::removeCTerminus(std::string label){
     return (bool) mCTermini.erase(label);
 }
+
+bool ChemicalBasis::setAminoacidBindEnergy(std::string label, double newBindEnergy){
+    std::map<std::string,Aminoacid>::iterator it = mAminoacids.find(label);
+    if (it == mAminoacids.end()) return false;
+    it->second.setBindEnergy(newBindEnergy);
+    return true;
+}
+
+bool ChemicalBasis::setNTerminusBindEnergy(std::string label, double newBindEnergy){
+    std::map<std::string,Terminus>::iterator it = mNTermini.find(label);
+    if (it == mNTermini.end()) return false;
+    it->second.setBindEnergy(newBindEnergy);
+    return true;
+}
+
+bool ChemicalBasis::setCTerminusBindEnergy(std::string label, double newBindEnergy){
+    std::map<std::string,Terminus>::iterator it = mCTermini.find(label);
+    if (it == mCTermini.end()) return false;
+    it->second.setBindEnergy(newBindEnergy);
+    return true;
+}
 }

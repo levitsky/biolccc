@@ -78,11 +78,13 @@ class ChemicalBasis {
             Adds a new aminoacid
         */
         void addAminoacid(Aminoacid newAminoacid);
-         /*!
+
+        /*!
             Adds a new N-terminus
         */
         void addNTerminus(Terminus newNTerminus);
-         /*!
+
+        /*!
             Adds a new C-terminus
         */
         void addCTerminus(Terminus newCTerminus);
@@ -91,14 +93,34 @@ class ChemicalBasis {
             Removes the aminoacid with the given label; returns 'true' on success
         */
         bool removeAminoacid (std::string label);
+
         /*!
             Removes the N-terminus with the given label; returns 'true' on success
         */
         bool removeNTerminus (std::string label);
+
         /*!
             Removes the C-terminus with the given label; returns 'true' on success
         */
         bool removeCTerminus (std::string label);
+
+        /*!
+            Sets the value of binding energy for the aminoacid with the given label;
+            returns 'true' on success or 'false' if the aminoacid is not found.
+        */
+        bool setAminoacidBindEnergy (std::string label, double newBindEnergy);
+
+        /*!
+            Sets the value of binding energy for the N-terminus with the given label;
+            returns 'true' on success or 'false' if the aminoacid is not found.
+        */
+        bool setNTerminusBindEnergy (std::string label, double newBindEnergy);
+
+        /*!
+            Sets the value of binding energy for the C-terminus with the given label;
+            returns 'true' on success or 'false' if the aminoacid is not found.
+        */
+        bool setCTerminusBindEnergy (std::string label, double newBindEnergy);
         
     private:
         std::map<std::string,Aminoacid> mAminoacids;

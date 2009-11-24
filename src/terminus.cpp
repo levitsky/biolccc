@@ -33,4 +33,8 @@ double Terminus::averageMass() const{
 double Terminus::monoisotopicMass() const{
     return mMonoisotopicMass;
 }
+
+void Terminus::setBindEnergy(double newBindEnergy){
+    mBindEnergy = newBindEnergy;
+}
 }
