@@ -73,6 +73,32 @@ class ChemicalBasis {
             is bind energy of water and the unit is kT.
         */
         void setSecondSolventBindEnergy(double newEnergy);
+
+        /*!
+            Adds a new aminoacid
+        */
+        void addAminoacid(Aminoacid newAminoacid);
+         /*!
+            Adds a new N-terminus
+        */
+        void addNTerminus(Terminus newNTerminus);
+         /*!
+            Adds a new C-terminus
+        */
+        void addCTerminus(Terminus newCTerminus);
+
+        /*!
+            Removes the aminoacid with the given label; returns 'true' on success
+        */
+        bool removeAminoacid (std::string label);
+        /*!
+            Removes the N-terminus with the given label; returns 'true' on success
+        */
+        bool removeNTerminus (std::string label);
+        /*!
+            Removes the C-terminus with the given label; returns 'true' on success
+        */
+        bool removeCTerminus (std::string label);
         
     private:
         std::map<std::string,Aminoacid> mAminoacids;

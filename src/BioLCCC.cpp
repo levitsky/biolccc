@@ -423,7 +423,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                         
                         (currentGradientPoint == --convertedGradient.end()))
                     {
-                        j += ceil((1.0 - S) / dV * 
+                        j += (int)ceil((1.0 - S) / dV *
                             calculateKd(peptideEnergyProfile, 
                                 currentGradientPoint->second,
                                 chemBasis,
