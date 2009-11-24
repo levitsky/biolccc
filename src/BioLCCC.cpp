@@ -224,12 +224,12 @@ double calculateKd(
     // A density is distributed uniformely over all layers of the lattice, 
     // except for the wall layers. There a density is multiplied by Boltzmann 
     // factor due to interaction of a residue with a solid phase.
-    density[0] = boltzmannFactorProfile[ boltzmannFactorProfile.size() - 1 ];
+    density[0] = boltzmannFactorProfile[0];
     for (int i = 1; i < poreSteps - 1 ; i++) {
         density[i] = 1;
     }
     density[poreSteps - 1] = 
-        boltzmannFactorProfile[boltzmannFactorProfile.size() - 1];
+        boltzmannFactorProfile[0];
 
     // Than we construct a basis for the transition matrix. The basis is 
     // a diagonal matrix with 4.0/6.0 on the main diagonal and 1.0/6.0 on 
@@ -266,7 +266,7 @@ double calculateKd(
     
     // Filling the n-th row.
     for (int i = poreSteps * (poreSteps - 1); 
-         i < ( poreSteps * poreSteps - 2); 
+         i < (poreSteps * poreSteps - 2); 
          i++) {
         transitionMatrix[i] = 0.0;
     }
@@ -276,9 +276,9 @@ double calculateKd(
     // On the each step we calculate a density vector for the n-th aminoacid 
     // residue by multiplication of the transition matrix and the density vector
     // for the (n-1)th residue.
-    for (std::vector<double>::const_reverse_iterator residueBoltzmannFactor =
-             ++boltzmannFactorProfile.rbegin();
-         residueBoltzmannFactor != boltzmannFactorProfile.rend();
+    for (std::vector<double>::const_iterator residueBoltzmannFactor =
+             ++boltzmannFactorProfile.begin();
+         residueBoltzmannFactor != boltzmannFactorProfile.end();
          residueBoltzmannFactor++
     ) {
         // Elements of the first and the last rows of the transition matrix are

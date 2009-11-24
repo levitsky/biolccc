@@ -64,16 +64,29 @@
 #include <iostream>
 
 #include "BioLCCC.h"
+#include "./boost/foreach.hpp"
 
 int main(int argc, char* argv[]) {
     std::string name;
 
     BioLCCC::ChemicalBasis standardChemicalBasis;
     BioLCCC::ChromoConditions chromatograph;
-    //std::cout << PeptideMethods::calculateMonoisotopicMass("FFF", 
-    //             standardChemicalBasis) << "\n";
-    std::cout << "RT: " << BioLCCC::calculateRT("FFRSDK", 
-                            chromatograph, standardChemicalBasis) << "\n";
+    std::vector<std::string> peptideList;
+    peptideList.push_back("KYIPGTK");
+    peptideList.push_back("YIPGTK");
+    peptideList.push_back("IFVQK");
+    peptideList.push_back("KTGQAPGFSYTDANK");
+    peptideList.push_back("TGQAPGFSYTDANK");
+    peptideList.push_back("GEREDLIAYLKK");
+    peptideList.push_back("TGPNLHGLFGR");
+    peptideList.push_back("MIFAGIK");
+    peptideList.push_back("EDLIAYLK");
+    peptideList.push_back("IFVQKCAQCHTVEK");
+    peptideList.push_back("GITWGEETLMEYLENPKK");
+    peptideList.push_back("GITWGEETLMEYLENPK");
+    BOOST_FOREACH(std::string peptide, peptideList) {
+        std::cout << peptide << ": " << BioLCCC::calculateRT(peptide) << "\n";
+    }
 
     return 1;
 }

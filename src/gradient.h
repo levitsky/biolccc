@@ -31,10 +31,6 @@ class Gradient: public std::vector<GradientPoint> {
             Adds a new point to the gradient in more convenient way.
         */
         Gradient addPoint(double iTime, double iConcentrationB);
-
-    private:
-        double mTime;
-        double mConcentrationB;
 };
 
 }
