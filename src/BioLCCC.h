@@ -64,6 +64,16 @@ bool calculatePeptideProperties(const std::string &sequence,
     double *RTBioLCCC,
     double *averageMass,
     double *monoisotopicMass);
+
+/*!
+    Finds the minimum point of the optimized function by brute force method.
+*/
+std::vector<double> findMinimumBruteForce(
+        std::unary_function<void,double> optimizedFunction,
+        std::vector< std::unary_function<double,void> > coordinateSetters,
+        std::vector<double> lowerBounds,
+        std::vector<double> upperBounds,
+        std::vector<double> steps);
 }
 
 #endif
