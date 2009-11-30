@@ -1,7 +1,6 @@
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(BioLCCC_SRCS 
-   main.cpp
    aminoacid.cpp
    terminus.cpp
    chemicalbasis.cpp
@@ -21,7 +20,8 @@ SET(BioLCCC_HDRS
    BioLCCC.h
 )
 
-ADD_EXECUTABLE(BioLCCC_bin ${BioLCCC_SRCS} ${BioLCCC_HDRS})
+ADD_EXECUTABLE(BioLCCC_bin main.cpp ${BioLCCC_SRCS} ${BioLCCC_HDRS})
+ADD_EXECUTABLE(BioLCCC_test tests.cpp ${BioLCCC_SRCS} tests.h ${BioLCCC_HDRS})
 
 IF(UNIX)
     add_definitions(-Wall -O2)

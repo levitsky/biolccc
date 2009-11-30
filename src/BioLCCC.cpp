@@ -627,34 +627,6 @@ bool calculatePeptideProperties(const std::string &sequence,
     }
 }
 
-std::vector<double> findMinimumBruteForce(
-        std::unary_function<void,double> optimizedFunction,
-        std::vector< std::unary_function<double,void> > coordinateSetters,
-        std::vector<double> lowerBounds,
-        std::vector<double> upperBounds,
-        std::vector<double> steps){
 
-    double currentMinimumValue;
-    std::vector<double> currentMinimumPoint, v;
-    v = currentMinimumPoint = lowerBounds;
-    int dim = coordinateSetters.size();
-
-    /* initialize currentMinimumValue with the value at lowerBounds */
-    for(int i = 0; i < dim; i++) coordinateSetters[i](lowerBounds[i]);
-    currentMinimumValue = optimizedFunction();
-
-    /* find minimum */
-    for(int i = 0; i < dim; i++){ //'i' is the number of the current coordinate
-        for(v[i] = lowerBounds[i], coordinateSetters[i](lowerBounds[i]);
-        v[i] < upperBounds[i];
-        coordinateSetters[i](v[i]+= steps[i])){ //searching the i-th coordinate
-            if(double f = optimizedFunction() < currentMinimumValue){
-                currentMinimumValue = f;
-                currentMinimumPoint = v;
-            }
-        }
-    }
-    return currentMinimumPoint;
-}
 }
 
