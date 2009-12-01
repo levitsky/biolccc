@@ -65,75 +65,86 @@ bool calculatePeptideProperties(const std::string &sequence,
     double *averageMass,
     double *monoisotopicMass);
 
-namespace {
+/*!
+    Finds the minimum point of the optimized function with brute force method.
+*/
+template<class optimizedFunctionType, class setterFunctionType>
+std::vector<double> findMinimumBruteForce (optimizedFunctionType optimizedFunction,
+                                           std::vector<setterFunctionType> coordinateSetters,
+                                           std::vector<double> lowerBounds,
+                                           std::vector<double> upperBounds,
+                                           std::vector<double> steps) {
 
-    /*!
-        Recursive function for minimum point search
-    */
-    template<class optimizedFunctionType, class setterFunctionType>
-    std::vector<double> optimizeCoordinates (optimizedFunctionType optimizedFunction,
-                               std::vector<setterFunctionType> coordinateSetters,
-                               std::vector<double> lowerBounds,
-                               std::vector<double> upperBounds,
-                               std::vector<double> steps) {
-         int dim = coordinateSetters.size();
-         if (! dim == lowerBounds.size() == upperBounds.size() == steps.size()) {
-             std::cout << "optimizeCoordinate error: vector sizes are not equal.\n";
-             return lowerBounds;
-         }
+    int dim = coordinateSetters.size(); //dimension of vector parameters
 
-         std::vector<double> minimumPoint;
-         double minPoint, curPoint, minValue, curValue;
+    if (! dim == lowerBounds.size() == upperBounds.size() == steps.size()) {
+         std::cout << "findMinimumBruteForce error: vector sizes are not equal.\n";
+         return lowerBounds;
+    }
 
-         if (dim == 1) {
-             coordinateSetters[0](lowerBounds[0]);
-             minValue = optimizedFunction();
-             for (minPoint = curPoint = lowerBounds[0];
-             curPoint < upperBounds[0];
-             coordinateSetters[0](curPoint += steps[0])) {
-                 curValue = optimizedFunction();
-                 if (curValue < minValue) {
-                     minValue = curValue;
-                     minPoint = curPoint;
-                 }
-             }
-             minimumPoint[0] = minPoint;
-             return minimumPoint;
-         }
+    // Initialize minValue with the value at lower bound
+    for(int i = 0; i < dim; i++) coordinateSetters[i](lowerBounds[i]);
+    double minValue = optimizedFunction();
 
-         std::vector<setterFunctionType> newCoordinateSetters = coordinateSetters;
-         std::vector<double> newLowerBounds = lowerBounds;
-         std::vector<double> newUpperBounds = upperBounds;
-         std::vector<double> newSteps = steps;
-         newCoordinateSetters.pop_back();
-         newLowerBounds.pop_back();
-         newUpperBounds.pop_back();
-         newSteps.pop_back();
+//    std::cout << "optimizeCoordinates called with dim = " << dim << ".\n";
 
-         for(minPoint = curPoint = lowerBounds[dim-1];
-             curPoint < upperBounds[dim-1];
-             coordinateSetters[dim-1](curPoint += steps[dim-1])) {
+    if (dim == 1) {
+        double minPoint = lowerBounds[0];
+        double curValue;
+        for (double curPoint = lowerBounds[0];
+        curPoint <= upperBounds[0];
+        curPoint += steps[0]) {
+            coordinateSetters[0](curPoint);
+            curValue = optimizedFunction();
+            if (curValue < minValue) {
+                minValue = curValue;
+                minPoint = curPoint;
+            }
+        }
+        return std::vector<double>(1, minPoint);
+    }
 
-             std::vector<double> subMin = optimizeCoordinates (optimizedFunction,
-                                             newCoordinateSetters,
-                                             newLowerBounds,
-                                             newUpperBounds,
-                                             newSteps);
-             curValue = optimizedFunction();
-             if(curValue < minValue) {
-                 minValue = curValue;
-                 minimumPoint = subMin;
-                 minimumPoint.push_back(curPoint);
-             }
-         }
-     }
+    std::vector<setterFunctionType> newCoordinateSetters = coordinateSetters;
+    std::vector<double> newLowerBounds = lowerBounds;
+    std::vector<double> newUpperBounds = upperBounds;
+    std::vector<double> newSteps = steps;
+    newCoordinateSetters.pop_back();
+    newLowerBounds.pop_back();
+    newUpperBounds.pop_back();
+    newSteps.pop_back();
 
+    double minPoint = lowerBounds.back();
+    coordinateSetters.back()(lowerBounds.back());
+    std::vector<double> subMin;
+    std::vector<double> minimumPoint;
+    double curValue;
+    for(double curPoint = lowerBounds.back();
+        curPoint <= upperBounds.back();
+        curPoint += steps.back()) {
 
+            /* find minimum for coordinates 0 .. dim-1 and the current value of the last coordinate */
+            coordinateSetters.back()(curPoint);
+            subMin = findMinimumBruteForce(optimizedFunction,
+                                           newCoordinateSetters,
+                                           newLowerBounds,
+                                           newUpperBounds,
+                                           newSteps);
+            for(int i = 0; i < newCoordinateSetters.size(); i++) {
+                newCoordinateSetters[i](subMin[i]);
+            }
+            curValue = optimizedFunction();
+            if (curValue < minValue) {
+                minValue = curValue;
+                minimumPoint = subMin;
+                minimumPoint.push_back(curPoint);
+            }
+    }
+    return minimumPoint;
 }
 
-/*!
-    Finds the minimum point of the optimized function by brute force method.
-*/
+
+
+/*
 template<class optimizedFunctionType, class setterFunctionType>
 std::vector<double> findMinimumBruteForce(
         optimizedFunctionType optimizedFunction,
@@ -149,20 +160,20 @@ std::vector<double> findMinimumBruteForce(
     int dim = coordinateSetters.size();
 
     /* check the equality of all vectors' dimensions */
-    if (! dim == lowerBounds.size() == upperBounds.size() == steps.size()) {
+ /*   if (! dim == lowerBounds.size() == upperBounds.size() == steps.size()) {
         std::cout << "findMinimumBruteForce error: vector sizes are not equal.\n";
         return lowerBounds;
     }
 
     /* initialize currentMinimumValue with the value at lowerBounds */
-    for(int i = 0; i < dim; i++) coordinateSetters[i](lowerBounds[i]);
+/*    for(int i = 0; i < dim; i++) coordinateSetters[i](lowerBounds[i]);
     currentMinimumValue = optimizedFunction();
 
-    std::cout << "dim = " << dim << "\n";
-    std::cout << "Initialized by " << currentMinimumValue << "\n";
+//    std::cout << "dim = " << dim << "\n";
+//    std::cout << "Initialized by " << currentMinimumValue << "\n";
 
     /* find minimum */
-    return optimizeCoordinates(optimizedFunction,
+ /*   return optimizeCoordinates(optimizedFunction,
                         coordinateSetters,
                         lowerBounds,
                         upperBounds,
@@ -178,8 +189,8 @@ std::vector<double> findMinimumBruteForce(
             }
         }
     }*/
-    return currentMinimumPoint;
-}
+//    return currentMinimumPoint;
+/*}*/
 }
 
 #endif
