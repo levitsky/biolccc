@@ -627,6 +627,5 @@ bool calculatePeptideProperties(const std::string &sequence,
     }
 }
 
-
 }
 

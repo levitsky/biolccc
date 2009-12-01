@@ -46,6 +46,11 @@ int main () {
 
     std::vector<double> min;
     min = BioLCCC::findMinimumBruteForce(calc, setters, low, high, steps);
-    std::cout << "Minimum at (" << min[0] << ", " << min[1] << ", " << min[2] << ").\n";
+    std::cout << "BruteForce: Minimum at (" << min[0] << ", " << min[1] << ", " << min[2] << ").\n";
+
+    std::vector<double> initialPoint;
+    initialPoint.push_back(0.0); initialPoint.push_back(0.0); initialPoint.push_back(0.0);
+    min = BioLCCC::findMinimumGradientDescent(calc, setters, initialPoint, steps, 0.1);
+    std::cout << "GradientDescent: Minimum at (" << min[0] << ", " << min[1] << ", " << min[2] << ").\n";
     return 1;
 }
