@@ -13,7 +13,7 @@ BioLCCC::BruteForceTester::BruteForceTester () {
 }
 
 double BioLCCC::BruteForceTester::calculate (void) {
-    return ((x-3)*(x-3) + (y-2)*(y-2) + (z-1)*(z-1));
+    return ((x-3)*(x-3) + (y-2)*(y-2) + (z-1)*(z-1) + 2.0*((x-4)*(x-4) + (y+1)*(y+1) + (z+3)*(z+3)));
 }
 
 void BioLCCC::BruteForceTester::set_x (double new_x) {
@@ -42,7 +42,7 @@ int main () {
     std::vector<double> high;
     high.push_back(5.0); high.push_back(5.0); high.push_back(5.0);
     std::vector<double> steps;
-    steps.push_back(.5); steps.push_back(.5); steps.push_back(.5);
+    steps.push_back(.05); steps.push_back(.05); steps.push_back(.05);
 
     std::vector<double> min;
     min = BioLCCC::findMinimumBruteForce(calc, setters, low, high, steps);
@@ -50,7 +50,7 @@ int main () {
 
     std::vector<double> initialPoint;
     initialPoint.push_back(0.0); initialPoint.push_back(0.0); initialPoint.push_back(0.0);
-    min = BioLCCC::findMinimumGradientDescent(calc, setters, initialPoint, steps, 0.1);
+    min = BioLCCC::findMinimumGradientDescent(calc, setters, initialPoint, steps, 0.001);
     std::cout << "GradientDescent: Minimum at (" << min[0] << ", " << min[1] << ", " << min[2] << ").\n";
     return 1;
 }
