@@ -1,6 +1,7 @@
 #ifndef PEPTIDEMETHODS_H
 #define PEPTIDEMETHODS_H
 
+#include <math.h>
 #include "chemicalbasis.h"
 #include "chromoconditions.h"
 
@@ -17,10 +18,10 @@ namespace BioLCCC {
 namespace {
 
 double VectorNorm (std::vector<double> vector) {
-double norm = 0.0;
+double norm2 = 0.0;
 for(int i = 0; i < vector.size(); i++)
-    norm += (vector[i] * vector[i]);
-return norm;
+    norm2 += (vector[i] * vector[i]);
+return sqrt(norm2);
 }
 
 template<class optimizedFunctionType, class setterFunctionType>
@@ -85,9 +86,10 @@ std::vector<double> findBestPointOnLine(
         }
         valueAtNewPoint = optimizedFunction();
 
-        if(valueAtNewPoint < valueAtCurrentPoint) { //compare; if the 'further value is better...
-            for(int i = 0; i < dim; i++)
+        if(valueAtNewPoint < valueAtCurrentPoint) { //compare; if the 'further' value is better...
+            for(int i = 0; i < dim; i++) {
                 currentPoint[i] += step*direction[i];   //... then make a step forward
+            }
             step *= 2.;                                 //... and double the step length
         }
         else {                                          //else
@@ -95,13 +97,13 @@ std::vector<double> findBestPointOnLine(
             coordinateSetters[i](currentPoint[i] - step*direction[i]);  //look at the value 1 step back
             }
             valueAtNewPoint = optimizedFunction();
-            if(valueAtNewPoint < valueAtCurrentPoint)                   //if the value there is better...
-                for(int i = 0; i < dim; i++) {
-                    currentPoint[i] -= step*direction[i];               //...then make a tep back
-                    step *= 2.;                                         //...and double the step length
-                }
-            else                                                        //or, if neither direction is OK
-                step /= 2.;                                             //decrease the step length 2-fold
+            if(valueAtNewPoint < valueAtCurrentPoint) {     //if the value there is better...
+                for(int i = 0; i < dim; i++)
+                    currentPoint[i] -= step*direction[i];   //...then make a step back
+                step *= 2.;                                 //...and double the step length
+            }
+            else                                            //or, if neither direction is OK
+                step /= 2.;                                 //decrease the step length 2-fold
         }
     }
     return currentPoint;
@@ -214,7 +216,7 @@ std::vector<double> findMinimumBruteForce (optimizedFunctionType optimizedFuncti
         curPoint <= upperBounds.back();
         curPoint += steps.back()) {
 
-            /* find minimum for coordinates 0 .. dim-1 and the current value of the last coordinate */
+            /* find minimum for coordinates 0 .. dim-1 at the current value of the last coordinate */
             coordinateSetters.back()(curPoint);
             subMin = findMinimumBruteForce(optimizedFunction,
                                            newCoordinateSetters,
@@ -268,8 +270,10 @@ std::vector<double> findMinimumGradientDescent(
                                                epsilon);
         for(int i = 0; i < dim; i++)
             shift[i] = currentPoint[i] - currentBestPoint[i];
+
         if(VectorNorm(shift) < epsilon)
             break;
+        currentPoint = currentBestPoint;
     }
     return currentPoint;
 }
