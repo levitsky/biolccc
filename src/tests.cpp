@@ -50,7 +50,7 @@ int main () {
 
     std::vector<double> initialPoint;
     initialPoint.push_back(0.0); initialPoint.push_back(0.0); initialPoint.push_back(0.0);
-    min = BioLCCC::findMinimumGradientDescent(calc, setters, initialPoint, steps, 0.001);
+    min = BioLCCC::findMinimumGradientDescent(calc, setters, initialPoint, steps, 1.0e-10);
     std::cout << "GradientDescent: Minimum at (" << min[0] << ", " << min[1] << ", " << min[2] << ").\n";
-    return 1;
+    return 0;
 }

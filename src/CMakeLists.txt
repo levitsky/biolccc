@@ -11,6 +11,7 @@ SET(BioLCCC_SRCS
 )
 
 SET(BioLCCC_HDRS
+   auxiliary.hpp
    aminoacid.h
    terminus.h
    chemicalbasis.h
