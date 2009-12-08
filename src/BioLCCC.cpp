@@ -4,7 +4,6 @@
 #include "boost/function.hpp"
 #include "boost/bind.hpp"
 #include "BioLCCC.h"
-//#include "math.h"
 
 #define MEMORY_ERROR   -2.0
 #define PARSING_ERROR  -3.0
@@ -657,10 +656,8 @@ ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
                                ChemicalBasis initialChemicalBasis,
                                std::vector<std::string> energiesToCalibrate) {
 
+    // Generate the list of setter functions out of 'energiesToCalibrate'
     ChemicalBasis newChemicalBasis = initialChemicalBasis;
-
-    /* Generate the list of setter functions out of 'energiesToCalibrate' */
-
     std::vector< boost::function<void(double)> > setters;
     for(int i = 0; i < energiesToCalibrate.size(); i++) {
         if (initialChemicalBasis.aminoacids().find(energiesToCalibrate[i]) !=
@@ -689,13 +686,14 @@ ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
                  }
 
     }
-/*    std::vector<double> calculatedRetentionTimes;
+
+    std::vector<double> calculatedRetentionTimes;
     for(int i = 0; i < calibrationMixture.size(); i++) {
         calculatedRetentionTimes.push_back(calculateRT(calibrationMixture[i],
                                            chromatograph, newChemicalBasis));
     }
 
-    struct PenFunc {
+/*    struct PenFunc {
         double operator()(std::vector<double> calculatedRetentionTimes,
                           std::vector<double> experimentalRetentionTimes) {
             std::vector<double> diffSquares = VectorDiff(
@@ -706,13 +704,37 @@ ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
     };
 
     PenFunc penFunc;
-
+*/
     boost::function<double(void)> penaltyFunction = boost::bind(
-        boost::bind(VectorNorm, boost::bind(VectorDiff, _1, _2)),
+        boost::bind(vectorNorm<double>, boost::bind(VectorDiff, _1, _2)),
         calculatedRetentionTimes,
-        retentionTimes);*/
+        retentionTimes);
 
+    std::vector<double> lowerBounds, upperBounds, steps, gradientSteps;
+    for(int i = 0; i < setters.size(); i++) {
+        lowerBounds.push_back(0.0);
+        upperBounds.push_back(3.0);
+        steps.push_back(0.5);
+        gradientSteps.push_back(0.001);
+    }
+    std::vector<double> calibratedEnergies_BruteForce = findMinimumBruteForce(penaltyFunction,
+                                                                   setters,
+                                                                   lowerBounds,
+                                                                   upperBounds,
+                                                                   steps);
+    std::cout << "findMinimumBruteForce approximation:\n";
+    for(int i = 0; i < setters.size(); i++) {
+        std::cout << energiesToCalibrate[i] << ": " << calibratedEnergies_BruteForce[i] << "\n";
+    }
+
+    std::vector<double> calibratedEnergies_GradientDescent = findMinimumGradientDescent(
+            penaltyFunction, setters, calibratedEnergies_BruteForce, gradientSteps, 0.00001);
+
+
+    for(int i = 0; i < setters.size(); i++) {
+        setters[i](calibratedEnergies_GradientDescent[i]);
+    }
     return newChemicalBasis;
 }
-}
 
+}
