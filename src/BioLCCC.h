@@ -15,14 +15,14 @@
 
 namespace BioLCCC {
 
-namespace {
-
 double VectorNorm (std::vector<double> vector) {
-double norm2 = 0.0;
-for(int i = 0; i < vector.size(); i++)
-    norm2 += (vector[i] * vector[i]);
-return sqrt(norm2);
+    double norm2 = 0.0;
+    for(int i = 0; i < vector.size(); i++)
+        norm2 += (vector[i] * vector[i]);
+    return sqrt(norm2);
 }
+
+namespace {
 
 template<class optimizedFunctionType, class setterFunctionType>
 std::vector<double> calculateGradient(
@@ -277,6 +277,12 @@ std::vector<double> findMinimumGradientDescent(
     }
     return currentPoint;
 }
-}
 
+ChemicalBasis calibrateBioLCCC(
+        std::vector<std::string> calibrationMixture,
+        std::vector<double> retentionTimes,
+        ChromoConditions chromatograph,
+        ChemicalBasis initialChemicalBasis,
+        std::vector<std::string> energiesToCalibrate);
+}
 #endif

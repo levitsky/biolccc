@@ -1,9 +1,10 @@
 #include <iostream>
-
+#include <vector>
 #include "boost/foreach.hpp"
-
+#include "boost/function.hpp"
+#include "boost/bind.hpp"
 #include "BioLCCC.h"
-#include "math.h"
+//#include "math.h"
 
 #define MEMORY_ERROR   -2.0
 #define PARSING_ERROR  -3.0
@@ -474,6 +475,29 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
     return RT;
 }
 
+std::vector<double> VectorSum(std::vector<double> v1, std::vector<double> v2) {
+    if(v1.size() != v2.size()) {
+        std::cout << "VectorSum error: vector sizes are not equal.\n";
+        return v1;
+    }
+    std::vector<double> sum(v1.size());
+    for(int i = 0; i < v1.size(); i++) {
+        sum[i] = v1[i]+v2[i];
+    }
+    return sum;
+}
+
+std::vector<double> VectorDiff(std::vector<double> v1, std::vector<double> v2) {
+    if(v1.size() != v2.size()) {
+        std::cout << "VectorDiff error: vector sizes are not equal.\n";
+        return v1;
+    }
+    std::vector<double> diff(v1.size());
+    for(int i = 0; i < v1.size(); i++) {
+        diff[i] = v1[i]-v2[i];
+    }
+    return diff;
+}
 }
 
 double calculateRT(const std::string &sequence,
@@ -627,5 +651,68 @@ bool calculatePeptideProperties(const std::string &sequence,
     }
 }
 
+ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
+                               std::vector<double> retentionTimes,
+                               ChromoConditions chromatograph,
+                               ChemicalBasis initialChemicalBasis,
+                               std::vector<std::string> energiesToCalibrate) {
+
+    ChemicalBasis newChemicalBasis = initialChemicalBasis;
+
+    /* Generate the list of setter functions out of 'energiesToCalibrate' */
+
+    std::vector< boost::function<void(double)> > setters;
+    for(int i = 0; i < energiesToCalibrate.size(); i++) {
+        if (initialChemicalBasis.aminoacids().find(energiesToCalibrate[i]) !=
+        initialChemicalBasis.aminoacids().end()) {
+            setters.push_back(boost::bind(
+                &ChemicalBasis::setAminoacidBindEnergy,
+                &newChemicalBasis,
+                energiesToCalibrate[i],
+                _1));
+        }
+        else if (initialChemicalBasis.NTermini().find(energiesToCalibrate[i]) !=
+                 initialChemicalBasis.NTermini().end()) {
+                     setters.push_back(boost::bind(
+                         &ChemicalBasis::setNTerminusBindEnergy,
+                         &newChemicalBasis,
+                         energiesToCalibrate[i],
+                         _1));
+                 }
+        else if (initialChemicalBasis.CTermini().find(energiesToCalibrate[i]) !=
+                 initialChemicalBasis.CTermini().end()) {
+                     setters.push_back(boost::bind(
+                         &ChemicalBasis::setCTerminusBindEnergy,
+                         &newChemicalBasis,
+                         energiesToCalibrate[i],
+                         _1));
+                 }
+
+    }
+/*    std::vector<double> calculatedRetentionTimes;
+    for(int i = 0; i < calibrationMixture.size(); i++) {
+        calculatedRetentionTimes.push_back(calculateRT(calibrationMixture[i],
+                                           chromatograph, newChemicalBasis));
+    }
+
+    struct PenFunc {
+        double operator()(std::vector<double> calculatedRetentionTimes,
+                          std::vector<double> experimentalRetentionTimes) {
+            std::vector<double> diffSquares = VectorDiff(
+                    calculatedRetentionTimes,
+                    experimentalRetentionTimes);
+            return VectorNorm(diffSquares);
+        };
+    };
+
+    PenFunc penFunc;
+
+    boost::function<double(void)> penaltyFunction = boost::bind(
+        boost::bind(VectorNorm, boost::bind(VectorDiff, _1, _2)),
+        calculatedRetentionTimes,
+        retentionTimes);*/
+
+    return newChemicalBasis;
+}
 }
 
