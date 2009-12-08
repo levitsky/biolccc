@@ -15,6 +15,32 @@ namespace BioLCCC {
         return sqrt(norm2);
     };
 
+    template <typename T>
+    std::vector<T> VectorSum(std::vector<T> v1, std::vector<T> v2) {
+        if(v1.size() != v2.size()) {
+            std::cout << "VectorSum error: vector sizes are not equal.\n";
+            return v1;
+        }
+        std::vector<T> sum(v1.size());
+        for(int i = 0; i < v1.size(); i++) {
+            sum[i] = v1[i]+v2[i];
+        }
+        return sum;
+    }
+
+    template <typename T>
+    std::vector<T> VectorDiff(std::vector<T> v1, std::vector<T> v2) {
+        if(v1.size() != v2.size()) {
+            std::cout << "VectorDiff error: vector sizes are not equal.\n";
+            return v1;
+        }
+        std::vector<T> diff(v1.size());
+        for(int i = 0; i < v1.size(); i++) {
+            diff[i] = v1[i]-v2[i];
+        }
+        return diff;
+    }
+
     template<class optimizedFunctionType, class setterFunctionType>
     std::vector<double> calculateGradient(
             optimizedFunctionType optimizedFunction,
@@ -147,19 +173,20 @@ namespace BioLCCC {
         double minPoint = lowerBounds.back();
         coordinateSetters.back()(lowerBounds.back());
         std::vector<double> subMin;
-        std::vector<double> minimumPoint;
-        double curValue;
+        std::vector<double> minimumPoint = lowerBounds;
+        double curValue = minValue;
         for(double curPoint = lowerBounds.back();
             curPoint <= upperBounds.back();
             curPoint += steps.back()) {
 
-                /* find minimum for coordinates 0 .. dim-1 at the current value of the last coordinate */
+                // find minimum for coordinates 0 .. dim-1 at the current value of the last coordinate
                 coordinateSetters.back()(curPoint);
                 subMin = findMinimumBruteForce(optimizedFunction,
                                                newCoordinateSetters,
                                                newLowerBounds,
                                                newUpperBounds,
                                                newSteps);
+                //std::cout << subMin.size();
                 for(int i = 0; i < newCoordinateSetters.size(); i++) {
                     newCoordinateSetters[i](subMin[i]);
                 }
@@ -216,6 +243,7 @@ namespace BioLCCC {
         std::cout << "findMinimumGradientDescent: count = " << count << "\n";
         return currentPoint;
     };
+
 }
 
 #endif

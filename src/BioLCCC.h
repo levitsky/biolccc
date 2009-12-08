@@ -66,7 +66,7 @@ bool calculatePeptideProperties(const std::string &sequence,
     double *RTBioLCCC,
     double *averageMass,
     double *monoisotopicMass);
-/*
+
 ChemicalBasis calibrateBioLCCC(
         std::vector<std::string> calibrationMixture,
         std::vector<double> retentionTimes,
@@ -74,6 +74,6 @@ ChemicalBasis calibrateBioLCCC(
         ChemicalBasis initialChemicalBasis,
         std::vector<std::string> energiesToCalibrate);
 
-*/
+
 }
 #endif
