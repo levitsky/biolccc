@@ -2,6 +2,7 @@
 #define AUXILIARY_H
 
 #include <vector>
+#include <iostream>
 #include "math.h"
 
 namespace BioLCCC {
@@ -9,7 +10,7 @@ namespace BioLCCC {
     template <typename T>
     T vectorNorm (std::vector<T> vec) {
         T norm2 = 0.0;
-        for(int i = 0; i < vec.size(); i++) {
+        for(unsigned int i = 0; i < vec.size(); i++) {
             norm2 += (vec[i] * vec[i]);
         }
         return sqrt(norm2);
@@ -22,7 +23,7 @@ namespace BioLCCC {
             return v1;
         }
         std::vector<T> sum(v1.size());
-        for(int i = 0; i < v1.size(); i++) {
+        for(unsigned int i = 0; i < v1.size(); i++) {
             sum[i] = v1[i]+v2[i];
         }
         return sum;
@@ -35,7 +36,7 @@ namespace BioLCCC {
             return v1;
         }
         std::vector<T> diff(v1.size());
-        for(int i = 0; i < v1.size(); i++) {
+        for(unsigned int i = 0; i < v1.size(); i++) {
             diff[i] = v1[i]-v2[i];
         }
         return diff;
@@ -48,19 +49,21 @@ namespace BioLCCC {
             std::vector<double> point,
             std::vector<double> steps) {
 
-        int dim = coordinateSetters.size(); //dimension of vector parameters
+        //dimension of vector parameters
+        unsigned int dim = coordinateSetters.size(); 
 
-        if (! dim == point.size() == steps.size()) {
-             std::cout << "calculateGradient error: vector sizes are not equal.\n";
+        if ((dim != point.size()) || (dim != steps.size())) {
+             std::cout << 
+                "calculateGradient error: vector sizes are not equal.\n";
              return point;
         }
         std::vector<double> gradient(dim);
 
         double f1, f2;
-        for (int i = 0; i < dim; i++)
+        for (unsigned int i = 0; i < dim; i++)
             coordinateSetters[i](point[i]);
 
-        for (int i = 0; i < dim; i++) {
+        for (unsigned int i = 0; i < dim; i++) {
             coordinateSetters[i](point[i]-steps[i]);
             f1 = optimizedFunction();
             coordinateSetters[i](point[i]+steps[i]);
@@ -80,10 +83,12 @@ namespace BioLCCC {
             double firstStep,
             double epsilon) {
 
-        int dim = coordinateSetters.size(); //dimension of vector parameters
+        //dimension of vector parameters
+        unsigned int dim = coordinateSetters.size(); 
 
-        if (! dim == initialPoint.size() == direction.size()) {
-             std::cout << "findBestPointOnLine error: vector sizes are not equal.\n";
+        if ((dim != initialPoint.size()) || (dim != direction.size())) {
+             std::cout << 
+                "findBestPointOnLine error: vector sizes are not equal.\n";
              return initialPoint;
         }
 
@@ -92,57 +97,77 @@ namespace BioLCCC {
         std::vector<double> currentPoint = initialPoint;
 
         while (step >= epsilon) {
-
-            for(int i = 0; i < dim; i++) {
+            // Evaluating the function at current point.
+            for(unsigned int i = 0; i < dim; i++) {
                 coordinateSetters[i](currentPoint[i]);
             }
-            valueAtCurrentPoint = optimizedFunction();  //evaluate the function at current point
+            valueAtCurrentPoint = optimizedFunction();  
 
-            for(int i = 0; i < dim; i++) {
-                coordinateSetters[i](currentPoint[i] + step*direction[i]); //evaluate the function 1 step forward
+            // Evaluating the function one step forward.
+            for(unsigned int i = 0; i < dim; i++) {
+                coordinateSetters[i](currentPoint[i] + step*direction[i]); 
             }
             valueAtNewPoint = optimizedFunction();
 
-            if(valueAtNewPoint < valueAtCurrentPoint) { //compare; if the 'further' value is better...
-                for(int i = 0; i < dim; i++) {
-                    currentPoint[i] += step*direction[i];   //... then make a step forward
+            // If the 'further' value is better...
+            if(valueAtNewPoint < valueAtCurrentPoint) {
+                //... then make a step forward ...
+                for(unsigned int i = 0; i < dim; i++) {
+                    currentPoint[i] += step*direction[i];   
                 }
-                step *= 2.;                                 //... and double the step length
+                step *= 2.;                                 
+                //... and double the step length.
             }
-            else {                                          //else
-                for(int i = 0; i < dim; i++) {
-                coordinateSetters[i](currentPoint[i] - step*direction[i]);  //look at the value 1 step back
+            else {  
+                // If not, look at the value 1 step back.
+                for(unsigned int i = 0; i < dim; i++) {
+                    coordinateSetters[i](currentPoint[i] - step*direction[i]);
                 }
                 valueAtNewPoint = optimizedFunction();
-                if(valueAtNewPoint < valueAtCurrentPoint) {     //if the value there is better...
-                    for(int i = 0; i < dim; i++)
-                        currentPoint[i] -= step*direction[i];   //...then make a step back
-                    step *= 2.;                                 //...and double the step length
+                // If the "back" value is better...
+                if(valueAtNewPoint < valueAtCurrentPoint) {     
+                    //...then make a step back ...
+                    for(unsigned int i = 0; i < dim; i++)
+                        currentPoint[i] -= step*direction[i];   
+                    //...and double the step length.
+                    step *= 2.; 
                 }
-                else                                            //or, if neither direction is OK
-                    step /= 2.;                                 //decrease the step length 2-fold
+                // Finally, if neither direction is OK,
+                // decrease the step length 2-fold
+                else {                             
+                    step /= 2.;                                 
+                }
             }
         }
         return currentPoint;
     };
+
     /*!
-        Finds the minimum point of the optimized function with brute force method.
+        Finds the minimum point of the optimized function with 
+        the brute force method.
     */
     template<class optimizedFunctionType, class setterFunctionType>
-    std::vector<double> findMinimumBruteForce (optimizedFunctionType optimizedFunction,
-                                               std::vector<setterFunctionType> coordinateSetters,
-                                               std::vector<double> lowerBounds,
-                                               std::vector<double> upperBounds,
-                                               std::vector<double> steps) {
+    std::vector<double> findMinimumBruteForce (
+        optimizedFunctionType optimizedFunction,
+        std::vector<setterFunctionType> coordinateSetters,
+        std::vector<double> lowerBounds,
+        std::vector<double> upperBounds,
+        std::vector<double> steps) {
 
-        int dim = coordinateSetters.size(); //dimension of vector parameters
+        //dimension of vector parameters
+        unsigned int dim = coordinateSetters.size(); 
 
-        if (! dim == lowerBounds.size() == upperBounds.size() == steps.size()) {
-             std::cout << "findMinimumBruteForce error: vector sizes are not equal.\n";
-             return lowerBounds;
+        if ((dim != lowerBounds.size()) || 
+            (dim != upperBounds.size()) ||
+            (dim != steps.size())) {
+            std::cout << 
+                "findMinimumBruteForce error: vector sizes are not equal.\n";
+            return lowerBounds;
         }
 
-        for(int i = 0; i < dim; i++) coordinateSetters[i](lowerBounds[i]);
+        for(unsigned int i = 0; i < dim; i++) {
+            coordinateSetters[i](lowerBounds[i]);
+        }
         double minValue = optimizedFunction();
 
         if (dim == 1) {
@@ -170,7 +195,7 @@ namespace BioLCCC {
         newUpperBounds.pop_back();
         newSteps.pop_back();
 
-        double minPoint = lowerBounds.back();
+        //double minPoint = lowerBounds.back();
         coordinateSetters.back()(lowerBounds.back());
         std::vector<double> subMin;
         std::vector<double> minimumPoint = lowerBounds;
@@ -187,7 +212,7 @@ namespace BioLCCC {
                                                newUpperBounds,
                                                newSteps);
                 //std::cout << subMin.size();
-                for(int i = 0; i < newCoordinateSetters.size(); i++) {
+                for(unsigned int i = 0; i < newCoordinateSetters.size(); i++) {
                     newCoordinateSetters[i](subMin[i]);
                 }
                 curValue = optimizedFunction();
@@ -214,9 +239,10 @@ namespace BioLCCC {
             std::vector<double> steps,
             double epsilon) {
 
-        int dim = coordinateSetters.size(), count = 0; //dimension of vector parameters
+        //dimension of vector parameters
+        unsigned int dim = coordinateSetters.size(), count = 0; 
 
-        if (! dim == initialPoint.size() == steps.size()) {
+        if ((dim != initialPoint.size()) || (dim != steps.size())) {
              std::cout << "findMinimumGradientDescent error: vector sizes are not equal.\n";
              return initialPoint;
         }
@@ -232,7 +258,7 @@ namespace BioLCCC {
                                                    gradient,
                                                    firstStep,
                                                    epsilon);
-            for(int i = 0; i < dim; i++)
+            for(unsigned int i = 0; i < dim; i++)
                 shift[i] = currentPoint[i] - currentBestPoint[i];
 
             if(vectorNorm(shift) < epsilon)
