@@ -26,7 +26,8 @@ static const ChemicalBasis standardChemicalBasis = ChemicalBasis();
 */
 double calculateRT(const std::string &sequence,
     const ChromoConditions & conditions = standardChromoConditions,
-    const ChemicalBasis & chemBasis = standardChemicalBasis);
+    const ChemicalBasis & chemBasis = standardChemicalBasis,
+    const bool continueGradient = true);
 
 /*!
     Calculates the average (molar) mass of a peptide with given 
@@ -73,7 +74,6 @@ ChemicalBasis calibrateBioLCCC(
         ChromoConditions chromatograph,
         ChemicalBasis initialChemicalBasis,
         std::vector<std::string> energiesToCalibrate);
-
 
 }
 #endif
