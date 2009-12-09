@@ -36,7 +36,7 @@ bool parseSequence(
     Terminus *CTerminus,
     std::vector<double> *peptideEnergyProfile
 ) {
-    parsedPeptideStructure -> clear();
+    parsedPeptideStructure->clear();
     
     // At first we need to strip the sequence from adjacent aminoacids.
     // If a source sequence contains them, it should contain two dots, so we 
@@ -459,6 +459,9 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                         j = currentGradientPoint->first;
                     }
                 }
+            }
+            else if (!continueGradient) {
+                break;
             }
         }
         secondSolventConcentration = currentGradientPoint->second - 
