@@ -78,8 +78,7 @@ bool parseSequence(
     *NTerminus = chemBasis.defaultNTerminus();
     std::pair<std::string,Terminus> NTerminusIterator;
     BOOST_FOREACH(NTerminusIterator, chemBasis.NTermini()) {
-        if (strippedSource.find(NTerminusIterator.second.label()) != 
-                std::string::npos) {
+        if (strippedSource.find(NTerminusIterator.second.label()) == (size_t)0){
             *NTerminus = NTerminusIterator.second;
             NTerminusPosition = NTerminusIterator.second.label().size();
         }
