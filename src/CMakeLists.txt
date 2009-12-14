@@ -34,7 +34,8 @@ IF(SWIG_FOUND)
     SET(CMAKE_SWIG_FLAGS "")
 
     FIND_PACKAGE(PythonLibs)
-    IF(PythonLibs_FOUND)
+    IF(PYTHONLIBS_FOUND)
+        MESSAGE("Building makefiles for pyBioLCCC")
         INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 
         SET_SOURCE_FILES_PROPERTIES(pyBioLCCC.i PROPERTIES CPLUSPLUS ON)
@@ -42,8 +43,9 @@ IF(SWIG_FOUND)
                         pyBioLCCC.i
                         ${BioLCCC_SRCS})
         SWIG_LINK_LIBRARIES(pyBioLCCC ${PYTHON_LIBRARIES})
-    ENDIF(PythonLibs_FOUND)
+    ENDIF(PYTHONLIBS_FOUND)
 
+    MESSAGE("Building makefiles for csBioLCCC")
     SET_SOURCE_FILES_PROPERTIES(csBioLCCC.i PROPERTIES CPLUSPLUS ON)
     SWIG_ADD_MODULE(csBioLCCC csharp 
                     csBioLCCC.i
