@@ -1,8 +1,10 @@
 #ifndef PEPTIDEMETHODS_H
 #define PEPTIDEMETHODS_H
 
+#include <math.h>
 #include "chemicalbasis.h"
 #include "chromoconditions.h"
+#include "auxiliary.hpp"
 
 //! This is the main header for the whole BioLCCC library project. 
 
@@ -24,7 +26,8 @@ static const ChemicalBasis standardChemicalBasis = ChemicalBasis();
 */
 double calculateRT(const std::string &sequence,
     const ChromoConditions & conditions = standardChromoConditions,
-    const ChemicalBasis & chemBasis = standardChemicalBasis);
+    const ChemicalBasis & chemBasis = standardChemicalBasis,
+    const bool continueGradient = true);
 
 /*!
     Calculates the average (molar) mass of a peptide with given 
@@ -106,6 +109,13 @@ bool calculatePeptideProperties(const std::string &sequence,
     double *RTBioLCCC,
     double *averageMass,
     double *monoisotopicMass);
-}
 
+ChemicalBasis calibrateBioLCCC(
+        std::vector<std::string> calibrationMixture,
+        std::vector<double> retentionTimes,
+        ChromoConditions chromatograph,
+        ChemicalBasis initialChemicalBasis,
+        std::vector<std::string> energiesToCalibrate);
+
+}
 #endif

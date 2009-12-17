@@ -3,6 +3,7 @@
 %include "std_string.i"
 
 %{
+#include "auxiliary.hpp"
 #include "aminoacid.h"
 #include "terminus.h"
 #include "chemicalbasis.h"
@@ -13,6 +14,7 @@
 %}
 
 // Parse the original header file
+%include "auxiliary.hpp"
 %include "aminoacid.h"
 %include "terminus.h"
 %include "chemicalbasis.h"
