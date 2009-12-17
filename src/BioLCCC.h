@@ -42,12 +42,54 @@ double calculateMonoisotopicMass(const std::string &sequence,
 
 /*!
     Calculates the distribution coefficient (Kd) of a peptide with
-    given sequence with the BioLCCC model using given table of peptide 
-    chemicals, the name of the second solvent, its concentration, 
+    given sequence with the STANDARD BioLCCC model (for a coil using the 
+    Boltzmann equation) with given table of peptide chemicals, the name of 
+    the second solvent, its concentration, the size of adsorbent's pores, 
+    calibration parameter and temperature.
+*/
+double calculateKd(const std::string &sequence,
+    const double secondSolventConcentration,
+    const ChemicalBasis &chemBasis = standardChemicalBasis,
+    const double columnPoreSize = 100.0,
+    const double calibrationParameter = 1.0,
+    const double temperature = 293.0);
+
+/*!
+    Calculates the distribution coefficient (Kd) of a peptide with
+    given sequence with the BioLCCC model for a coil using the Boltzmann 
+    equation with given table of peptide chemicals, the name of the second 
+    solvent, its concentration, the size of adsorbent's pores, calibration 
+    parameter and temperature.
+*/
+double calculateKdCoilBoltzmann(const std::string &sequence,
+    const double secondSolventConcentration,
+    const ChemicalBasis &chemBasis = standardChemicalBasis,
+    const double columnPoreSize = 100.0,
+    const double calibrationParameter = 1.0,
+    const double temperature = 293.0);
+
+/*!
+    Calculates the distribution coefficient (Kd) of a peptide with
+    given sequence with the BioLCCC model for a coil using the Snyder equation 
+    given table of peptide chemicals, the name of the second solvent, its 
+    concentration, the size of adsorbent's pores, calibration parameter and 
+    temperature.
+*/
+double calculateKdCoilSnyder(const std::string &sequence,
+    const double secondSolventConcentration,
+    const ChemicalBasis &chemBasis = standardChemicalBasis,
+    const double columnPoreSize = 100.0,
+    const double calibrationParameter = 1.0,
+    const double temperature = 293.0);
+
+/*!
+    Calculates the distribution coefficient (Kd) of a peptide with
+    given sequence with the BioLCCC model for a rod using given table of 
+    peptide chemicals, the name of the second solvent, its concentration, 
     the size of adsorbent's pores, calibration parameter and 
     temperature.
 */
-double calculateKd(const std::string &sequence,
+double calculateKdRod(const std::string &sequence,
     const double secondSolventConcentration,
     const ChemicalBasis &chemBasis = standardChemicalBasis,
     const double columnPoreSize = 100.0,
