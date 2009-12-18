@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <numeric>
 #include "boost/foreach.hpp"
 #include "boost/function.hpp"
 #include "boost/bind.hpp"
@@ -182,6 +183,8 @@ double calculateKdCoilBoltzmann(
     // are scaled to the new temperature) and column aging (calibration
     // parameter) are introduced.
     
+    const double segmentLength = 5.0;
+
     // Due to the preliminary scaling the binding energy of water equals zero.
     double Q = exp((0 + chemBasis.secondSolventBindEnergy()) * 
                293.0 / temperature);
@@ -218,7 +221,7 @@ double calculateKdCoilBoltzmann(
     
     // PoreSteps is a number of nodes in a lattice between two walls. Because of
     // the features of a following calculation it should be more than 2.
-    const int poreSteps = (int) columnPoreSize / 10.0;
+    const int poreSteps = (int) columnPoreSize / segmentLength;
     if (poreSteps <=2) {
         return PORESIZE_ERROR;
     }
@@ -326,7 +329,7 @@ double calculateKdCoilBoltzmann(
     // Finally, Kd is calculated as a sum of elements of the density vector. 
     // It is normalized to the size of the lattice.
     double Kd=0;
-    for (int k=0;k<poreSteps;k++) {
+    for (int k=0; k < poreSteps; k++) {
         Kd += density[k];
     }
     Kd = Kd / poreSteps;
@@ -361,6 +364,8 @@ double calculateKdCoilSnyder(
     // are scaled to the new temperature) and column aging (calibration
     // parameter) are introduced.
     
+    const double segmentLength = 5.0;
+
     // Due to the preliminary scaling the binding energy of water equals zero.
     double Nb = 0;
    
@@ -395,7 +400,7 @@ double calculateKdCoilSnyder(
     
     // PoreSteps is a number of nodes in a lattice between two walls. Because of
     // the features of a following calculation it should be more than 2.
-    const int poreSteps = (int) columnPoreSize / 10.0;
+    const int poreSteps = (int) columnPoreSize / segmentLength;
     if (poreSteps <=2) {
         return PORESIZE_ERROR;
     }
@@ -525,7 +530,7 @@ double partitionFunctionRodFreeSlit(double rodLength,
                                     double slitWidth
 ) {
     // the equation works only if the slit is wider than the rod
-    if (rodLength >= slitWidth) {
+    if (rodLength <= slitWidth) {
     // full volume without exclusion caused by walls
         return (4 * PI * slitWidth * rodLength * rodLength) -
     // minus volume excluded by walls
@@ -540,59 +545,66 @@ double partitionFunctionRodFreeSlit(double rodLength,
 double rodAdsorbtionEnergy(const std::vector<double> & peptideEnergyProfile,
                            int n
 ) {
-    return (double) n;
+    double init = 0;
+    return std::accumulate(peptideEnergyProfile.begin(),
+                           peptideEnergyProfile.begin()+n,
+                           init);
 }
 
 double partitionFunctionRodAdsorbtionLayer(
     const std::vector<double> &rodEnergyProfile,
     double segmentLength,
-    double slitWidth,
     double layerWidth
 ) {
     double rodLength = segmentLength * (rodEnergyProfile.size() - 1);
     double partitionFunction = 0;
     for (unsigned int n = 1; n <= rodEnergyProfile.size(); n++) {
-        if (segmentLength * (n - 1) < layerWidth) {
+        if (segmentLength * n < layerWidth) {
             partitionFunction += 2 * PI * rodLength * rodLength *
-                segmentLength / 2 / n * rodAdsorbtionEnergy(rodEnergyProfile,n);
+                segmentLength / 2 / n *
+                exp(rodAdsorbtionEnergy(rodEnergyProfile,n));
 
             for (unsigned int k = n + 1; k <= rodEnergyProfile.size() - 1;k++) {
                 partitionFunction += 2 * PI * rodLength * rodLength *
                     segmentLength * (2 * n - 1) / 2 / k / (k - 1) *
-                    rodAdsorbtionEnergy(rodEnergyProfile, k);
-            }
+                    exp(rodAdsorbtionEnergy(rodEnergyProfile, k));
 
+            }
             partitionFunction += 2 * PI * rodLength * rodLength *
                 segmentLength * (2*n - 1) / 2 / (rodEnergyProfile.size() - 1) *
-                rodAdsorbtionEnergy(rodEnergyProfile, rodEnergyProfile.size());
+                exp(rodAdsorbtionEnergy(rodEnergyProfile,
+                                        rodEnergyProfile.size()));
 
             // Z residual
             if (n == rodEnergyProfile.size()) {
                 partitionFunction += 2 * PI * rodLength * rodLength *
-                (slitWidth - rodLength) *
-                rodAdsorbtionEnergy(rodEnergyProfile,
-                                    rodEnergyProfile.size());
+                (layerWidth - rodLength) *
+                exp(rodAdsorbtionEnergy(rodEnergyProfile,
+                                        rodEnergyProfile.size()));
             }
         }
 
         else {
             partitionFunction += 2 * PI * rodLength * rodLength *
-                (slitWidth - segmentLength * (n - 1) - (slitWidth * slitWidth -
+                (layerWidth - segmentLength * (n - 1) - 
+                (layerWidth * layerWidth -
                 segmentLength * segmentLength * (n - 1) * (n - 1)) / 2 /
-                segmentLength / n) * rodAdsorbtionEnergy(rodEnergyProfile,n);
+                segmentLength / n) * 
+                exp(rodAdsorbtionEnergy(rodEnergyProfile,n));
 
             for (unsigned int k = n+1; k <= rodEnergyProfile.size() - 1; k++) {
                 partitionFunction += 2 * PI * rodLength * rodLength *
-                    (slitWidth * slitWidth - segmentLength * segmentLength *
+                    (layerWidth * layerWidth - segmentLength * segmentLength *
                     (n - 1) * (n - 1)) / 2 / segmentLength / k / (k - 1) *
-                    rodAdsorbtionEnergy(rodEnergyProfile, k);
+                    exp(rodAdsorbtionEnergy(rodEnergyProfile, k));
             }
 
             partitionFunction += 2 * PI * rodLength * rodLength *
-                (slitWidth * slitWidth - segmentLength * segmentLength *
+                (layerWidth * layerWidth - segmentLength * segmentLength *
                 (n - 1) * (n - 1)) / 2 / segmentLength /
                 (rodEnergyProfile.size() - 1) *
-                rodAdsorbtionEnergy(rodEnergyProfile, rodEnergyProfile.size());
+                exp(rodAdsorbtionEnergy(rodEnergyProfile,
+                                        rodEnergyProfile.size()));
             break;
         }
     }     
@@ -622,7 +634,7 @@ double calculateKdRod(
     double Nb = 0;
     double Eab = 0;
     const double segmentLength = 5.0;
-    const double layerWidth = 5.0;
+    const double layerWidth = 20.0;
    
     // A Boltzmann factor is an exponent of an energy of interaction between
     // an amino acid residue and a solid phase divided by a temperature * 
@@ -637,20 +649,18 @@ double calculateKdRod(
               (100.0 - secondSolventConcentration) * 5.56);
         Eab = 0.0 + 1.0 / calibrationParameter * log( 1.0 - Nb + Nb * Q );
         effectiveEnergyProfile.push_back(calibrationParameter * 
-            (Eab - residueEnergy) * 293.0 / temperature);
+            (residueEnergy - Eab) * 293.0 / temperature);
         revEffectiveEnergyProfile.insert(
             revEffectiveEnergyProfile.begin(),
-            calibrationParameter * (Eab - residueEnergy) * 293.0 / temperature);
+            calibrationParameter * (residueEnergy - Eab) * 293.0 / temperature);
     }
     
     double Kd = 
     (2 * partitionFunctionRodAdsorbtionLayer(effectiveEnergyProfile, 
                                             segmentLength, 
-                                            columnPoreSize,
                                             layerWidth) +
     2 * partitionFunctionRodAdsorbtionLayer(revEffectiveEnergyProfile, 
                                             segmentLength,
-                                            columnPoreSize,
                                             layerWidth) +
     partitionFunctionRodFreeSlit(
         (effectiveEnergyProfile.size() - 1) * segmentLength,

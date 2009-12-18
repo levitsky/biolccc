@@ -53,6 +53,7 @@ int main () {
     min = BioLCCC::findMinimumGradientDescent(calc, setters, initialPoint, steps, 1.0e-10);
     std::cout << "GradientDescent: Minimum at (" << min[0] << ", " << min[1] << ", " << min[2] << ").\n";
 */
+/*
     std::vector<std::string> peptides,groups;
     std::vector<double> rTimes;
 
@@ -69,6 +70,11 @@ int main () {
     BioLCCC::ChromoConditions chr;
     BioLCCC::ChemicalBasis chb;
     BioLCCC::ChemicalBasis calibrated = BioLCCC::calibrateBioLCCC(peptides, rTimes, chr, chb, groups);
-
+*/
+    std::cout << BioLCCC::calculateKdRod("AAARGD", 10.0) << "\n";
+//    std::cout << BioLCCC::calculateKdRod("AAARGD", 20.0) << "\n" ;
+//    std::cout << BioLCCC::calculateKdRod("AAALLLRGD", 10.0) << "\n";
+//    std::cout << BioLCCC::calculateKdRod("AAARRKKRGD", 10.0) << "\n";
+//    std::cout << BioLCCC::calculateKdRod("AAARRKKRGD", 0.0) << "\n";
     return 0;
 }
