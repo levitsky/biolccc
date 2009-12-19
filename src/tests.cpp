@@ -29,14 +29,19 @@ void BioLCCC::BruteForceTester::set_z (double new_z) {
 }
 
 int main () {
-/*    BioLCCC::BruteForceTester tester;
-    boost::function<double()> calc = boost::bind(&BioLCCC::BruteForceTester::calculate, &tester);
+/*
+    BioLCCC::BruteForceTester tester;
+    boost::function<double()> calc = 
+        boost::bind(&BioLCCC::BruteForceTester::calculate, &tester);
     std::cout << "Test: " << calc() << "\n";
 
     std::vector< boost::function<void(double)> > setters;
-    setters.push_back(boost::bind(&BioLCCC::BruteForceTester::set_x, &tester, _1));
-    setters.push_back(boost::bind(&BioLCCC::BruteForceTester::set_y, &tester, _1));
-    setters.push_back(boost::bind(&BioLCCC::BruteForceTester::set_z, &tester, _1));
+    setters.push_back(
+        boost::bind(&BioLCCC::BruteForceTester::set_x, &tester, _1));
+    setters.push_back(
+        boost::bind(&BioLCCC::BruteForceTester::set_y, &tester, _1));
+    setters.push_back(
+        boost::bind(&BioLCCC::BruteForceTester::set_z, &tester, _1));
     std::vector<double> low;
     low.push_back(-5.0); low.push_back(-5.0); low.push_back(-5.0);
     std::vector<double> high;
@@ -46,13 +51,19 @@ int main () {
 
     std::vector<double> min;
     min = BioLCCC::findMinimumBruteForce(calc, setters, low, high, steps);
-    std::cout << "BruteForce: Minimum at (" << min[0] << ", " << min[1] << ", " << min[2] << ").\n";
+    std::cout << "BruteForce: Minimum at ("
+        << min[0] << ", " << min[1] << ", " << min[2] << ").\n";
 
     std::vector<double> initialPoint;
-    initialPoint.push_back(0.0); initialPoint.push_back(0.0); initialPoint.push_back(0.0);
-    min = BioLCCC::findMinimumGradientDescent(calc, setters, initialPoint, steps, 1.0e-10);
-    std::cout << "GradientDescent: Minimum at (" << min[0] << ", " << min[1] << ", " << min[2] << ").\n";
+    initialPoint.push_back(0.0); 
+    initialPoint.push_back(0.0); 
+    initialPoint.push_back(0.0);
+    min = BioLCCC::findMinimumGradientDescent(calc, setters, initialPoint, 
+                                              steps, 1.0e-10);
+    std::cout << "GradientDescent: Minimum at (" 
+        << min[0] << ", " << min[1] << ", " << min[2] << ").\n";
 */
+
 /*
     std::vector<std::string> peptides,groups;
     std::vector<double> rTimes;
@@ -69,12 +80,30 @@ int main () {
 
     BioLCCC::ChromoConditions chr;
     BioLCCC::ChemicalBasis chb;
-    BioLCCC::ChemicalBasis calibrated = BioLCCC::calibrateBioLCCC(peptides, rTimes, chr, chb, groups);
+    BioLCCC::ChemicalBasis calibrated = 
+        BioLCCC::calibrateBioLCCC(peptides, rTimes, chr, chb, groups);
 */
-    std::cout << BioLCCC::calculateKdRod("AAARGD", 10.0) << "\n";
-//    std::cout << BioLCCC::calculateKdRod("AAARGD", 20.0) << "\n" ;
-//    std::cout << BioLCCC::calculateKdRod("AAALLLRGD", 10.0) << "\n";
-//    std::cout << BioLCCC::calculateKdRod("AAARRKKRGD", 10.0) << "\n";
-//    std::cout << BioLCCC::calculateKdRod("AAARRKKRGD", 0.0) << "\n";
+
+    std::vector<std::string> peptides,groups;
+    std::vector<double> rTimes;
+
+    peptides.push_back("Ac-GGGLLLKK-NH2"); rTimes.push_back(19.23);
+    peptides.push_back("Ac-GLLLLLKK-NH2"); rTimes.push_back(36.28);
+    peptides.push_back("Ac-GKKLLLKK-NH2"); rTimes.push_back(16.71);
+    groups.push_back("K"); 
+    groups.push_back("G"); 
+    groups.push_back("L"); 
+
+    BioLCCC::ChromoConditions chr;
+    chr.setColumnPoreSize(300.0);
+    chr.setColumnLength(250.0);
+    chr.setColumnDiameter(4.1);
+    chr.setColumnPoreSize(300.0);
+    chr.setFlowRate(1.0);
+    chr.setGradient(BioLCCC::Gradient(0.0,100.0,100.0));
+    BioLCCC::ChemicalBasis chb;
+    BioLCCC::ChemicalBasis calibrated = 
+        BioLCCC::calibrateBioLCCC(peptides, rTimes, chr, chb, groups);
+
     return 0;
 }

@@ -27,7 +27,8 @@ static const ChemicalBasis standardChemicalBasis = ChemicalBasis();
 double calculateRT(const std::string &sequence,
     const ChromoConditions & conditions = standardChromoConditions,
     const ChemicalBasis & chemBasis = standardChemicalBasis,
-    const bool continueGradient = true);
+    const bool continueGradient = true,
+    const std::string model = "CoilBoltzmann");
 
 /*!
     Calculates the average (molar) mass of a peptide with given 
