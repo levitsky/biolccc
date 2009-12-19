@@ -7,10 +7,11 @@
 #include "boost/ref.hpp"
 #include "BioLCCC.h"
 
-#define MEMORY_ERROR   -2.0
-#define PARSING_ERROR  -3.0
-#define PORESIZE_ERROR -4.0
-#define GRADIENT_ERROR -5.0
+#define MEMORY_ERROR    -2.0
+#define PARSING_ERROR   -3.0
+#define PORESIZE_ERROR  -4.0
+#define GRADIENT_ERROR  -5.0
+#define MODELTYPE_ERROR -6.0 
 
 #define PI 3.14159265
 
@@ -21,7 +22,7 @@ namespace {
 // Auxiliary functions that shouldn't be exposed to user at this
 // point.
 std::vector<double> calculateRT(std::vector<std::string> mixture,
-                                             ChromoConditions chromatograph,
+                                ChromoConditions chromatograph,
                                              ChemicalBasis chemicalBasis) {
     std::vector<double> times;
     for(unsigned int i = 0; i < mixture.size(); i++) {
@@ -675,10 +676,30 @@ double calculateKdRod(
 double calculateRT(const std::vector<double> &peptideEnergyProfile,
     const ChromoConditions &conditions,
     const ChemicalBasis &chemBasis,
-    bool continueGradient
+    const bool continueGradient,
+    const std::string modelType
 ) {
-        
-    // Calculating column volumes 
+    double (*calculateKdLocal)(const std::vector<double> &,
+                          const double,
+                          const ChemicalBasis &,
+                          const double,
+                          const double,
+                          const double);
+    // Setting the appropriate model.
+    if (modelType=="CoilBoltzmann") {
+        calculateKdLocal = calculateKdCoilBoltzmann;
+    }
+    else if (modelType == "CoilSnyder") {
+        calculateKdLocal = calculateKdCoilSnyder;
+    }
+    else if (modelType == "RodBoltzmann") {
+        calculateKdLocal = calculateKdRod;
+    }
+    else {
+        return MODELTYPE_ERROR;
+    }
+    
+    // Calculating column volumes.
     double volumeLiquidPhase = conditions.columnDiameter() * 
         conditions.columnDiameter() * 3.1415 * conditions.columnLength() / 4.0 /
         1000.0 * (conditions.columnPorosity()-conditions.columnVpToVtot());
@@ -688,7 +709,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
     
     // Recalculating dV. By default dV is calculated as flow rate divided by 20.
     double dV;
-    if ( conditions.dV()!= 0.0 ) {
+    if (conditions.dV()!= 0.0) {
         dV = conditions.dV();
     }
     else {
@@ -697,7 +718,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
 
     // Because of the features of the BioLCCC model, size of the pore should be 
     // more than 20A.
-    if (conditions.columnPoreSize() <= 15) {
+    if (conditions.columnPoreSize() <= 15.0) {
         return PORESIZE_ERROR;
     }
 
@@ -755,7 +776,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                     // One case is that a peptide elutes during this section or
                     // the section is the last.
                     if (((1.0 - S) / dV * 
-                        calculateKdCoilBoltzmann(
+                        calculateKdLocal(
                             peptideEnergyProfile, 
                             currentGradientPoint->second, 
                             chemBasis, 
@@ -767,7 +788,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                         (currentGradientPoint == --convertedGradient.end()))
                     {
                         j += (int)ceil((1.0 - S) / dV *
-                            calculateKdCoilBoltzmann(
+                            calculateKdLocal(
                                 peptideEnergyProfile, 
                                 currentGradientPoint->second,
                                 chemBasis,
@@ -779,7 +800,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                     // Another case is that this section is not long enough for 
                     // a peptide to elute.
                     else {
-                        S += dV / calculateKdCoilBoltzmann(
+                        S += dV / calculateKdLocal(
                                       peptideEnergyProfile,
                                       currentGradientPoint->second, 
                                       chemBasis,
@@ -800,22 +821,13 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
             (currentGradientPoint->second - previousGradientPoint->second) / 
             (currentGradientPoint->first - previousGradientPoint->first) * 
             (currentGradientPoint->first - j);
-        //std::cout << j << " " << secondSolventConcentration << "<br>";
-        S += dV / calculateKdCoilBoltzmann(
+        S += dV / calculateKdLocal(
                       peptideEnergyProfile, 
                       secondSolventConcentration, 
                       chemBasis, 
                       conditions.columnPoreSize(), 
                       conditions.calibrationParameter(),
                       conditions.temperature()) / volumePore;
-        //std::cout << secondSolventConcentration << " " << 
-        //1 / (1 + calculateKd (peptideEnergyProfile, 
-        //                      chemBasis,
-        //                      conditions.secondSolvent(), 
-        //                      secondSolventConcentration, 
-        //                      conditions.columnPoreSize(), 
-        //                      conditions.calibrationParameter(),
-        //                      conditions.temperature()) ) << "\n" << "<br>";
     }
 
     double RT = j * dV / conditions.flowRate() + conditions.delayTime() + 
@@ -829,7 +841,8 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
 double calculateRT(const std::string &sequence,
     const ChromoConditions &conditions,
     const ChemicalBasis &chemBasis,
-    bool continueGradient
+    const bool continueGradient,
+    const std::string model
 ) {
     std::vector<Aminoacid> parsedPeptideStructure;
     Terminus NTerminus;    
@@ -846,43 +859,13 @@ double calculateRT(const std::string &sequence,
         return calculateRT(peptideEnergyProfile,
             conditions,
             chemBasis,
-            continueGradient);
+            continueGradient,
+            model);
     }
     else {
         return PARSING_ERROR;
     }
 }
-
-double calculateKd(const std::string &sequence,
-    const double secondSolventConcentration,
-    const ChemicalBasis & chemBasis,
-    const double columnPoreSize,
-    const double calibrationParameter,
-    const double temperature
-) {
-    std::vector<Aminoacid> parsedPeptideStructure;
-    Terminus NTerminus;    
-    Terminus CTerminus;
-    std::vector<double> peptideEnergyProfile;
-    
-    if (parseSequence(sequence, 
-                     chemBasis,
-                     &parsedPeptideStructure,
-                     &NTerminus,
-                     &CTerminus,
-                     &peptideEnergyProfile))
-    {
-        return calculateKdCoilBoltzmann(peptideEnergyProfile,
-                                  secondSolventConcentration,
-                                  chemBasis,
-                                  columnPoreSize,
-                                  calibrationParameter,
-                                  temperature);
-    }
-    else {
-        return PARSING_ERROR;
-    }
-}                                
 
 double calculateKdCoilBoltzmann(const std::string &sequence,
     const double secondSolventConcentration,
@@ -977,6 +960,37 @@ double calculateKdRod(const std::string &sequence,
     }
 }                                
 
+double calculateKd(const std::string &sequence,
+    const double secondSolventConcentration,
+    const ChemicalBasis & chemBasis,
+    const double columnPoreSize,
+    const double calibrationParameter,
+    const double temperature
+) {
+    std::vector<Aminoacid> parsedPeptideStructure;
+    Terminus NTerminus;    
+    Terminus CTerminus;
+    std::vector<double> peptideEnergyProfile;
+    
+    if (parseSequence(sequence, 
+                     chemBasis,
+                     &parsedPeptideStructure,
+                     &NTerminus,
+                     &CTerminus,
+                     &peptideEnergyProfile))
+    {
+        return calculateKdCoilBoltzmann(peptideEnergyProfile,
+                                  secondSolventConcentration,
+                                  chemBasis,
+                                  columnPoreSize,
+                                  calibrationParameter,
+                                  temperature);
+    }
+    else {
+        return PARSING_ERROR;
+    }
+}                                
+
 double calculateAverageMass(const std::string &sequence,
     const ChemicalBasis &chemBasis
 ){
@@ -1023,7 +1037,6 @@ double calculateMonoisotopicMass(const std::string &sequence,
     return monoisotopicMass;
 }
 
-
 bool calculatePeptideProperties(const std::string &sequence,
          const ChromoConditions &conditions,
          const ChemicalBasis &chemBasis,
@@ -1044,7 +1057,7 @@ bool calculatePeptideProperties(const std::string &sequence,
                      &peptideEnergyProfile))
     {
         *RTBioLCCC = calculateRT(peptideEnergyProfile, conditions, chemBasis,
-                                 true);
+                                 true, "CoilBotzmann");
         
         *averageMass = 0;
         for (std::vector<Aminoacid>::const_iterator i = 
@@ -1073,13 +1086,12 @@ bool calculatePeptideProperties(const std::string &sequence,
     }
 }
 
-
-
 ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
                                std::vector<double> retentionTimes,
                                ChromoConditions chromatograph,
                                ChemicalBasis initialChemicalBasis,
-                               std::vector<std::string> energiesToCalibrate) {
+                               std::vector<std::string> energiesToCalibrate
+) {
 
     // Generate the list of setter functions out of 'energiesToCalibrate'
     ChemicalBasis newChemicalBasis = initialChemicalBasis;
@@ -1124,13 +1136,14 @@ ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
 
     }
 
-    //boost::function<std::vector<double> (std::vector<std::string>,ChromoConditions,ChemicalBasis)>
-    //    calculateRTforList = &calculateRT;
-    std::vector<double> (*calculateRTforList)(std::vector<std::string>,ChromoConditions,ChemicalBasis) =
-        &calculateRT;
+    std::vector<double> (*calculateRTforList)
+        (std::vector<std::string>,ChromoConditions,ChemicalBasis) =
+            &calculateRT;
     boost::function<double(void)> penaltyFunction = boost::bind(
-        boost::bind(vectorNorm<double>, boost::bind(VectorDiff<double>, _1, _2)),
-        boost::bind(calculateRTforList, calibrationMixture, chromatograph, boost::ref(newChemicalBasis)),
+        boost::bind(vectorNorm<double>, 
+                    boost::bind(VectorDiff<double>, _1, _2)),
+        boost::bind(calculateRTforList, calibrationMixture, 
+                    chromatograph, boost::ref(newChemicalBasis)),
         retentionTimes);
 
     std::vector<double> lowerBounds, upperBounds, steps, gradientSteps;
@@ -1140,23 +1153,25 @@ ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
         steps.push_back(1.0);
         gradientSteps.push_back(0.001);
     }
-    std::vector<double> calibratedEnergies_BruteForce = findMinimumBruteForce(penaltyFunction,
-                                                                   setters,
-                                                                   lowerBounds,
-                                                                   upperBounds,
-                                                                   steps);
-    std::cout << "Initial penalty function value: " << penaltyFunction() << "\n";
+    std::vector<double> calibratedEnergies_BruteForce = 
+        findMinimumBruteForce(penaltyFunction, setters, lowerBounds,
+                              upperBounds, steps);
+    std::cout << "Initial penalty function value: " 
+        << penaltyFunction() << "\n";
     std::cout << "BruteForce approximation:\n";
     for(unsigned int i = 0; i < setters.size(); i++) {
-        std::cout << energiesToCalibrate[i] << ": " << calibratedEnergies_BruteForce[i] << "\n";
+        std::cout << energiesToCalibrate[i] << ": " 
+            << calibratedEnergies_BruteForce[i] << "\n";
     }
 
-    std::vector<double> calibratedEnergies_GradientDescent = findMinimumGradientDescent(
-            penaltyFunction, setters, calibratedEnergies_BruteForce, gradientSteps, 0.00001);
+    std::vector<double> calibratedEnergies_GradientDescent = 
+        findMinimumGradientDescent(penaltyFunction, setters, 
+            calibratedEnergies_BruteForce, gradientSteps, 0.00001);
 
     std::cout << "GradientDescent approximation:\n";
     for(unsigned int i = 0; i < setters.size(); i++) {
-        std::cout << energiesToCalibrate[i] << ": " << calibratedEnergies_GradientDescent[i] << "\n";
+        std::cout << energiesToCalibrate[i] << ": " 
+            << calibratedEnergies_GradientDescent[i] << "\n";
     }
 
     for(unsigned int i = 0; i < setters.size(); i++) {
