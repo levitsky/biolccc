@@ -75,6 +75,26 @@ class ChemicalBasis {
         void setSecondSolventBindEnergy(double newEnergy);
 
         /*!
+            Return the length of a polymer segment.
+        */
+        double segmentLength();
+
+        /*!
+            Sets a new value of the length of a polymer segment.
+        */
+        void setSegmentLength(double newSegmentLength);
+
+        /*!
+            Return the width of a solid phase adsorbtion layer.
+        */
+        double adsorbtionLayerWidth();
+
+        /*!
+            Sets a new value of the width of a solid phase adsorbtion layer.
+        */
+        void setAdsrobtionLayerWidth(double newAdsorbtionLayerWidth);
+
+        /*!
             Adds a new aminoacid
         */
         void addAminoacid(Aminoacid newAminoacid);
@@ -127,6 +147,8 @@ class ChemicalBasis {
         std::map<std::string,Terminus>  mNTermini;
         std::map<std::string,Terminus>  mCTermini;
         double mSecondSolventBindEnergy;
+        double mSegmentLength;
+        double mAdsorbtionLayerWidth;
 };
 
 }

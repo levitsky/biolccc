@@ -184,8 +184,6 @@ double calculateKdCoilBoltzmann(
     // are scaled to the new temperature) and column aging (calibration
     // parameter) are introduced.
     
-    const double segmentLength = 5.0;
-
     // Due to the preliminary scaling the binding energy of water equals zero.
     double Q = exp((0 + chemBasis.secondSolventBindEnergy()) * 
                293.0 / temperature);
@@ -222,7 +220,7 @@ double calculateKdCoilBoltzmann(
     
     // PoreSteps is a number of nodes in a lattice between two walls. Because of
     // the features of a following calculation it should be more than 2.
-    const int poreSteps = (int) columnPoreSize / segmentLength;
+    const int poreSteps = (int) columnPoreSize / chemBasis.segmentLength();
     if (poreSteps <=2) {
         return PORESIZE_ERROR;
     }
@@ -365,8 +363,6 @@ double calculateKdCoilSnyder(
     // are scaled to the new temperature) and column aging (calibration
     // parameter) are introduced.
     
-    const double segmentLength = 5.0;
-
     // Due to the preliminary scaling the binding energy of water equals zero.
     double Nb = 0;
    
@@ -401,7 +397,7 @@ double calculateKdCoilSnyder(
     
     // PoreSteps is a number of nodes in a lattice between two walls. Because of
     // the features of a following calculation it should be more than 2.
-    const int poreSteps = (int) columnPoreSize / segmentLength;
+    const int poreSteps = (int) columnPoreSize / chemBasis.segmentLength();
     if (poreSteps <=2) {
         return PORESIZE_ERROR;
     }
@@ -543,6 +539,21 @@ double partitionFunctionRodFreeSlit(double rodLength,
         
 }
 
+double partitionFunctionRodFreeVolume(double rodLength,
+                                      double slitWidth
+) {
+    // the equation works only if the slit is wider than the rod
+    if (rodLength <= slitWidth) {
+    // full volume without exclusion caused by walls
+        return (4 * PI * slitWidth * rodLength * rodLength);
+    // minus volume excluded by walls
+    }
+    else {
+        return -1.0;
+    }
+        
+}
+
 double rodAdsorbtionEnergy(const std::vector<double> & peptideEnergyProfile,
                            int n
 ) {
@@ -634,8 +645,6 @@ double calculateKdRod(
                293.0 / temperature);
     double Nb = 0;
     double Eab = 0;
-    const double segmentLength = 5.0;
-    const double layerWidth = 20.0;
    
     // A Boltzmann factor is an exponent of an energy of interaction between
     // an amino acid residue and a solid phase divided by a temperature * 
@@ -658,16 +667,16 @@ double calculateKdRod(
     
     double Kd = 
     (2 * partitionFunctionRodAdsorbtionLayer(effectiveEnergyProfile, 
-                                            segmentLength, 
-                                            layerWidth) +
+                                            chemBasis.segmentLength(), 
+                                            chemBasis.layerWidth()) +
     2 * partitionFunctionRodAdsorbtionLayer(revEffectiveEnergyProfile, 
-                                            segmentLength,
-                                            layerWidth) +
+                                            chemBasis.segmentLength(),
+                                            chemBasis.layerWidth()) +
     partitionFunctionRodFreeSlit(
-        (effectiveEnergyProfile.size() - 1) * segmentLength,
-        columnPoreSize - 2 * layerWidth) ) / 
-    partitionFunctionRodFreeSlit(
-        (effectiveEnergyProfile.size() - 1) * segmentLength,
+        (effectiveEnergyProfile.size() - 1) * chemBasis.segmentLength(),
+        columnPoreSize - 2 * chemBasis.layerWidth()) ) / 
+    partitionFunctionRodFreeVolume(
+        (effectiveEnergyProfile.size() - 1) * chemBasis.segmentLength(),
         columnPoreSize); 
 
     return Kd;
@@ -820,7 +829,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
         secondSolventConcentration = currentGradientPoint->second - 
             (currentGradientPoint->second - previousGradientPoint->second) / 
             (currentGradientPoint->first - previousGradientPoint->first) * 
-            (currentGradientPoint->first - j);
+            (currentGradientPoint->first - (double) j);
         S += dV / calculateKdLocal(
                       peptideEnergyProfile, 
                       secondSolventConcentration, 
@@ -1150,32 +1159,52 @@ ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
     for(unsigned int i = 0; i < setters.size(); i++) {
         lowerBounds.push_back(0.0);
         upperBounds.push_back(3.0);
-        steps.push_back(1.0);
+        steps.push_back(0.25);
         gradientSteps.push_back(0.001);
     }
-    std::vector<double> calibratedEnergies_BruteForce = 
-        findMinimumBruteForce(penaltyFunction, setters, lowerBounds,
-                              upperBounds, steps);
+    //std::vector<double> lowerBounds, upperBounds, steps, gradientSteps;
+    //lowerBounds.push_back(0.575-0.01);
+    //lowerBounds.push_back(0.83-0.01);
+    //lowerBounds.push_back(2.20-0.01);
+    //upperBounds.push_back(0.575+0.01);
+    //upperBounds.push_back(0.83+0.01);
+    //upperBounds.push_back(2.20+0.01);
+    //steps.push_back(0.0025);
+    //steps.push_back(0.0025);
+    //steps.push_back(0.0025);
+    //gradientSteps.push_back(0.001);
+    //gradientSteps.push_back(0.001);
+    //gradientSteps.push_back(0.001);
+
     std::cout << "Initial penalty function value: " 
         << penaltyFunction() << "\n";
+    std::vector<double> calibratedEnergiesBruteForce = 
+        findMinimumBruteForce(penaltyFunction, setters, lowerBounds,
+                              upperBounds, steps);
     std::cout << "BruteForce approximation:\n";
     for(unsigned int i = 0; i < setters.size(); i++) {
         std::cout << energiesToCalibrate[i] << ": " 
-            << calibratedEnergies_BruteForce[i] << "\n";
+            << calibratedEnergiesBruteForce[i] << "\n";
     }
 
-    std::vector<double> calibratedEnergies_GradientDescent = 
+    for(unsigned int i = 0; i < setters.size(); i++) {
+        setters[i](calibratedEnergiesBruteForce[i]);
+    }
+    std::cout << "Penalty function value after calibration: " 
+        << penaltyFunction() << "\n";
+
+    std::vector<double> calibratedEnergiesGradientDescent = 
         findMinimumGradientDescent(penaltyFunction, setters, 
-            calibratedEnergies_BruteForce, gradientSteps, 0.00001);
+            calibratedEnergiesBruteForce, gradientSteps, 0.00001);
 
     std::cout << "GradientDescent approximation:\n";
     for(unsigned int i = 0; i < setters.size(); i++) {
         std::cout << energiesToCalibrate[i] << ": " 
-            << calibratedEnergies_GradientDescent[i] << "\n";
+            << calibratedEnergiesGradientDescent[i] << "\n";
     }
 
     for(unsigned int i = 0; i < setters.size(); i++) {
-        setters[i](calibratedEnergies_GradientDescent[i]);
+        setters[i](calibratedEnergiesGradientDescent[i]);
     }
     return newChemicalBasis;
 }
