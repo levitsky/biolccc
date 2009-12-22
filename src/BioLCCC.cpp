@@ -668,13 +668,13 @@ double calculateKdRod(
     double Kd = 
     (2 * partitionFunctionRodAdsorbtionLayer(effectiveEnergyProfile, 
                                             chemBasis.segmentLength(), 
-                                            chemBasis.layerWidth()) +
+                                            chemBasis.adsorbtionLayerWidth()) +
     2 * partitionFunctionRodAdsorbtionLayer(revEffectiveEnergyProfile, 
                                             chemBasis.segmentLength(),
-                                            chemBasis.layerWidth()) +
+                                            chemBasis.adsorbtionLayerWidth()) +
     partitionFunctionRodFreeSlit(
         (effectiveEnergyProfile.size() - 1) * chemBasis.segmentLength(),
-        columnPoreSize - 2 * chemBasis.layerWidth()) ) / 
+        columnPoreSize - 2 * chemBasis.adsorbtionLayerWidth()) ) / 
     partitionFunctionRodFreeVolume(
         (effectiveEnergyProfile.size() - 1) * chemBasis.segmentLength(),
         columnPoreSize); 
