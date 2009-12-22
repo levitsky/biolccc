@@ -100,8 +100,12 @@ int main () {
     chr.setColumnDiameter(4.1);
     chr.setColumnPoreSize(300.0);
     chr.setFlowRate(1.0);
+    chr.setDV(0.005);
     chr.setGradient(BioLCCC::Gradient(0.0,100.0,100.0));
     BioLCCC::ChemicalBasis chb;
+    chb.setAminoacidBindEnergy("K", 0.5725);
+    chb.setAminoacidBindEnergy("G", 0.83);
+    chb.setAminoacidBindEnergy("L", 2.2025);
     BioLCCC::ChemicalBasis calibrated = 
         BioLCCC::calibrateBioLCCC(peptides, rTimes, chr, chb, groups);
 

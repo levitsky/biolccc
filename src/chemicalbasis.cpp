@@ -151,6 +151,12 @@ ChemicalBasis::ChemicalBasis() {
                                     
     //setting standard second solvent bind energy 
     mSecondSolventBindEnergy = 2.3979;
+
+    //setting standard (BUT NOT CORRECT) value of the peptide segment length
+    mSegmentLength = 10.0;
+
+    //setting arbitrary value for the adsorbtion layer width
+    mAdsorbtionLayerWidth = 15.0;
 }
 
 const std::map<std::string,Aminoacid> & ChemicalBasis::aminoacids() const{
@@ -179,6 +185,22 @@ double ChemicalBasis::secondSolventBindEnergy() const{
 
 void ChemicalBasis::setSecondSolventBindEnergy(double newEnergy){
     mSecondSolventBindEnergy = newEnergy;
+}
+
+double ChemicalBasis::segmentLength() {
+    return mSegmentLength;
+}
+
+void setSegmentLength(double newSegmentLength) {
+    mSegmentLength = newSegmentLength;
+}
+
+double adsorbtionLayerWidth() {
+    return mAdsorbtionLayerWidth;
+}
+
+void setAdsrobtionLayerWidth(double newAdsorbtionLayerWidth) {
+    mAdsorbtionLayerWidth = newAdsorbtionLayerWidth;
 }
 
 void ChemicalBasis::addAminoacid(Aminoacid newAminoacid){
