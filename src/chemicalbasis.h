@@ -92,7 +92,7 @@ class ChemicalBasis {
         /*!
             Sets a new value of the width of a solid phase adsorbtion layer.
         */
-        void setAdsrobtionLayerWidth(double newAdsorbtionLayerWidth);
+        void setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth);
 
         /*!
             Adds a new aminoacid
