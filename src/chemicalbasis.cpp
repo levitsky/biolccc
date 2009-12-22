@@ -187,19 +187,19 @@ void ChemicalBasis::setSecondSolventBindEnergy(double newEnergy){
     mSecondSolventBindEnergy = newEnergy;
 }
 
-double ChemicalBasis::segmentLength() {
+double ChemicalBasis::segmentLength() const {
     return mSegmentLength;
 }
 
-void setSegmentLength(double newSegmentLength) {
+void ChemicalBasis::setSegmentLength(double newSegmentLength) {
     mSegmentLength = newSegmentLength;
 }
 
-double adsorbtionLayerWidth() {
+double ChemicalBasis::adsorbtionLayerWidth() const {
     return mAdsorbtionLayerWidth;
 }
 
-void setAdsrobtionLayerWidth(double newAdsorbtionLayerWidth) {
+void ChemicalBasis::setAdsrobtionLayerWidth(double newAdsorbtionLayerWidth) {
     mAdsorbtionLayerWidth = newAdsorbtionLayerWidth;
 }
 

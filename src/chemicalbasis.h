@@ -77,7 +77,7 @@ class ChemicalBasis {
         /*!
             Return the length of a polymer segment.
         */
-        double segmentLength();
+        double segmentLength() const;
 
         /*!
             Sets a new value of the length of a polymer segment.
@@ -87,7 +87,7 @@ class ChemicalBasis {
         /*!
             Return the width of a solid phase adsorbtion layer.
         */
-        double adsorbtionLayerWidth();
+        double adsorbtionLayerWidth() const;
 
         /*!
             Sets a new value of the width of a solid phase adsorbtion layer.
