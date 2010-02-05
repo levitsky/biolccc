@@ -66,6 +66,11 @@ ChemicalBasis::ChemicalBasis() {
                                 1.8215,
                                 131.1926,
                                 131.04049));
+    addAminoacid(Aminoacid ("Oxidated methionine",
+                                "oxM",
+                                1.8215,
+                                131.1926 + 15.9994,
+                                131.04049 + 15.994915));
     addAminoacid(Aminoacid ("Asparagine",
                                 "N",
                                 0.6135,
