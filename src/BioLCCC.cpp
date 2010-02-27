@@ -398,7 +398,7 @@ double calculateKdCoilBoltzmannDoubleLayer(
     double *densityBuffer;
     
     // PoreSteps is a number of nodes in a lattice between two walls. Because of
-    // the features of a following calculation it should be more than 2.
+    // the features of the following calculation it should be more than 2.
     const int poreSteps = (int) columnPoreSize / chemBasis.segmentLength();
     if (poreSteps <=2) {
         return PORESIZE_ERROR;
@@ -486,7 +486,7 @@ double calculateKdCoilBoltzmannDoubleLayer(
         transitionMatrix[1] = 1.0 / 6.0 * (*residueBoltzmannFactor);
         transitionMatrix[poreSteps] = 1.0 / 6.0 * (*residueBoltzmannFactor);
         transitionMatrix[poreSteps + 1] = 4.0 / 6.0 * (*residueBoltzmannFactor);
-        transitionMatrix[poreSteps + 2] = 4.0 / 6.0 * (*residueBoltzmannFactor);
+        transitionMatrix[poreSteps + 2] = 1.0 / 6.0 * (*residueBoltzmannFactor);
 
         transitionMatrix[poreSteps*(poreSteps - 1) - 1] = 1.0 / 6.0 * 
             (*residueBoltzmannFactor);
