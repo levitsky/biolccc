@@ -1,6 +1,5 @@
 // pyBioLCCC.i - SWIG interface
 %module pyBioLCCC 
-%include "std_string.i"
 
 %{
 #include "auxiliary.hpp"
@@ -12,6 +11,9 @@
 #include "chromoconditions.h"
 #include "BioLCCC.h"
 %}
+
+%include "std_string.i"
+%include "std_map.i"
 
 // Parse the original header file
 %include "auxiliary.hpp"
