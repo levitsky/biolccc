@@ -95,52 +95,70 @@ class ChemicalBasis {
         void setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth);
 
         /*!
-            Adds a new aminoacid
+            Adds a new aminoacid.
         */
         void addAminoacid(Aminoacid newAminoacid);
 
         /*!
-            Adds a new N-terminus
+            Adds a new N-terminus.
         */
         void addNTerminus(Terminus newNTerminus);
 
         /*!
-            Adds a new C-terminus
+            Adds a new C-terminus.
         */
         void addCTerminus(Terminus newCTerminus);
 
         /*!
-            Removes the aminoacid with the given label; returns 'true' on success
+            Removes the aminoacid with the given label; returns 'true' on 
+            success.
         */
         bool removeAminoacid (std::string label);
 
         /*!
-            Removes the N-terminus with the given label; returns 'true' on success
+            Removes the N-terminus with the given label; returns 'true' on 
+            success.
         */
         bool removeNTerminus (std::string label);
 
         /*!
-            Removes the C-terminus with the given label; returns 'true' on success
+            Removes the C-terminus with the given label; returns 'true' on 
+            success.
         */
         bool removeCTerminus (std::string label);
 
         /*!
-            Sets the value of binding energy for the aminoacid with the given label;
+            Sets the value of binding energy for the aminoacid with the given 
+            label;
             returns 'true' on success or 'false' if the aminoacid is not found.
         */
         bool setAminoacidBindEnergy (std::string label, double newBindEnergy);
 
         /*!
-            Sets the value of binding energy for the N-terminus with the given label;
+            Sets the value of binding energy for the N-terminus with the given 
+            label;
             returns 'true' on success or 'false' if the aminoacid is not found.
         */
         bool setNTerminusBindEnergy (std::string label, double newBindEnergy);
 
         /*!
-            Sets the value of binding energy for the C-terminus with the given label;
+            Sets the value of binding energy for the C-terminus with the given 
+            label;
             returns 'true' on success or 'false' if the aminoacid is not found.
         */
         bool setCTerminusBindEnergy (std::string label, double newBindEnergy);
+
+        /*!
+            Sets the type of BioLCCC model (e.g. CoilBoltzmann, CoilSnyder,
+            RodBoltzmann and so on).
+        */
+        bool setModel(std::string newModel);
+
+        /*!
+            Returns the type of BioLCCC model which is used in calculations with
+            this ChemicalBasis.
+        */
+        const std::string model() const;
         
     private:
         std::map<std::string,Aminoacid> mAminoacids;
@@ -149,6 +167,7 @@ class ChemicalBasis {
         double mSecondSolventBindEnergy;
         double mSegmentLength;
         double mAdsorbtionLayerWidth;
+        std::string mModel;
 };
 
 }

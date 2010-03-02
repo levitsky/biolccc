@@ -11,26 +11,24 @@
 #define PARSING_ERROR   -3.0
 #define PORESIZE_ERROR  -4.0
 #define GRADIENT_ERROR  -5.0
-#define MODELTYPE_ERROR -6.0 
+#define MODEL_ERROR     -6.0 
 
 #define PI 3.14159265
 
 namespace BioLCCC {
 
-namespace {
-
 // Auxiliary functions that shouldn't be exposed to user at this
 // point.
+namespace {
 std::vector<double> calculateRT(std::vector<std::string> mixture,
                                 ChromoConditions chromatograph,
-                                             ChemicalBasis chemicalBasis) {
+                                ChemicalBasis chemicalBasis) {
     std::vector<double> times;
     for(unsigned int i = 0; i < mixture.size(); i++) {
         times.push_back(calculateRT(mixture[i], chromatograph, chemicalBasis));
     }
     return times;
 }
-
 
 bool parseSequence(
     const std::string &source, 
@@ -879,8 +877,7 @@ double calculateKdRod(
 double calculateRT(const std::vector<double> &peptideEnergyProfile,
     const ChromoConditions &conditions,
     const ChemicalBasis &chemBasis,
-    const bool continueGradient,
-    const std::string modelType
+    const bool continueGradient
 ) {
     double (*calculateKdLocal)(const std::vector<double> &,
                           const double,
@@ -889,20 +886,20 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                           const double,
                           const double);
     // Setting the appropriate model.
-    if (modelType=="CoilBoltzmann") {
+    if (chemBasis.model()=="CoilBoltzmann") {
         calculateKdLocal = calculateKdCoilBoltzmann;
     }
-    else if (modelType=="CoilBoltzmannDoubleLayer") {
+    else if (chemBasis.model()=="CoilBoltzmannDoubleLayer") {
         calculateKdLocal = calculateKdCoilBoltzmannDoubleLayer;
     }
-    else if (modelType == "CoilSnyder") {
+    else if (chemBasis.model() == "CoilSnyder") {
         calculateKdLocal = calculateKdCoilSnyder;
     }
-    else if (modelType == "RodBoltzmann") {
+    else if (chemBasis.model() == "RodBoltzmann") {
         calculateKdLocal = calculateKdRod;
     }
     else {
-        return MODELTYPE_ERROR;
+        return MODEL_ERROR;
     }
     
     // Calculating column volumes.
@@ -1041,14 +1038,12 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
     return RT;
 }
 
-
 }
 
 double calculateRT(const std::string &sequence,
     const ChromoConditions &conditions,
     const ChemicalBasis &chemBasis,
-    const bool continueGradient,
-    const std::string model
+    const bool continueGradient
 ) {
     std::vector<Aminoacid> parsedPeptideStructure;
     Terminus NTerminus;    
@@ -1065,137 +1060,136 @@ double calculateRT(const std::string &sequence,
         return calculateRT(peptideEnergyProfile,
             conditions,
             chemBasis,
-            continueGradient,
-            model);
+            continueGradient);
     }
     else {
         return PARSING_ERROR;
     }
 }
 
-double calculateKdCoilBoltzmann(const std::string &sequence,
-    const double secondSolventConcentration,
-    const ChemicalBasis & chemBasis,
-    const double columnPoreSize,
-    const double calibrationParameter,
-    const double temperature
-) {
-    std::vector<Aminoacid> parsedPeptideStructure;
-    Terminus NTerminus;    
-    Terminus CTerminus;
-    std::vector<double> peptideEnergyProfile;
-    
-    if (parseSequence(sequence, 
-                     chemBasis,
-                     &parsedPeptideStructure,
-                     &NTerminus,
-                     &CTerminus,
-                     &peptideEnergyProfile))
-    {
-        return calculateKdCoilBoltzmann(peptideEnergyProfile,
-                                  secondSolventConcentration,
-                                  chemBasis,
-                                  columnPoreSize,
-                                  calibrationParameter,
-                                  temperature);
-    }
-    else {
-        return PARSING_ERROR;
-    }
-}                                
-
-double calculateKdCoilBoltzmannDoubleLayer(const std::string &sequence,
-    const double secondSolventConcentration,
-    const ChemicalBasis & chemBasis,
-    const double columnPoreSize,
-    const double calibrationParameter,
-    const double temperature
-) {
-    std::vector<Aminoacid> parsedPeptideStructure;
-    Terminus NTerminus;    
-    Terminus CTerminus;
-    std::vector<double> peptideEnergyProfile;
-    
-    if (parseSequence(sequence, 
-                     chemBasis,
-                     &parsedPeptideStructure,
-                     &NTerminus,
-                     &CTerminus,
-                     &peptideEnergyProfile))
-    {
-        return calculateKdCoilBoltzmannDoubleLayer(peptideEnergyProfile,
-                                  secondSolventConcentration,
-                                  chemBasis,
-                                  columnPoreSize,
-                                  calibrationParameter,
-                                  temperature);
-    }
-    else {
-        return PARSING_ERROR;
-    }
-}                                
-
-double calculateKdCoilSnyder(const std::string &sequence,
-    const double secondSolventConcentration,
-    const ChemicalBasis & chemBasis,
-    const double columnPoreSize,
-    const double calibrationParameter,
-    const double temperature
-) {
-    std::vector<Aminoacid> parsedPeptideStructure;
-    Terminus NTerminus;    
-    Terminus CTerminus;
-    std::vector<double> peptideEnergyProfile;
-    
-    if (parseSequence(sequence, 
-                     chemBasis,
-                     &parsedPeptideStructure,
-                     &NTerminus,
-                     &CTerminus,
-                     &peptideEnergyProfile))
-    {
-        return calculateKdCoilSnyder(peptideEnergyProfile,
-                                  secondSolventConcentration,
-                                  chemBasis,
-                                  columnPoreSize,
-                                  calibrationParameter,
-                                  temperature);
-    }
-    else {
-        return PARSING_ERROR;
-    }
-}                                
-
-double calculateKdRod(const std::string &sequence,
-    const double secondSolventConcentration,
-    const ChemicalBasis & chemBasis,
-    const double columnPoreSize,
-    const double calibrationParameter,
-    const double temperature
-) {
-    std::vector<Aminoacid> parsedPeptideStructure;
-    Terminus NTerminus;    
-    Terminus CTerminus;
-    std::vector<double> peptideEnergyProfile;
-    
-    if (parseSequence(sequence, 
-                     chemBasis,
-                     &parsedPeptideStructure,
-                     &NTerminus,
-                     &CTerminus,
-                     &peptideEnergyProfile))
-    {
-        return calculateKdRod(peptideEnergyProfile,
-                                  secondSolventConcentration,
-                                  chemBasis,
-                                  columnPoreSize,
-                                  calibrationParameter,
-                                  temperature);
-    }
-    else {
-        return PARSING_ERROR;
-    }
-}                                
+//double calculateKdCoilBoltzmann(const std::string &sequence,
+//    const double secondSolventConcentration,
+//    const ChemicalBasis & chemBasis,
+//    const double columnPoreSize,
+//    const double calibrationParameter,
+//    const double temperature
+//) {
+//    std::vector<Aminoacid> parsedPeptideStructure;
+//    Terminus NTerminus;    
+//    Terminus CTerminus;
+//    std::vector<double> peptideEnergyProfile;
+//    
+//    if (parseSequence(sequence, 
+//                     chemBasis,
+//                     &parsedPeptideStructure,
+//                     &NTerminus,
+//                     &CTerminus,
+//                     &peptideEnergyProfile))
+//    {
+//        return calculateKdCoilBoltzmann(peptideEnergyProfile,
+//                                  secondSolventConcentration,
+//                                  chemBasis,
+//                                  columnPoreSize,
+//                                  calibrationParameter,
+//                                  temperature);
+//    }
+//    else {
+//        return PARSING_ERROR;
+//    }
+//}                                
+//
+//double calculateKdCoilBoltzmannDoubleLayer(const std::string &sequence,
+//    const double secondSolventConcentration,
+//    const ChemicalBasis & chemBasis,
+//    const double columnPoreSize,
+//    const double calibrationParameter,
+//    const double temperature
+//) {
+//    std::vector<Aminoacid> parsedPeptideStructure;
+//    Terminus NTerminus;    
+//    Terminus CTerminus;
+//    std::vector<double> peptideEnergyProfile;
+//    
+//    if (parseSequence(sequence, 
+//                     chemBasis,
+//                     &parsedPeptideStructure,
+//                     &NTerminus,
+//                     &CTerminus,
+//                     &peptideEnergyProfile))
+//    {
+//        return calculateKdCoilBoltzmannDoubleLayer(peptideEnergyProfile,
+//                                  secondSolventConcentration,
+//                                  chemBasis,
+//                                  columnPoreSize,
+//                                  calibrationParameter,
+//                                  temperature);
+//    }
+//    else {
+//        return PARSING_ERROR;
+//    }
+//}                                
+//
+//double calculateKdCoilSnyder(const std::string &sequence,
+//    const double secondSolventConcentration,
+//    const ChemicalBasis & chemBasis,
+//    const double columnPoreSize,
+//    const double calibrationParameter,
+//    const double temperature
+//) {
+//    std::vector<Aminoacid> parsedPeptideStructure;
+//    Terminus NTerminus;    
+//    Terminus CTerminus;
+//    std::vector<double> peptideEnergyProfile;
+//    
+//    if (parseSequence(sequence, 
+//                     chemBasis,
+//                     &parsedPeptideStructure,
+//                     &NTerminus,
+//                     &CTerminus,
+//                     &peptideEnergyProfile))
+//    {
+//        return calculateKdCoilSnyder(peptideEnergyProfile,
+//                                  secondSolventConcentration,
+//                                  chemBasis,
+//                                  columnPoreSize,
+//                                  calibrationParameter,
+//                                  temperature);
+//    }
+//    else {
+//        return PARSING_ERROR;
+//    }
+//}                                
+//
+//double calculateKdRod(const std::string &sequence,
+//    const double secondSolventConcentration,
+//    const ChemicalBasis & chemBasis,
+//    const double columnPoreSize,
+//    const double calibrationParameter,
+//    const double temperature
+//) {
+//    std::vector<Aminoacid> parsedPeptideStructure;
+//    Terminus NTerminus;    
+//    Terminus CTerminus;
+//    std::vector<double> peptideEnergyProfile;
+//    
+//    if (parseSequence(sequence, 
+//                     chemBasis,
+//                     &parsedPeptideStructure,
+//                     &NTerminus,
+//                     &CTerminus,
+//                     &peptideEnergyProfile))
+//    {
+//        return calculateKdRod(peptideEnergyProfile,
+//                                  secondSolventConcentration,
+//                                  chemBasis,
+//                                  columnPoreSize,
+//                                  calibrationParameter,
+//                                  temperature);
+//    }
+//    else {
+//        return PARSING_ERROR;
+//    }
+//}                                
 
 double calculateKd(const std::string &sequence,
     const double secondSolventConcentration,
@@ -1216,12 +1210,42 @@ double calculateKd(const std::string &sequence,
                      &CTerminus,
                      &peptideEnergyProfile))
     {
-        return calculateKdCoilBoltzmann(peptideEnergyProfile,
-                                  secondSolventConcentration,
-                                  chemBasis,
-                                  columnPoreSize,
-                                  calibrationParameter,
-                                  temperature);
+        // Choosing the appropriate model.
+        if (chemBasis.model()=="CoilBoltzmann") {
+            return calculateKdCoilBoltzmann(peptideEnergyProfile,
+                secondSolventConcentration,
+                chemBasis,
+                columnPoreSize,
+                calibrationParameter,
+                temperature);
+        }
+        else if (chemBasis.model()=="CoilBoltzmannDoubleLayer") {
+            return calculateKdCoilBoltzmannDoubleLayer(peptideEnergyProfile,
+                secondSolventConcentration,
+                chemBasis,
+                columnPoreSize,
+                calibrationParameter,
+                temperature);
+        }
+        else if (chemBasis.model() == "CoilSnyder") {
+            return calculateKdCoilSnyder(peptideEnergyProfile,
+                secondSolventConcentration,
+                chemBasis,
+                columnPoreSize,
+                calibrationParameter,
+                temperature);
+        }
+        else if (chemBasis.model() == "RodBoltzmann") {
+            return calculateKdRod(peptideEnergyProfile,
+                secondSolventConcentration,
+                chemBasis,
+                columnPoreSize,
+                calibrationParameter,
+                temperature);
+        }
+        else {
+            return MODEL_ERROR;
+        }
     }
     else {
         return PARSING_ERROR;
@@ -1294,7 +1318,7 @@ bool calculatePeptideProperties(const std::string &sequence,
                      &peptideEnergyProfile))
     {
         *RTBioLCCC = calculateRT(peptideEnergyProfile, conditions, chemBasis,
-                                 true, "CoilBotzmann");
+                                 true);
         
         *averageMass = 0;
         for (std::vector<Aminoacid>::const_iterator i = 

@@ -4,6 +4,7 @@ namespace BioLCCC {
 
 //TODO: make addAminoacid method!
 ChemicalBasis::ChemicalBasis() {
+    setModel("CoilBoltzmann");
     
     //adding standard aminoacids, masses set to zero.
     addAminoacid(Aminoacid ("Alanine",
@@ -246,10 +247,21 @@ bool ChemicalBasis::setNTerminusBindEnergy(std::string label, double newBindEner
     return true;
 }
 
-bool ChemicalBasis::setCTerminusBindEnergy(std::string label, double newBindEnergy){
+bool ChemicalBasis::setCTerminusBindEnergy(std::string label, 
+                                           double newBindEnergy){
     std::map<std::string,Terminus>::iterator it = mCTermini.find(label);
     if (it == mCTermini.end()) return false;
     it->second.setBindEnergy(newBindEnergy);
     return true;
 }
+
+const std::string ChemicalBasis::model() const{
+    return mModel;
 }
+
+bool ChemicalBasis::setModel(std::string newModel){
+    mModel = newModel;
+    return true;
+}
+}
+
