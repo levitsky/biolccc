@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <numeric>
+#include <algorithm>
 #include "boost/foreach.hpp"
 #include "boost/function.hpp"
 #include "boost/bind.hpp"
@@ -187,24 +188,39 @@ double calculateKdCoilBoltzmann(
                293.0 / temperature);
     double Nb = 0;
     double Eab = 0;
+    Nb = secondSolventConcentration * 1.91 / 
+         (secondSolventConcentration * 1.91 + 
+          (100.0 - secondSolventConcentration) * 5.56);
+    Eab = 0.0 + 1.0 / calibrationParameter * log( 1.0 - Nb + Nb * Q );
    
     // A Boltzmann factor is an exponent of an energy of interaction between
     // an amino acid residue and a solid phase divided by a temperature * 
     // Boltzmann's constant. An energy unit is a Boltzmann's constant * 
     // 293.0 Kelvins. This probability is used later in the transition matrix.
     std::vector<double> boltzmannFactorProfile;
+    int residueNumber = 0;
+    double energySum = 0.0;
     for (std::vector<double>::const_iterator residueEnergy = 
              peptideEnergyProfile.begin();
          residueEnergy != peptideEnergyProfile.end();
          residueEnergy ++
     ) {
-        //std::cout << *residueEnergy << " ";
-        Nb = secondSolventConcentration * 1.91 / 
-             (secondSolventConcentration * 1.91 + 
-              (100.0 - secondSolventConcentration) * 5.56);
-        Eab = 0.0 + 1.0 / calibrationParameter * log( 1.0 - Nb + Nb * Q );
-        boltzmannFactorProfile.push_back(exp(calibrationParameter * 
-            (*residueEnergy - Eab) * 293.0 / temperature));
+        // More detailed formula for the Nb is:
+        // Nb = (DensityB * %B / MB) / (DensityB * %B / MB + DensityA * %A / MA)
+        // Where DensityA and DensityB are the corresponding densities and
+        // MA and MB are the corresponding molecular weights.
+        residueNumber++;
+        energySum += calibrationParameter * (*residueEnergy - Eab) *
+            293.0 / temperature;
+        if ((residueNumber % chemBasis.persistentLength()) == 0) {
+            boltzmannFactorProfile.push_back(exp(energySum));
+            energySum = 0.0;
+        }
+    }
+
+    // If the last persistent block is incomplete, we should add it manually.
+    if ((residueNumber % chemBasis.persistentLength()) != 0) {
+        boltzmannFactorProfile.push_back(energySum);
     }
     
     // The density vector correspond to a probability of n-th residue to be in 
@@ -218,7 +234,8 @@ double calculateKdCoilBoltzmann(
     
     // PoreSteps is a number of nodes in a lattice between two walls. Because of
     // the features of a following calculation it should be more than 2.
-    const int poreSteps = (int) columnPoreSize / chemBasis.segmentLength();
+    const int poreSteps = (int) (columnPoreSize / 
+        chemBasis.segmentLength() / (double) chemBasis.persistentLength()) ;
     if (poreSteps <=2) {
         return PORESIZE_ERROR;
     }
@@ -238,9 +255,11 @@ double calculateKdCoilBoltzmann(
     // except for the wall layers. There a density is multiplied by Boltzmann 
     // factor due to interaction of a residue with a solid phase.
     density[0] = boltzmannFactorProfile[0];
+
     for (int i = 1; i < poreSteps - 1 ; i++) {
         density[i] = 1;
     }
+
     density[poreSteps - 1] = 
         boltzmannFactorProfile[0];
 
@@ -874,34 +893,66 @@ double calculateKdRod(
     return Kd;
 }                                            
 
+double calculateKd(const std::vector<double> &peptideEnergyProfile,
+    const double secondSolventConcentration,
+    const ChemicalBasis &chemBasis,
+    const double columnPoreSize,
+    const double calibrationParameter,
+    const double temperature
+) {
+    // Choosing the appropriate model.
+    if (chemBasis.model()=="CoilBoltzmann") {
+        if (peptideEnergyProfile.size() % chemBasis.persistentLength() == 0) {
+            return calculateKdCoilBoltzmann(peptideEnergyProfile,
+                secondSolventConcentration, chemBasis, columnPoreSize,
+                calibrationParameter, temperature);
+        }
+        else {
+            std::vector<double> revPeptideEnergyProfile = peptideEnergyProfile;
+            std::reverse(revPeptideEnergyProfile.begin(),
+                         revPeptideEnergyProfile.end());
+            return (calculateKdCoilBoltzmann(peptideEnergyProfile,
+                secondSolventConcentration, chemBasis, columnPoreSize,
+                calibrationParameter, temperature) +
+                calculateKdCoilBoltzmann(revPeptideEnergyProfile,
+                secondSolventConcentration, chemBasis, columnPoreSize,
+                calibrationParameter, temperature)) / 2.0 ;
+        }
+    }
+    else if (chemBasis.model()=="CoilBoltzmannDoubleLayer") {
+        return calculateKdCoilBoltzmannDoubleLayer(peptideEnergyProfile,
+            secondSolventConcentration,
+            chemBasis,
+            columnPoreSize,
+            calibrationParameter,
+            temperature);
+    }
+    else if (chemBasis.model() == "CoilSnyder") {
+        return calculateKdCoilSnyder(peptideEnergyProfile,
+            secondSolventConcentration,
+            chemBasis,
+            columnPoreSize,
+            calibrationParameter,
+            temperature);
+    }
+    else if (chemBasis.model() == "RodBoltzmann") {
+        return calculateKdRod(peptideEnergyProfile,
+            secondSolventConcentration,
+            chemBasis,
+            columnPoreSize,
+            calibrationParameter,
+            temperature);
+    }
+    else {
+        return MODEL_ERROR;
+    }
+}                                
+
 double calculateRT(const std::vector<double> &peptideEnergyProfile,
     const ChromoConditions &conditions,
     const ChemicalBasis &chemBasis,
     const bool continueGradient
 ) {
-    double (*calculateKdLocal)(const std::vector<double> &,
-                          const double,
-                          const ChemicalBasis &,
-                          const double,
-                          const double,
-                          const double);
-    // Setting the appropriate model.
-    if (chemBasis.model()=="CoilBoltzmann") {
-        calculateKdLocal = calculateKdCoilBoltzmann;
-    }
-    else if (chemBasis.model()=="CoilBoltzmannDoubleLayer") {
-        calculateKdLocal = calculateKdCoilBoltzmannDoubleLayer;
-    }
-    else if (chemBasis.model() == "CoilSnyder") {
-        calculateKdLocal = calculateKdCoilSnyder;
-    }
-    else if (chemBasis.model() == "RodBoltzmann") {
-        calculateKdLocal = calculateKdRod;
-    }
-    else {
-        return MODEL_ERROR;
-    }
-    
     // Calculating column volumes.
     double volumeLiquidPhase = conditions.columnDiameter() * 
         conditions.columnDiameter() * 3.1415 * conditions.columnLength() / 4.0 /
@@ -979,7 +1030,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                     // One case is that a peptide elutes during this section or
                     // the section is the last.
                     if (((1.0 - S) / dV * 
-                        calculateKdLocal(
+                        calculateKd(
                             peptideEnergyProfile, 
                             currentGradientPoint->second, 
                             chemBasis, 
@@ -991,7 +1042,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                         (currentGradientPoint == --convertedGradient.end()))
                     {
                         j += (int)ceil((1.0 - S) / dV *
-                            calculateKdLocal(
+                            calculateKd(
                                 peptideEnergyProfile, 
                                 currentGradientPoint->second,
                                 chemBasis,
@@ -1003,7 +1054,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                     // Another case is that this section is not long enough for 
                     // a peptide to elute.
                     else {
-                        S += dV / calculateKdLocal(
+                        S += dV / calculateKd(
                                       peptideEnergyProfile,
                                       currentGradientPoint->second, 
                                       chemBasis,
@@ -1024,7 +1075,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
             (currentGradientPoint->second - previousGradientPoint->second) / 
             (currentGradientPoint->first - previousGradientPoint->first) * 
             (currentGradientPoint->first - (double) j);
-        S += dV / calculateKdLocal(
+        S += dV / calculateKd(
                       peptideEnergyProfile, 
                       secondSolventConcentration, 
                       chemBasis, 
@@ -1067,130 +1118,6 @@ double calculateRT(const std::string &sequence,
     }
 }
 
-//double calculateKdCoilBoltzmann(const std::string &sequence,
-//    const double secondSolventConcentration,
-//    const ChemicalBasis & chemBasis,
-//    const double columnPoreSize,
-//    const double calibrationParameter,
-//    const double temperature
-//) {
-//    std::vector<Aminoacid> parsedPeptideStructure;
-//    Terminus NTerminus;    
-//    Terminus CTerminus;
-//    std::vector<double> peptideEnergyProfile;
-//    
-//    if (parseSequence(sequence, 
-//                     chemBasis,
-//                     &parsedPeptideStructure,
-//                     &NTerminus,
-//                     &CTerminus,
-//                     &peptideEnergyProfile))
-//    {
-//        return calculateKdCoilBoltzmann(peptideEnergyProfile,
-//                                  secondSolventConcentration,
-//                                  chemBasis,
-//                                  columnPoreSize,
-//                                  calibrationParameter,
-//                                  temperature);
-//    }
-//    else {
-//        return PARSING_ERROR;
-//    }
-//}                                
-//
-//double calculateKdCoilBoltzmannDoubleLayer(const std::string &sequence,
-//    const double secondSolventConcentration,
-//    const ChemicalBasis & chemBasis,
-//    const double columnPoreSize,
-//    const double calibrationParameter,
-//    const double temperature
-//) {
-//    std::vector<Aminoacid> parsedPeptideStructure;
-//    Terminus NTerminus;    
-//    Terminus CTerminus;
-//    std::vector<double> peptideEnergyProfile;
-//    
-//    if (parseSequence(sequence, 
-//                     chemBasis,
-//                     &parsedPeptideStructure,
-//                     &NTerminus,
-//                     &CTerminus,
-//                     &peptideEnergyProfile))
-//    {
-//        return calculateKdCoilBoltzmannDoubleLayer(peptideEnergyProfile,
-//                                  secondSolventConcentration,
-//                                  chemBasis,
-//                                  columnPoreSize,
-//                                  calibrationParameter,
-//                                  temperature);
-//    }
-//    else {
-//        return PARSING_ERROR;
-//    }
-//}                                
-//
-//double calculateKdCoilSnyder(const std::string &sequence,
-//    const double secondSolventConcentration,
-//    const ChemicalBasis & chemBasis,
-//    const double columnPoreSize,
-//    const double calibrationParameter,
-//    const double temperature
-//) {
-//    std::vector<Aminoacid> parsedPeptideStructure;
-//    Terminus NTerminus;    
-//    Terminus CTerminus;
-//    std::vector<double> peptideEnergyProfile;
-//    
-//    if (parseSequence(sequence, 
-//                     chemBasis,
-//                     &parsedPeptideStructure,
-//                     &NTerminus,
-//                     &CTerminus,
-//                     &peptideEnergyProfile))
-//    {
-//        return calculateKdCoilSnyder(peptideEnergyProfile,
-//                                  secondSolventConcentration,
-//                                  chemBasis,
-//                                  columnPoreSize,
-//                                  calibrationParameter,
-//                                  temperature);
-//    }
-//    else {
-//        return PARSING_ERROR;
-//    }
-//}                                
-//
-//double calculateKdRod(const std::string &sequence,
-//    const double secondSolventConcentration,
-//    const ChemicalBasis & chemBasis,
-//    const double columnPoreSize,
-//    const double calibrationParameter,
-//    const double temperature
-//) {
-//    std::vector<Aminoacid> parsedPeptideStructure;
-//    Terminus NTerminus;    
-//    Terminus CTerminus;
-//    std::vector<double> peptideEnergyProfile;
-//    
-//    if (parseSequence(sequence, 
-//                     chemBasis,
-//                     &parsedPeptideStructure,
-//                     &NTerminus,
-//                     &CTerminus,
-//                     &peptideEnergyProfile))
-//    {
-//        return calculateKdRod(peptideEnergyProfile,
-//                                  secondSolventConcentration,
-//                                  chemBasis,
-//                                  columnPoreSize,
-//                                  calibrationParameter,
-//                                  temperature);
-//    }
-//    else {
-//        return PARSING_ERROR;
-//    }
-//}                                
-
 double calculateKd(const std::string &sequence,
     const double secondSolventConcentration,
     const ChemicalBasis & chemBasis,
@@ -1210,42 +1137,12 @@ double calculateKd(const std::string &sequence,
                      &CTerminus,
                      &peptideEnergyProfile))
     {
-        // Choosing the appropriate model.
-        if (chemBasis.model()=="CoilBoltzmann") {
-            return calculateKdCoilBoltzmann(peptideEnergyProfile,
-                secondSolventConcentration,
-                chemBasis,
-                columnPoreSize,
-                calibrationParameter,
-                temperature);
-        }
-        else if (chemBasis.model()=="CoilBoltzmannDoubleLayer") {
-            return calculateKdCoilBoltzmannDoubleLayer(peptideEnergyProfile,
-                secondSolventConcentration,
-                chemBasis,
-                columnPoreSize,
-                calibrationParameter,
-                temperature);
-        }
-        else if (chemBasis.model() == "CoilSnyder") {
-            return calculateKdCoilSnyder(peptideEnergyProfile,
-                secondSolventConcentration,
-                chemBasis,
-                columnPoreSize,
-                calibrationParameter,
-                temperature);
-        }
-        else if (chemBasis.model() == "RodBoltzmann") {
-            return calculateKdRod(peptideEnergyProfile,
-                secondSolventConcentration,
-                chemBasis,
-                columnPoreSize,
-                calibrationParameter,
-                temperature);
-        }
-        else {
-            return MODEL_ERROR;
-        }
+        return calculateKd(peptideEnergyProfile,
+            secondSolventConcentration,
+            chemBasis,
+            columnPoreSize,
+            calibrationParameter,
+            temperature);
     }
     else {
         return PARSING_ERROR;
