@@ -155,14 +155,17 @@ ChemicalBasis::ChemicalBasis() {
                             16.0226,
                             16.01872));
                                     
-    //setting standard second solvent bind energy 
+    // setting standard second solvent bind energy 
     setSecondSolventBindEnergy(2.3979);
 
-    //setting standard (BUT NOT CORRECT) value of the peptide segment length
+    // setting standard (BUT NOT CORRECT) value of the peptide segment length
     setSegmentLength(10.0);
 
-    //setting arbitrary value for the adsorbtion layer width
+    // setting arbitrary value for the adsorbtion layer width
     setAdsorbtionLayerWidth(15.0);
+
+    // setting the standard persistent length.
+    setPersistentLength(1);
 }
 
 const std::map<std::string,Aminoacid> & ChemicalBasis::aminoacids() const{
@@ -197,16 +200,42 @@ double ChemicalBasis::segmentLength() const {
     return mSegmentLength;
 }
 
-void ChemicalBasis::setSegmentLength(double newSegmentLength) {
-    mSegmentLength = newSegmentLength;
+bool ChemicalBasis::setSegmentLength(double newSegmentLength) {
+    if (newSegmentLength > 0.0) {
+        mSegmentLength = newSegmentLength;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+int ChemicalBasis::persistentLength() const {
+    return mPeristentLength;
+}
+
+bool ChemicalBasis::setPersistentLength(int newPersistentLength) {
+    if (newPersistentLength > 0) {
+        mPeristentLength = newPersistentLength;
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 double ChemicalBasis::adsorbtionLayerWidth() const {
     return mAdsorbtionLayerWidth;
 }
 
-void ChemicalBasis::setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth) {
-    mAdsorbtionLayerWidth = newAdsorbtionLayerWidth;
+bool ChemicalBasis::setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth) {
+    if (newAdsorbtionLayerWidth > 0.0) {
+        mAdsorbtionLayerWidth = newAdsorbtionLayerWidth;
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 void ChemicalBasis::addAminoacid(Aminoacid newAminoacid){

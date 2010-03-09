@@ -75,14 +75,26 @@ class ChemicalBasis {
         void setSecondSolventBindEnergy(double newEnergy);
 
         /*!
-            Return the length of a polymer segment.
+            Return the length between two peptide bonds, angstroms.
         */
         double segmentLength() const;
 
         /*!
-            Sets a new value of the length of a polymer segment.
+            Sets the length between two peptide bonds, angstroms.
         */
-        void setSegmentLength(double newSegmentLength);
+        bool setSegmentLength(double newSegmentLength);
+
+        /*!
+            Sets the persistent length of a biopolymer. Persistent length equals
+            the number of aminoacids between the joints of a polymer.
+        */
+        bool setPersistentLength(int newPersistentLength);
+
+        /*!
+            Returns the persistent length of a biopolymer. Persistent length 
+            equals the number of aminoacids between the joints of a polymer.
+        */
+        int persistentLength() const;
 
         /*!
             Return the width of a solid phase adsorbtion layer.
@@ -92,7 +104,7 @@ class ChemicalBasis {
         /*!
             Sets a new value of the width of a solid phase adsorbtion layer.
         */
-        void setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth);
+        bool setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth);
 
         /*!
             Adds a new aminoacid.
@@ -159,13 +171,14 @@ class ChemicalBasis {
             this ChemicalBasis.
         */
         const std::string model() const;
-        
+
     private:
         std::map<std::string,Aminoacid> mAminoacids;
         std::map<std::string,Terminus>  mNTermini;
         std::map<std::string,Terminus>  mCTermini;
         double mSecondSolventBindEnergy;
         double mSegmentLength;
+        int mPeristentLength;
         double mAdsorbtionLayerWidth;
         std::string mModel;
 };

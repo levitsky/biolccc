@@ -21,6 +21,8 @@
         sprintf(tmp, "{'model': '%s'", $self->model().c_str());
         sprintf(tmp, "%s,\n'segmentLength': %.6g", 
                 tmp,$self->segmentLength());
+        sprintf(tmp, "%s,\n'persistentLength': %d", 
+                tmp,$self->persistentLength());
         sprintf(tmp, "%s,\n'adsorbtionLayerWidth': %.6g",
                 tmp, $self->adsorbtionLayerWidth());
         sprintf(tmp, "%s,\n'secondSolventBindEnergy': %.6g",
@@ -63,6 +65,8 @@
                 chembasis.setModel(val)
             elif key == "segmentLength":
                 chembasis.setSegmentLength(val)
+            elif key == "persistentLength":
+                chembasis.setPersistentLength(val)
             elif key == "adsorbtionLayerWidth":
                 chembasis.setAdsorbtionLayerWidth(val)
             elif key == "secondSolventBindEnergy":
