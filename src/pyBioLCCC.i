@@ -48,6 +48,9 @@
 %extend BioLCCC::ChemicalBasis {
     // The following function works only for the aminoacids defined by default.
     %insert("python") %{
+        def __str__(self):
+            return str(self.__getstate__())
+
         def __getstate__(self):
             output_dict = {}
             output_dict['model'] = self.model()
