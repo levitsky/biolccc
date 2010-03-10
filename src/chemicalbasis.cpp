@@ -141,7 +141,7 @@ ChemicalBasis::ChemicalBasis() {
                             1.00782));
     addNTerminus(Terminus("N-terminal acetyl",
                             "Ac-",
-                            0,
+                            0.0,
                             43.0452,
                             43.01839));
     addCTerminus(Terminus("C-terminal carboxyl",
@@ -149,9 +149,9 @@ ChemicalBasis::ChemicalBasis() {
                             -0.03,
                             17.0073,
                             17.00274));
-    addCTerminus(Terminus("C-terminal amid",
+    addCTerminus(Terminus("C-terminal amide",
                             "-NH2",
-                            0,
+                            0.0,
                             16.0226,
                             16.01872));
                                     
@@ -260,6 +260,18 @@ bool ChemicalBasis::removeNTerminus(std::string label){
 
 bool ChemicalBasis::removeCTerminus(std::string label){
     return (bool) mCTermini.erase(label);
+}
+
+void ChemicalBasis::clearAminoacids(){
+    mAminoacids.clear();
+}
+
+void ChemicalBasis::clearNTermini(){
+    mNTermini.clear();
+}
+
+void ChemicalBasis::clearCTermini(){
+    mCTermini.clear();
 }
 
 bool ChemicalBasis::setAminoacidBindEnergy(std::string label, double newBindEnergy){
