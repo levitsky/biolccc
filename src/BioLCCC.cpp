@@ -126,7 +126,7 @@ bool parseSequence(
         }
     }
 
-    // Then we divide the whole sequence on aminoacids. 
+    // Then we divide the whole sequence into aminoacids. 
     bool aminoacidFound;
     size_t curPos = 0;
     while (curPos < strippedSource.size()) {
@@ -187,7 +187,7 @@ double calculateKdCoilBoltzmann(
     double Q = exp((0 + chemBasis.secondSolventBindEnergy()) * 
                293.0 / temperature);
     double Nb = 0;
-    double Eab = 0;
+    double Eab = 0; 
     Nb = secondSolventConcentration * 1.91 / 
          (secondSolventConcentration * 1.91 + 
           (100.0 - secondSolventConcentration) * 5.56);
@@ -220,7 +220,7 @@ double calculateKdCoilBoltzmann(
 
     // If the last persistent block is incomplete, we should add it manually.
     if ((residueNumber % chemBasis.persistentLength()) != 0) {
-        boltzmannFactorProfile.push_back(energySum);
+        boltzmannFactorProfile.push_back(exp(energySum));
     }
     
     // The density vector correspond to a probability of n-th residue to be in 
@@ -235,7 +235,7 @@ double calculateKdCoilBoltzmann(
     // PoreSteps is a number of nodes in a lattice between two walls. Because of
     // the features of a following calculation it should be more than 2.
     const int poreSteps = (int) (columnPoreSize / 
-        chemBasis.segmentLength() / (double) chemBasis.persistentLength()) ;
+        chemBasis.segmentLength() / (double)(chemBasis.persistentLength())) ;
     if (poreSteps <=2) {
         return PORESIZE_ERROR;
     }
@@ -257,7 +257,7 @@ double calculateKdCoilBoltzmann(
     density[0] = boltzmannFactorProfile[0];
 
     for (int i = 1; i < poreSteps - 1 ; i++) {
-        density[i] = 1;
+        density[i] = 1.0;
     }
 
     density[poreSteps - 1] = 
@@ -267,15 +267,8 @@ double calculateKdCoilBoltzmann(
     // a diagonal matrix with 4.0/6.0 on the main diagonal and 1.0/6.0 on 
     // the side diagonals.
     
-    // Filling the first row.
-    transitionMatrix[0] = 4.0/6.0;
-    transitionMatrix[1] = 1.0/6.0;
-    for (int i = 2; i < poreSteps; i++) {
-        transitionMatrix[i] = 0.0;
-    }
-
-    // Filling from 2nd to (n-1)th rows.
-    for (int i = 1; i < poreSteps - 1; i++) {
+    // Filling the matrix.
+    for (int i = 0; i < poreSteps; i++) {
         for (int j = 0; j < poreSteps; j++) {
             switch ( j - i + 1 ) {
                 case 0: {
@@ -295,15 +288,6 @@ double calculateKdCoilBoltzmann(
             }
         }
     }
-    
-    // Filling the n-th row.
-    for (int i = poreSteps * (poreSteps - 1); 
-         i < (poreSteps * poreSteps - 2); 
-         i++) {
-        transitionMatrix[i] = 0.0;
-    }
-    transitionMatrix[poreSteps * poreSteps - 2] = 1.0/6.0;
-    transitionMatrix[poreSteps * poreSteps - 1] = 4.0/6.0;
     
     // On the each step we calculate a density vector for the n-th aminoacid 
     // residue by multiplication of the transition matrix and the density vector
@@ -336,7 +320,7 @@ double calculateKdCoilBoltzmann(
             }
         } 
 
-        // Transferring results from the density vector.
+        // Transferring the results from the density vector.
         for (int i = 0; i < poreSteps; i++)  {
             density[i] = densityBuffer[i];
         }
@@ -345,10 +329,10 @@ double calculateKdCoilBoltzmann(
     // Finally, Kd is calculated as a sum of elements of the density vector. 
     // It is normalized to the size of the lattice.
     double Kd=0;
-    for (int k=0; k < poreSteps; k++) {
-        Kd += density[k];
+    for (int i=0; i < poreSteps; i++) {
+        Kd += density[i];
     }
-    Kd = Kd / poreSteps;
+    Kd = Kd / (double)(poreSteps);
 
     // Cleaning memory.
     try {

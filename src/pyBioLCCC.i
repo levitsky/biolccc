@@ -14,71 +14,150 @@
 
 %include "std_string.i"
 %include "std_map.i"
+%include "std_vector.i"
+%template(GradientPointVector) std::vector<BioLCCC::GradientPoint>;
+%template(StringAminoacidMap) std::map<std::string,BioLCCC::Aminoacid>;
+%template(StringTerminusMap) std::map<std::string,BioLCCC::Terminus>;
+
+%extend BioLCCC::Aminoacid {
+    %insert("python") %{
+        def __getstate__(self):
+            output_dict = {}
+            output_dict['name'] = self.name()
+            output_dict['label'] = self.label()
+            output_dict['bindEnergy'] = self.bindEnergy()
+            output_dict['averageMass'] = self.averageMass()
+            output_dict['monoisotopicMass'] = self.monoisotopicMass()
+            return output_dict
+    %}
+}
+
+%extend BioLCCC::Terminus {
+    %insert("python") %{
+        def __getstate__(self):
+            output_dict = {}
+            output_dict['name'] = self.name()
+            output_dict['label'] = self.label()
+            output_dict['bindEnergy'] = self.bindEnergy()
+            output_dict['averageMass'] = self.averageMass()
+            output_dict['monoisotopicMass'] = self.monoisotopicMass()
+            return output_dict
+    %}
+}
 
 %extend BioLCCC::ChemicalBasis {
-    char *__str__() {
-        static char tmp[1024];
-        sprintf(tmp, "{'model': '%s'", $self->model().c_str());
-        sprintf(tmp, "%s,\n'segmentLength': %.6g", 
-                tmp,$self->segmentLength());
-        sprintf(tmp, "%s,\n'persistentLength': %d", 
-                tmp,$self->persistentLength());
-        sprintf(tmp, "%s,\n'adsorbtionLayerWidth': %.6g",
-                tmp, $self->adsorbtionLayerWidth());
-        sprintf(tmp, "%s,\n'secondSolventBindEnergy': %.6g",
-                tmp, $self->secondSolventBindEnergy());
-        for (std::map<std::string, BioLCCC::Aminoacid>::const_iterator i =
-                $self->aminoacids().begin();
-             i != $self->aminoacids().end();
-             i++) {
-            sprintf(tmp, "%s,\n'%s': %.6g",
-                    tmp, i->second.label().c_str(),i->second.bindEnergy());
-        }
+    // The following function works only for the aminoacids defined by default.
+    %insert("python") %{
+        def __getstate__(self):
+            output_dict = {}
+            output_dict['model'] = self.model()
+            output_dict['segmentLength'] = self.segmentLength()
+            output_dict['persistentLength'] = self.persistentLength()
+            output_dict['adsorbtionLayerWidth'] = self.adsorbtionLayerWidth()
+            output_dict['secondSolventBindEnergy'] = \
+                self.secondSolventBindEnergy()
 
-        for (std::map<std::string, BioLCCC::Terminus>::const_iterator i =
-                $self->NTermini().begin();
-             i != $self->NTermini().end();
-             i++) {
-            sprintf(tmp, "%s,\n'%s': %.6g",
-                    tmp, i->second.label().c_str(),i->second.bindEnergy());
-        }
+            output_dict['aminoacids'] = {}
+            for label, aminoacid in self.aminoacids().items():
+                output_dict['aminoacids'][label] = aminoacid.__getstate__()
 
-        for (std::map<std::string, BioLCCC::Terminus>::const_iterator i =
-                $self->CTermini().begin();
-             i != $self->CTermini().end();
-             i++) {
-            sprintf(tmp, "%s,\n'%s': %.6g",
-                    tmp, i->second.label().c_str(),i->second.bindEnergy());
-        }
+            output_dict['CTermini'] = {}
+            for label, CTerminus in self.CTermini().items():
+                output_dict['CTermini'][label] = CTerminus.__getstate__()
 
-        sprintf(tmp, "%s}",tmp);
+            output_dict['NTermini'] = {}
+            for label, NTerminus in self.NTermini().items():
+                output_dict['NTermini'][label] = NTerminus.__getstate__()
+            return output_dict
 
-        return tmp;
-    }
+        def __setstate__(self, chembasis_dict):
+            self.setModel(chembasis_dict['model'])
+            self.setSegmentLength(chembasis_dict['segmentLength'])
+            self.setPersistentLength(chembasis_dict['persistentLength'])
+            self.setAdsorbtionLayerWidth(chembasis_dict['adsorbtionLayerWidth'])
+            self.setSecondSolventBindEnergy(
+                chembasis_dict['secondSolventBindEnergy'])
+            self.clearAminoacids()
+            for aminoacid_dict in chembasis_dict['aminoacids'].values():
+                aminoacid = Aminoacid(aminoacid_dict['name'],
+                                      aminoacid_dict['label'],
+                                      aminoacid_dict['bindEnergy'],
+                                      aminoacid_dict['averageMass'],
+                                      aminoacid_dict['monoisotopicMass'])
+                self.addAminoacid(aminoacid)
+            self.clearCTermini()
+            for CTerminus_dict in chembasis_dict['CTermini'].values():
+                CTerminus = Terminus(CTerminus_dict['name'],
+                                     CTerminus_dict['label'],
+                                     CTerminus_dict['bindEnergy'],
+                                     CTerminus_dict['averageMass'],
+                                     CTerminus_dict['monoisotopicMass'])
+                self.addCTerminus(CTerminus)
+            self.clearNTermini()
+            for NTerminus_dict in chembasis_dict['NTermini'].values():
+                NTerminus = Terminus(NTerminus_dict['name'],
+                                     NTerminus_dict['label'],
+                                     NTerminus_dict['bindEnergy'],
+                                     NTerminus_dict['averageMass'],
+                                     NTerminus_dict['monoisotopicMass'])
+                self.addNTerminus(NTerminus)
+    %}
 };
 
-%pythoncode %{
-    def chemicalBasis_from_dict(chembasis_dict):
-        chembasis = ChemicalBasis()
-        for key, val in chembasis_dict.items():
-            if key == "model":
-                chembasis.setModel(val)
-            elif key == "segmentLength":
-                chembasis.setSegmentLength(val)
-            elif key == "persistentLength":
-                chembasis.setPersistentLength(val)
-            elif key == "adsorbtionLayerWidth":
-                chembasis.setAdsorbtionLayerWidth(val)
-            elif key == "secondSolventBindEnergy":
-                chembasis.setSecondSolventBindEnergy(val)
-            elif key.endswith("-"):
-                chembasis.setNTerminusBindEnergy(key, val)
-            elif key.startswith("-"):
-                chembasis.setCTerminusBindEnergy(key, val)
-            else:
-                chembasis.setAminoacidBindEnergy(key, val)
-        return chembasis
-%}
+%extend BioLCCC::GradientPoint{
+    %insert("python") %{
+        def __str__(self):
+            return '(%f,%f)' % (self.time(), self.concentrationB())
+    %}
+};
+
+%extend BioLCCC::ChromoConditions{
+    %insert("python") %{
+        def __str__(self):
+            return str(self.__getstate__())
+
+        def __getstate__(self):
+            output_dict = {}
+            output_dict['columnLength'] = self.columnLength()
+            output_dict['columnDiameter'] = self.columnDiameter()
+            output_dict['columnPoreSize'] = self.columnPoreSize()
+            output_dict['gradient'] = [eval(str(i)) for i in self.gradient()]
+            output_dict['secondSolventConcentrationA'] = \
+                self.secondSolventConcentrationA()
+            output_dict['secondSolventConcentrationB'] = \
+                self.secondSolventConcentrationB()
+            output_dict['delayTime'] = self.delayTime()
+            output_dict['flowRate'] = self.flowRate()
+            output_dict['dV'] = self.dV()
+            output_dict['calibrationParameter'] = self.calibrationParameter()
+            output_dict['columnVpToVtot'] = self.columnVpToVtot()
+            output_dict['columnPorosity'] = self.columnPorosity()
+            output_dict['temperature'] = self.temperature()
+            return output_dict
+
+        def __setstate__(self, input_dict):
+            self.setColumnLength(input_dict['columnLength'])
+            self.setColumnDiameter(input_dict['columnDiameter'])
+            self.setColumnPoreSize(input_dict['columnPoreSize'])
+
+            input_gradient = self.gradient();
+            input_gradient.clear();
+            for (time, concentrationB) in input_dict['gradient']:
+                input_gradient.addPoint(time, concentrationB)
+            self.setGradient(input_gradient)
+            self.setSecondSolventConcentrationA(
+                input_dict['secondSolventConcentrationA'])
+            self.setSecondSolventConcentrationB(
+                input_dict['secondSolventConcentrationB'])
+            self.setDelayTime(input_dict['delayTime'])
+            self.setFlowRate(input_dict['flowRate'])
+            self.setDV(input_dict['dV'])
+            self.setCalibrationParameter(input_dict['calibrationParameter'])
+            self.setColumnVpToVtot(input_dict['columnVpToVtot'])
+            self.setColumnPorosity(input_dict['columnPorosity'])
+            self.setTemperature(input_dict['temperature'])
+    %}
+};
 
 // Parse the original header file
 %include "auxiliary.hpp"

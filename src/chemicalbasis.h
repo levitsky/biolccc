@@ -140,6 +140,21 @@ class ChemicalBasis {
         bool removeCTerminus (std::string label);
 
         /*!
+            Removes all aminoacids in a basis.
+        */
+        void clearAminoacids();
+
+        /*!
+            Removes all N-termini in a basis.
+        */
+        void clearNTermini();
+
+        /*!
+            Removes all C-termini in a basis.
+        */
+        void clearCTermini();
+
+        /*!
             Sets the value of binding energy for the aminoacid with the given 
             label;
             returns 'true' on success or 'false' if the aminoacid is not found.
