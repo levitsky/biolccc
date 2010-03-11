@@ -46,10 +46,9 @@
 }
 
 %extend BioLCCC::ChemicalBasis {
-    // The following function works only for the aminoacids defined by default.
     %insert("python") %{
         def __str__(self):
-            return str(self.__getstate__())
+            return str(self.min_inf())
 
         def __getstate__(self):
             output_dict = {}
@@ -104,6 +103,60 @@
                                      NTerminus_dict['averageMass'],
                                      NTerminus_dict['monoisotopicMass'])
                 self.addNTerminus(NTerminus)
+
+        def min_inf(self):
+            output_dict = {}
+            output_dict['model'] = self.model()
+            output_dict['segmentLength'] = self.segmentLength()
+            output_dict['persistentLength'] = self.persistentLength()
+            output_dict['adsorbtionLayerWidth'] = self.adsorbtionLayerWidth()
+            output_dict['secondSolventBindEnergy'] = \
+                self.secondSolventBindEnergy()
+
+            for label, aminoacid in self.aminoacids().items():
+                output_dict[label] = aminoacid.bindEnergy()
+
+            for label, CTerminus in self.CTermini().items():
+                output_dict[label] = CTerminus.bindEnergy()
+
+            for label, NTerminus in self.NTermini().items():
+                output_dict[label] = NTerminus.bindEnergy()
+            return output_dict
+
+        def set_min_inf(self, min_inf_dict):
+            for key, value in min_inf_dict.items():
+                if key == 'model':
+                    self.setModel(value)
+                elif key == 'segmentLength':
+                    self.setSegmentLength(value)
+                elif key == 'persistentLength':
+                    self.setPersistentLength(value)
+                elif key == 'adsorbtionLayerWidth':
+                    self.setAdsorbtionLayerWidth(value)
+                elif key == 'secondSolventBindEnergy':
+                    self.setSecondSolventBindEnergy(value)
+                else:
+                    if key.endswith('-'):
+                        if key in self.NTermini():
+                            self.setNTerminusBindEnergy(key, value) 
+                        else:
+                            self.addNTerminus(Terminus("",
+                                                       key, 
+                                                       value))
+                    elif key.startswith('-'):
+                        if key in self.CTermini():
+                            self.setCTerminusBindEnergy(key, value) 
+                        else:
+                            self.addCTerminus(Terminus("",
+                                                       key, 
+                                                       value))
+                    else:
+                        if key in self.aminoacids():
+                            self.setAminoacidBindEnergy(key, value) 
+                        else:
+                            self.addAminoacid(Aminoacid("",
+                                                        key, 
+                                                        value))
     %}
 };
 
