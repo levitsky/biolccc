@@ -64,7 +64,7 @@
 #include <iostream>
 
 #include "BioLCCC.h"
-#include "./boost/foreach.hpp"
+//#include "./boost/foreach.hpp"
 
 int main(int argc, char* argv[]) {
     std::string name;
@@ -84,8 +84,11 @@ int main(int argc, char* argv[]) {
     peptideList.push_back("IFVQKCAQCHTVEK");
     peptideList.push_back("GITWGEETLMEYLENPKK");
     peptideList.push_back("GITWGEETLMEYLENPK");
-    BOOST_FOREACH(std::string peptide, peptideList) {
-        std::cout << peptide << ": " << BioLCCC::calculateRT(peptide) << "\n";
+    //BOOST_FOREACH(std::string peptide, peptideList) {
+    for (std::vector<std::string>::const_iterator peptide = peptideList.begin();
+        peptide != peptideList.end();
+        peptide++) {
+        std::cout << *peptide << ": " << BioLCCC::calculateRT(*peptide) << "\n";
     }
 
     return 1;
