@@ -48,7 +48,7 @@
 %extend BioLCCC::ChemicalBasis {
     %insert("python") %{
         def __str__(self):
-            return str(self.min_inf())
+            return str(self.min_inf()).replace(',', ',\n')
 
         def __getstate__(self):
             output_dict = {}
@@ -123,40 +123,43 @@
                 output_dict[label] = NTerminus.bindEnergy()
             return output_dict
 
+        def set_min_inf_element(self, key, value):
+            if key == 'model':
+                self.setModel(value)
+            elif key == 'segmentLength':
+                self.setSegmentLength(value)
+            elif key == 'persistentLength':
+                self.setPersistentLength(value)
+            elif key == 'adsorbtionLayerWidth':
+                self.setAdsorbtionLayerWidth(value)
+            elif key == 'secondSolventBindEnergy':
+                self.setSecondSolventBindEnergy(value)
+            else:
+                if key.endswith('-'):
+                    if key in self.NTermini():
+                        self.setNTerminusBindEnergy(key, value) 
+                    else:
+                        self.addNTerminus(Terminus("",
+                                                   key, 
+                                                   value))
+                elif key.startswith('-'):
+                    if key in self.CTermini():
+                        self.setCTerminusBindEnergy(key, value) 
+                    else:
+                        self.addCTerminus(Terminus("",
+                                                   key, 
+                                                   value))
+                else:
+                    if key in self.aminoacids():
+                        self.setAminoacidBindEnergy(key, value) 
+                    else:
+                        self.addAminoacid(Aminoacid("",
+                                                    key, 
+                                                    value))
+
         def set_min_inf(self, min_inf_dict):
             for key, value in min_inf_dict.items():
-                if key == 'model':
-                    self.setModel(value)
-                elif key == 'segmentLength':
-                    self.setSegmentLength(value)
-                elif key == 'persistentLength':
-                    self.setPersistentLength(value)
-                elif key == 'adsorbtionLayerWidth':
-                    self.setAdsorbtionLayerWidth(value)
-                elif key == 'secondSolventBindEnergy':
-                    self.setSecondSolventBindEnergy(value)
-                else:
-                    if key.endswith('-'):
-                        if key in self.NTermini():
-                            self.setNTerminusBindEnergy(key, value) 
-                        else:
-                            self.addNTerminus(Terminus("",
-                                                       key, 
-                                                       value))
-                    elif key.startswith('-'):
-                        if key in self.CTermini():
-                            self.setCTerminusBindEnergy(key, value) 
-                        else:
-                            self.addCTerminus(Terminus("",
-                                                       key, 
-                                                       value))
-                    else:
-                        if key in self.aminoacids():
-                            self.setAminoacidBindEnergy(key, value) 
-                        else:
-                            self.addAminoacid(Aminoacid("",
-                                                        key, 
-                                                        value))
+                self.set_min_inf_element(key, value)
     %}
 };
 

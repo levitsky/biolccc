@@ -2,10 +2,10 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
-#include "boost/foreach.hpp"
-#include "boost/function.hpp"
-#include "boost/bind.hpp"
-#include "boost/ref.hpp"
+//#include "boost/foreach.hpp"
+//#include "boost/function.hpp"
+//#include "boost/bind.hpp"
+//#include "boost/ref.hpp"
 #include "BioLCCC.h"
 
 #define MEMORY_ERROR    -2.0
@@ -79,11 +79,15 @@ bool parseSequence(
     // First we need to check the stripped source sequence for 
     // the N-Terminal group.
     *NTerminus = chemBasis.defaultNTerminus();
-    std::pair<std::string,Terminus> NTerminusIterator;
-    BOOST_FOREACH(NTerminusIterator, chemBasis.NTermini()) {
-        if (strippedSource.find(NTerminusIterator.second.label()) == (size_t)0){
-            *NTerminus = NTerminusIterator.second;
-            NTerminusPosition = NTerminusIterator.second.label().size();
+    //std::pair<std::string,Terminus> NTerminusIterator;
+    //BOOST_FOREACH(NTerminusIterator, chemBasis.NTermini()) {
+    for (std::map<std::string,Terminus>::const_iterator NTerminusIterator = 
+             chemBasis.NTermini().begin();
+         NTerminusIterator != chemBasis.NTermini().end();
+         NTerminusIterator++) {
+        if (strippedSource.find(NTerminusIterator->second.label())== (size_t)0){
+            *NTerminus = NTerminusIterator->second;
+            NTerminusPosition = NTerminusIterator->second.label().size();
         }
     }
     
@@ -99,11 +103,15 @@ bool parseSequence(
         }
         
         // Searching for known C-terminal groups.
-        std::pair<std::string,Terminus> CTerminusIterator;
-        BOOST_FOREACH(CTerminusIterator, chemBasis.CTermini()) {
-            if (strippedSource.find(CTerminusIterator.second.label(), 
+        //std::pair<std::string,Terminus> CTerminusIterator;
+        //BOOST_FOREACH(CTerminusIterator, chemBasis.CTermini()) {
+        for (std::map<std::string,Terminus>::const_iterator CTerminusIterator = 
+                 chemBasis.CTermini().begin();
+             CTerminusIterator != chemBasis.CTermini().end();
+             CTerminusIterator++) {
+            if (strippedSource.find(CTerminusIterator->second.label(), 
                 CTerminusPosition ) != std::string::npos) {
-                *CTerminus = CTerminusIterator.second;
+                *CTerminus = CTerminusIterator->second;
             }
         }
     }
@@ -131,13 +139,17 @@ bool parseSequence(
     size_t curPos = 0;
     while (curPos < strippedSource.size()) {
         aminoacidFound = false;
-        std::pair<std::string,Aminoacid> aminoacidIterator;
-        BOOST_FOREACH(aminoacidIterator, chemBasis.aminoacids()) {
+        //std::pair<std::string,Aminoacid> aminoacidIterator;
+        //BOOST_FOREACH(aminoacidIterator, chemBasis.aminoacids()) {
+        for (std::map<std::string,Aminoacid>::const_iterator aminoacidIterator= 
+                 chemBasis.aminoacids().begin();
+             aminoacidIterator != chemBasis.aminoacids().end();
+             aminoacidIterator++) {
             if (strippedSource.compare(curPos, 
-                    aminoacidIterator.second.label().size(), 
-                    aminoacidIterator.second.label()) == 0) {
-                curPos += aminoacidIterator.second.label().size();
-                parsedPeptideStructure -> push_back(aminoacidIterator.second);
+                    aminoacidIterator->second.label().size(), 
+                    aminoacidIterator->second.label()) == 0) {
+                curPos += aminoacidIterator->second.label().size();
+                parsedPeptideStructure -> push_back(aminoacidIterator->second);
                 aminoacidFound = true;
                 break;
             }
@@ -152,8 +164,12 @@ bool parseSequence(
     if (peptideEnergyProfile != NULL)
     {
         peptideEnergyProfile->clear();
-        BOOST_FOREACH(Aminoacid currentAminoacid, *parsedPeptideStructure){
-            peptideEnergyProfile->push_back(currentAminoacid.bindEnergy());
+        //BOOST_FOREACH(Aminoacid currentAminoacid, *parsedPeptideStructure){
+        for (std::vector<Aminoacid>::const_iterator currentAminoacid =
+                parsedPeptideStructure->begin();
+            currentAminoacid != parsedPeptideStructure->end();
+            currentAminoacid++) {
+            peptideEnergyProfile->push_back(currentAminoacid->bindEnergy());
         }
         
         // Modifing energies of terminal aminoacid residues.
@@ -718,104 +734,94 @@ double calculateKdCoilSnyder(
     return Kd;
 }                                            
 
+double rodAdsorbtionEnergy(const std::vector<double> & peptideEnergyProfile,
+                           unsigned int n,
+                           bool reversed = false
+) {
+    double init = 0;
+    if (n > peptideEnergyProfile.size()){
+        // TODO: make an exception.
+        return -65536;
+    }
+    if (reversed) {
+        return std::accumulate(peptideEnergyProfile.end()-n,
+                               peptideEnergyProfile.end(),
+                               init);
+    }
+    else {
+        return std::accumulate(peptideEnergyProfile.begin(),
+                               peptideEnergyProfile.begin()+n,
+                               init);
+    }
+}
+
 double partitionFunctionRodFreeSlit(double rodLength,
                                     double slitWidth
 ) {
     // the equation works only if the slit is wider than the rod
     if (rodLength <= slitWidth) {
     // full volume without exclusion caused by walls
-        return (4 * PI * slitWidth * rodLength * rodLength) -
+        return (4 * PI * slitWidth * rodLength * rodLength -
     // minus volume excluded by walls
-        2 * PI * rodLength * rodLength * rodLength;
+                2 * PI * rodLength * rodLength * rodLength);
     }
     else {
-        return -1.0;
+    // This case is considered in the paper as Zc.
+        return (2 * PI * slitWidth * slitWidth * rodLength);
     }
         
+}
+
+double partitionFunctionRodFreeSlitA(double rodLength,
+                                     double slitWidth
+) {
+        return (4 * PI * slitWidth * rodLength * rodLength -
+                2 * PI * rodLength * rodLength * rodLength);
+}
+
+double partitionFunctionRodFreeSlitC(double rodLength,
+                                     double slitWidth
+) {
+        return (2 * PI * slitWidth * slitWidth * rodLength);
+}
+
+double partitionFunctionRodSubmergedIntoLayer(
+    double segmentLength,
+    double slitWidth,
+    double layerWidth,
+    const std::vector<double> & rodEnergyProfile,
+    bool reversed = false
+) {
+    double rodLength = segmentLength * (double)(rodEnergyProfile.size() - 1);
+    double partitionFunction = 0.0;
+    for (unsigned int n = 1; n < rodEnergyProfile.size(); n++) {
+        if (layerWidth >= segmentLength * double(n)) {
+            partitionFunction += 2.0 * PI * rodLength * rodLength *
+                exp(rodAdsorbtionEnergy(rodEnergyProfile, n, reversed)) *
+                segmentLength / 2.0;
+        }
+        else if ((segmentLength * (double)(n-1) < layerWidth) && 
+                 (layerWidth < segmentLength * double(n))) {
+            partitionFunction += 2.0 * PI * rodLength * rodLength *
+                exp(rodAdsorbtionEnergy(rodEnergyProfile, n, reversed)) *
+                (layerWidth
+                 - segmentLength * (double)(n-1) / 2.0
+                 - layerWidth * layerWidth / 2.0 / (double)n / segmentLength);
+        }
+        else {
+            partitionFunction += 2.0 * PI * rodLength * rodLength *
+                exp(rodAdsorbtionEnergy(rodEnergyProfile, n, reversed)) *
+                layerWidth * layerWidth / 2.0 / double(n) / double(n-1) /
+                segmentLength;
+        }
+    }
+    return partitionFunction;
 }
 
 double partitionFunctionRodFreeVolume(double rodLength,
                                       double slitWidth
 ) {
-    // the equation works only if the slit is wider than the rod
-    if (rodLength <= slitWidth) {
-    // full volume without exclusion caused by walls
-        return (4 * PI * slitWidth * rodLength * rodLength);
-    // minus volume excluded by walls
-    }
-    else {
-        return -1.0;
-    }
-        
-}
-
-double rodAdsorbtionEnergy(const std::vector<double> & peptideEnergyProfile,
-                           int n
-) {
-    double init = 0;
-    return std::accumulate(peptideEnergyProfile.begin(),
-                           peptideEnergyProfile.begin()+n,
-                           init);
-}
-
-double partitionFunctionRodAdsorbtionLayer(
-    const std::vector<double> &rodEnergyProfile,
-    double segmentLength,
-    double layerWidth
-) {
-    double rodLength = segmentLength * (rodEnergyProfile.size() - 1);
-    double partitionFunction = 0;
-    for (unsigned int n = 1; n <= rodEnergyProfile.size(); n++) {
-        if (segmentLength * n < layerWidth) {
-            partitionFunction += 2 * PI * rodLength * rodLength *
-                segmentLength / 2 / n *
-                exp(rodAdsorbtionEnergy(rodEnergyProfile,n));
-
-            for (unsigned int k = n + 1; k <= rodEnergyProfile.size() - 1;k++) {
-                partitionFunction += 2 * PI * rodLength * rodLength *
-                    segmentLength * (2 * n - 1) / 2 / k / (k - 1) *
-                    exp(rodAdsorbtionEnergy(rodEnergyProfile, k));
-
-            }
-            partitionFunction += 2 * PI * rodLength * rodLength *
-                segmentLength * (2*n - 1) / 2 / (rodEnergyProfile.size() - 1) *
-                exp(rodAdsorbtionEnergy(rodEnergyProfile,
-                                        rodEnergyProfile.size()));
-
-            // Z residual
-            if (n == rodEnergyProfile.size()) {
-                partitionFunction += 2 * PI * rodLength * rodLength *
-                (layerWidth - rodLength) *
-                exp(rodAdsorbtionEnergy(rodEnergyProfile,
-                                        rodEnergyProfile.size()));
-            }
-        }
-
-        else {
-            partitionFunction += 2 * PI * rodLength * rodLength *
-                (layerWidth - segmentLength * (n - 1) - 
-                (layerWidth * layerWidth -
-                segmentLength * segmentLength * (n - 1) * (n - 1)) / 2 /
-                segmentLength / n) * 
-                exp(rodAdsorbtionEnergy(rodEnergyProfile,n));
-
-            for (unsigned int k = n+1; k <= rodEnergyProfile.size() - 1; k++) {
-                partitionFunction += 2 * PI * rodLength * rodLength *
-                    (layerWidth * layerWidth - segmentLength * segmentLength *
-                    (n - 1) * (n - 1)) / 2 / segmentLength / k / (k - 1) *
-                    exp(rodAdsorbtionEnergy(rodEnergyProfile, k));
-            }
-
-            partitionFunction += 2 * PI * rodLength * rodLength *
-                (layerWidth * layerWidth - segmentLength * segmentLength *
-                (n - 1) * (n - 1)) / 2 / segmentLength /
-                (rodEnergyProfile.size() - 1) *
-                exp(rodAdsorbtionEnergy(rodEnergyProfile,
-                                        rodEnergyProfile.size()));
-            break;
-        }
-    }     
-    return partitionFunction;
+    return (4 * PI * slitWidth * rodLength * rodLength);
 }
 
 double calculateKdRod(
@@ -846,30 +852,77 @@ double calculateKdRod(
     // Boltzmann's constant. An energy unit is a Boltzmann's constant * 
     // 293.0 Kelvins. This probability is used later in the transition matrix.
     std::vector<double> effectiveEnergyProfile;
-    std::vector<double> revEffectiveEnergyProfile;
 
-    BOOST_FOREACH(double residueEnergy, peptideEnergyProfile) {
+    //BOOST_FOREACH(double residueEnergy, peptideEnergyProfile) {
+    for (std::vector<double>::const_iterator residueEnergy=
+            peptideEnergyProfile.begin();
+        residueEnergy != peptideEnergyProfile.end();
+        residueEnergy++) {
         Nb = secondSolventConcentration * 1.91 / 
              (secondSolventConcentration * 1.91 + 
               (100.0 - secondSolventConcentration) * 5.56);
         Eab = 0.0 + 1.0 / calibrationParameter * log( 1.0 - Nb + Nb * Q );
         effectiveEnergyProfile.push_back(calibrationParameter * 
-            (residueEnergy - Eab) * 293.0 / temperature);
-        revEffectiveEnergyProfile.insert(
-            revEffectiveEnergyProfile.begin(),
-            calibrationParameter * (residueEnergy - Eab) * 293.0 / temperature);
+            (*residueEnergy - Eab) * 293.0 / temperature);
     }
-    
+   
+    //std::cout << "Calculating Kd:\n";
+    //std::cout << 
+    //    partitionFunctionRodFreeSlit(
+    //    chemBasis.segmentLength() * (effectiveEnergyProfile.size() - 1),
+    //    columnPoreSize)<< "\n";
+
+    //std::cout << 
+    //    2.0 * partitionFunctionRodFreeSlit(
+    //            chemBasis.segmentLength() * (effectiveEnergyProfile.size() - 1),
+    //            chemBasis.adsorbtionLayerWidth()) 
+    //    * exp(rodAdsorbtionEnergy(
+    //        effectiveEnergyProfile,
+    //        effectiveEnergyProfile.size()))<< "\n";
+
+    //std::cout << 
+    //2.0 * partitionFunctionRodSubmergedIntoLayer(
+    //    chemBasis.segmentLength(),
+    //    columnPoreSize,
+    //    chemBasis.adsorbtionLayerWidth(),
+    //    effectiveEnergyProfile,
+    //    false) << "\n";
+
+    //std::cout << 2.0 * partitionFunctionRodSubmergedIntoLayer(
+    //    chemBasis.segmentLength(),
+    //    columnPoreSize,
+    //    chemBasis.adsorbtionLayerWidth(),
+    //    effectiveEnergyProfile,
+    //    true) << "\n";
+
+    //std::cout << 
+    //    partitionFunctionRodFreeVolume(
+    //    (effectiveEnergyProfile.size() - 1) * chemBasis.segmentLength(),
+    //    columnPoreSize) << "\n"; 
+
     double Kd = 
-    (2 * partitionFunctionRodAdsorbtionLayer(effectiveEnergyProfile, 
-                                            chemBasis.segmentLength(), 
-                                            chemBasis.adsorbtionLayerWidth()) +
-    2 * partitionFunctionRodAdsorbtionLayer(revEffectiveEnergyProfile, 
-                                            chemBasis.segmentLength(),
-                                            chemBasis.adsorbtionLayerWidth()) +
-    partitionFunctionRodFreeSlit(
-        (effectiveEnergyProfile.size() - 1) * chemBasis.segmentLength(),
-        columnPoreSize - 2 * chemBasis.adsorbtionLayerWidth()) ) / 
+    (partitionFunctionRodFreeSlit(
+        chemBasis.segmentLength() * (effectiveEnergyProfile.size() - 1),
+        columnPoreSize - 2.0 * chemBasis.adsorbtionLayerWidth()) 
+    + 2.0 * partitionFunctionRodFreeSlit(
+                chemBasis.segmentLength() * (effectiveEnergyProfile.size() - 1),
+                chemBasis.adsorbtionLayerWidth()) 
+        * exp(rodAdsorbtionEnergy(
+            effectiveEnergyProfile,
+            effectiveEnergyProfile.size()))
+
+    + 2.0 * partitionFunctionRodSubmergedIntoLayer(
+        chemBasis.segmentLength(),
+        columnPoreSize,
+        chemBasis.adsorbtionLayerWidth(),
+        effectiveEnergyProfile,
+        false) 
+    + 2.0 * partitionFunctionRodSubmergedIntoLayer(
+        chemBasis.segmentLength(),
+        columnPoreSize,
+        chemBasis.adsorbtionLayerWidth(),
+        effectiveEnergyProfile,
+        true)) /
     partitionFunctionRodFreeVolume(
         (effectiveEnergyProfile.size() - 1) * chemBasis.segmentLength(),
         columnPoreSize); 
@@ -974,14 +1027,18 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
     // and the y-coordinate to the scale of second solvent concentration.
     std::vector<std::pair<int, double> > convertedGradient;
     
-    BOOST_FOREACH(GradientPoint currentGradientPoint, conditions.gradient()) {
+    //BOOST_FOREACH(GradientPoint currentGradientPoint, conditions.gradient()) {
+    for (Gradient::const_iterator currentGradientPoint =
+            conditions.gradient().begin();
+        currentGradientPoint != conditions.gradient().end();
+        currentGradientPoint++) {
         convertedGradient.push_back(
                 std::pair<int,double>(
-                    floor(currentGradientPoint.time() * conditions.flowRate()
+                    floor(currentGradientPoint->time() * conditions.flowRate()
                         / dV),
-                    (100.0 - currentGradientPoint.concentrationB()) / 100.0 *
+                    (100.0 - currentGradientPoint->concentrationB()) / 100.0 *
                         conditions.secondSolventConcentrationA() + 
-                        currentGradientPoint.concentrationB() / 100.0 *
+                        currentGradientPoint->concentrationB() / 100.0 *
                         conditions.secondSolventConcentrationB()));
     }
     
@@ -1228,118 +1285,118 @@ bool calculatePeptideProperties(const std::string &sequence,
     }
 }
 
-ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
-                               std::vector<double> retentionTimes,
-                               ChromoConditions chromatograph,
-                               ChemicalBasis initialChemicalBasis,
-                               std::vector<std::string> energiesToCalibrate
-) {
-
-    // Generate the list of setter functions out of 'energiesToCalibrate'
-    ChemicalBasis newChemicalBasis = initialChemicalBasis;
-    std::vector< boost::function<void(double)> > setters;
-    for(unsigned int i = 0; i < energiesToCalibrate.size(); i++) {
-        if (initialChemicalBasis.aminoacids().find(energiesToCalibrate[i]) !=
-        initialChemicalBasis.aminoacids().end()) {
-            setters.push_back(boost::bind(
-                &ChemicalBasis::setAminoacidBindEnergy,
-                &newChemicalBasis,
-                energiesToCalibrate[i],
-                _1));
-//            std::cout << "AA found\n";
-        }
-        else if (initialChemicalBasis.NTermini().find(energiesToCalibrate[i]) !=
-                 initialChemicalBasis.NTermini().end()) {
-                     setters.push_back(boost::bind(
-                         &ChemicalBasis::setNTerminusBindEnergy,
-                         &newChemicalBasis,
-                         energiesToCalibrate[i],
-                         _1));
-//                     std::cout << "NT found\n";
-                 }
-        else if (initialChemicalBasis.CTermini().find(energiesToCalibrate[i]) !=
-                 initialChemicalBasis.CTermini().end()) {
-                     setters.push_back(boost::bind(
-                         &ChemicalBasis::setCTerminusBindEnergy,
-                         &newChemicalBasis,
-                         energiesToCalibrate[i],
-                         _1));
-//                     std::cout << "CT found\n";
-                 }
-        else if (energiesToCalibrate[i] == "ACN") {
-            // This is a walkaround for the strange type-punning GCC warning.
-            boost::function<void (ChemicalBasis*, double)> secondSolventSetter;
-            secondSolventSetter = &ChemicalBasis::setSecondSolventBindEnergy;
-            setters.push_back(boost::bind(secondSolventSetter,
-                                          &newChemicalBasis,
-                                          _1));
-//            std::cout << "ACN found\n";
-        }
-
-    }
-
-    std::vector<double> (*calculateRTforList)
-        (std::vector<std::string>,ChromoConditions,ChemicalBasis) =
-            &calculateRT;
-    boost::function<double(void)> penaltyFunction = boost::bind(
-        boost::bind(vectorNorm<double>, 
-                    boost::bind(VectorDiff<double>, _1, _2)),
-        boost::bind(calculateRTforList, calibrationMixture, 
-                    chromatograph, boost::ref(newChemicalBasis)),
-        retentionTimes);
-
-    std::vector<double> lowerBounds, upperBounds, steps, gradientSteps;
-    for(unsigned int i = 0; i < setters.size(); i++) {
-        lowerBounds.push_back(0.0);
-        upperBounds.push_back(3.0);
-        steps.push_back(0.25);
-        gradientSteps.push_back(0.001);
-    }
-    //std::vector<double> lowerBounds, upperBounds, steps, gradientSteps;
-    //lowerBounds.push_back(0.575-0.01);
-    //lowerBounds.push_back(0.83-0.01);
-    //lowerBounds.push_back(2.20-0.01);
-    //upperBounds.push_back(0.575+0.01);
-    //upperBounds.push_back(0.83+0.01);
-    //upperBounds.push_back(2.20+0.01);
-    //steps.push_back(0.0025);
-    //steps.push_back(0.0025);
-    //steps.push_back(0.0025);
-    //gradientSteps.push_back(0.001);
-    //gradientSteps.push_back(0.001);
-    //gradientSteps.push_back(0.001);
-
-    std::cout << "Initial penalty function value: " 
-        << penaltyFunction() << "\n";
-    std::vector<double> calibratedEnergiesBruteForce = 
-        findMinimumBruteForce(penaltyFunction, setters, lowerBounds,
-                              upperBounds, steps);
-    std::cout << "BruteForce approximation:\n";
-    for(unsigned int i = 0; i < setters.size(); i++) {
-        std::cout << energiesToCalibrate[i] << ": " 
-            << calibratedEnergiesBruteForce[i] << "\n";
-    }
-
-    for(unsigned int i = 0; i < setters.size(); i++) {
-        setters[i](calibratedEnergiesBruteForce[i]);
-    }
-    std::cout << "Penalty function value after calibration: " 
-        << penaltyFunction() << "\n";
-
-    std::vector<double> calibratedEnergiesGradientDescent = 
-        findMinimumGradientDescent(penaltyFunction, setters, 
-            calibratedEnergiesBruteForce, gradientSteps, 0.00001);
-
-    std::cout << "GradientDescent approximation:\n";
-    for(unsigned int i = 0; i < setters.size(); i++) {
-        std::cout << energiesToCalibrate[i] << ": " 
-            << calibratedEnergiesGradientDescent[i] << "\n";
-    }
-
-    for(unsigned int i = 0; i < setters.size(); i++) {
-        setters[i](calibratedEnergiesGradientDescent[i]);
-    }
-    return newChemicalBasis;
-}
+//ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
+//                               std::vector<double> retentionTimes,
+//                               ChromoConditions chromatograph,
+//                               ChemicalBasis initialChemicalBasis,
+//                               std::vector<std::string> energiesToCalibrate
+//) {
+//
+//    // Generate the list of setter functions out of 'energiesToCalibrate'
+//    ChemicalBasis newChemicalBasis = initialChemicalBasis;
+//    std::vector< boost::function<void(double)> > setters;
+//    for(unsigned int i = 0; i < energiesToCalibrate.size(); i++) {
+//        if (initialChemicalBasis.aminoacids().find(energiesToCalibrate[i]) !=
+//        initialChemicalBasis.aminoacids().end()) {
+//            setters.push_back(boost::bind(
+//                &ChemicalBasis::setAminoacidBindEnergy,
+//                &newChemicalBasis,
+//                energiesToCalibrate[i],
+//                _1));
+////            std::cout << "AA found\n";
+//        }
+//        else if (initialChemicalBasis.NTermini().find(energiesToCalibrate[i]) !=
+//                 initialChemicalBasis.NTermini().end()) {
+//                     setters.push_back(boost::bind(
+//                         &ChemicalBasis::setNTerminusBindEnergy,
+//                         &newChemicalBasis,
+//                         energiesToCalibrate[i],
+//                         _1));
+////                     std::cout << "NT found\n";
+//                 }
+//        else if (initialChemicalBasis.CTermini().find(energiesToCalibrate[i]) !=
+//                 initialChemicalBasis.CTermini().end()) {
+//                     setters.push_back(boost::bind(
+//                         &ChemicalBasis::setCTerminusBindEnergy,
+//                         &newChemicalBasis,
+//                         energiesToCalibrate[i],
+//                         _1));
+////                     std::cout << "CT found\n";
+//                 }
+//        else if (energiesToCalibrate[i] == "ACN") {
+//            // This is a walkaround for the strange type-punning GCC warning.
+//            boost::function<void (ChemicalBasis*, double)> secondSolventSetter;
+//            secondSolventSetter = &ChemicalBasis::setSecondSolventBindEnergy;
+//            setters.push_back(boost::bind(secondSolventSetter,
+//                                          &newChemicalBasis,
+//                                          _1));
+////            std::cout << "ACN found\n";
+//        }
+//
+//    }
+//
+//    std::vector<double> (*calculateRTforList)
+//        (std::vector<std::string>,ChromoConditions,ChemicalBasis) =
+//            &calculateRT;
+//    boost::function<double(void)> penaltyFunction = boost::bind(
+//        boost::bind(vectorNorm<double>, 
+//                    boost::bind(VectorDiff<double>, _1, _2)),
+//        boost::bind(calculateRTforList, calibrationMixture, 
+//                    chromatograph, boost::ref(newChemicalBasis)),
+//        retentionTimes);
+//
+//    std::vector<double> lowerBounds, upperBounds, steps, gradientSteps;
+//    for(unsigned int i = 0; i < setters.size(); i++) {
+//        lowerBounds.push_back(0.0);
+//        upperBounds.push_back(3.0);
+//        steps.push_back(0.25);
+//        gradientSteps.push_back(0.001);
+//    }
+//    //std::vector<double> lowerBounds, upperBounds, steps, gradientSteps;
+//    //lowerBounds.push_back(0.575-0.01);
+//    //lowerBounds.push_back(0.83-0.01);
+//    //lowerBounds.push_back(2.20-0.01);
+//    //upperBounds.push_back(0.575+0.01);
+//    //upperBounds.push_back(0.83+0.01);
+//    //upperBounds.push_back(2.20+0.01);
+//    //steps.push_back(0.0025);
+//    //steps.push_back(0.0025);
+//    //steps.push_back(0.0025);
+//    //gradientSteps.push_back(0.001);
+//    //gradientSteps.push_back(0.001);
+//    //gradientSteps.push_back(0.001);
+//
+//    std::cout << "Initial penalty function value: " 
+//        << penaltyFunction() << "\n";
+//    std::vector<double> calibratedEnergiesBruteForce = 
+//        findMinimumBruteForce(penaltyFunction, setters, lowerBounds,
+//                              upperBounds, steps);
+//    std::cout << "BruteForce approximation:\n";
+//    for(unsigned int i = 0; i < setters.size(); i++) {
+//        std::cout << energiesToCalibrate[i] << ": " 
+//            << calibratedEnergiesBruteForce[i] << "\n";
+//    }
+//
+//    for(unsigned int i = 0; i < setters.size(); i++) {
+//        setters[i](calibratedEnergiesBruteForce[i]);
+//    }
+//    std::cout << "Penalty function value after calibration: " 
+//        << penaltyFunction() << "\n";
+//
+//    std::vector<double> calibratedEnergiesGradientDescent = 
+//        findMinimumGradientDescent(penaltyFunction, setters, 
+//            calibratedEnergiesBruteForce, gradientSteps, 0.00001);
+//
+//    std::cout << "GradientDescent approximation:\n";
+//    for(unsigned int i = 0; i < setters.size(); i++) {
+//        std::cout << energiesToCalibrate[i] << ": " 
+//            << calibratedEnergiesGradientDescent[i] << "\n";
+//    }
+//
+//    for(unsigned int i = 0; i < setters.size(); i++) {
+//        setters[i](calibratedEnergiesGradientDescent[i]);
+//    }
+//    return newChemicalBasis;
+//}
 
 }
