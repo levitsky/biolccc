@@ -416,7 +416,7 @@ double calculateKdCoilBoltzmannDoubleLayer(
     
     // PoreSteps is a number of nodes in a lattice between two walls. Because of
     // the features of the following calculation it should be more than 2.
-    const int poreSteps = (int) columnPoreSize / chemBasis.segmentLength();
+    const int poreSteps = (int) (columnPoreSize / chemBasis.segmentLength());
     if (poreSteps <=2) {
         return PORESIZE_ERROR;
     }
@@ -608,7 +608,7 @@ double calculateKdCoilSnyder(
     
     // PoreSteps is a number of nodes in a lattice between two walls. Because of
     // the features of a following calculation it should be more than 2.
-    const int poreSteps = (int) columnPoreSize / chemBasis.segmentLength();
+    const int poreSteps = (int)(columnPoreSize / chemBasis.segmentLength());
     if (poreSteps <=2) {
         return PORESIZE_ERROR;
     }
@@ -1034,8 +1034,8 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
         currentGradientPoint++) {
         convertedGradient.push_back(
                 std::pair<int,double>(
-                    floor(currentGradientPoint->time() * conditions.flowRate()
-                        / dV),
+                    int(floor(currentGradientPoint->time() * 
+                         conditions.flowRate() / dV)),
                     (100.0 - currentGradientPoint->concentrationB()) / 100.0 *
                         conditions.secondSolventConcentrationA() + 
                         currentGradientPoint->concentrationB() / 100.0 *
