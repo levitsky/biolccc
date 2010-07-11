@@ -1,0 +1,10 @@
+import os
+
+Import('env')
+
+libBioLCCC = env.StaticLibrary(
+    target = '#'+os.path.join('lib',
+        env['PLATFORM'], env['BUILDTYPE'],'libBioLCCC'),
+    source = Glob('*.cpp'))
+
+Return('libBioLCCC')

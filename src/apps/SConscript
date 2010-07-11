@@ -1,0 +1,12 @@
+import os 
+
+Import('env')
+
+local_env = env.Clone()
+local_env.Append(LIBS='BioLCCC')
+theorchromo_bin = local_env.Program(
+    target = '#'+os.path.join('bin',
+        local_env['PLATFORM'], local_env['BUILDTYPE'], 'theorchromo_bin'),
+    source = 'main.cpp')
+
+Return('theorchromo_bin')
