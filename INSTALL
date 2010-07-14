@@ -1,0 +1,70 @@
+Compiling libBioLCCC on Linux.
+*******************************
+The main platform of libBioLCCC/pyBioLCCC development is Linux. We prefer it for
+its flexibility and vast automation capabilities.
+
+For several reasons Python is highly involved at every stage of libBioLCCC
+development. Being initially just a convenient language for libBioLCCC testing
+and usage, it became a tool for version control, building and distribution.
+
+This choice of tools is very powerful while being homogeneous and 
+cross-platform.
+
+In order to compile libBioLCCC you need to have the following tools installed:
+a) Python 2.6 (other versions 2.x are accepted, but not tested yet)
+b) SCons build system.
+c) SWIG interface wrapped.
+d) (optional) bazaar version control system.
+
+All these tools can be installed via the main repository of your Linux
+distribution. However, it was tested on Ubuntu only.
+
+Download the source code, make separate build directory (!) and print in it:
+scons -Y /path/to/source/directory.
+
+The build scripts will done everything else for you.
+If you want to compile and install the Python package print in the build
+directory:
+python setup.py build
+or
+python setup.py install
+
+
+Compiling libBioLCCC/pyBioLCCC on Windows.
+*******************************************
+
+As we mentioned, the main platform of libBioLCCC/pyBioLCCC development is Linux.
+However, we clearly understand the importance of the Windows and try to write 
+only platform-independent code and use only cross-platform tools. However, the 
+libBioLCCC development team is still very small (i.e. a single person),
+so our testing and packaging capabilities are extremely limited.
+
+So far the packaging for Windows was done using Wine+MinGW32. The instructions 
+are the following:
+
+1. Install the latest Wine distribution. On Debian-based systems it is done via:
+sudo apt-get install wine
+
+2. Install the latest MinGW distribution UNDER the Wine. In order to do that:
+    2.1. Download and install the latest version of MinGW-get:
+        wget http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/MinGW%205.1.6/MinGW-5.1.6.exe/download -P /tmp/
+        wine /tmp/MinGW-5.1.6.exe
+        Keep the installation directory by default.
+    2.2. Download and install the latest versions of SCons and SWIG.
+
+3. If you plan to upload the pyBioLCCC-derived packages to PyPi then:
+    3.1. Set the HOME environment variable to "C:\users\your_user", where 
+        replace your_user by your login name in Linux.
+        In order to set this variable print 'wine regedit' in console. Using the
+        regedit window navigate to HKEY_CURRENT_USER/Environment and right-click
+        on the right field choosing, Add->String value.
+    3.2. Create .pypirc in C:\users\your_user and fill it with the following
+        text:
+            [distutils]
+            index-servers =
+                pypi
+
+            [pypi]
+            username:<username>
+            password:<password>
+        Where <username> and <password> are the ones from your PyPi account.
