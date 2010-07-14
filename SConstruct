@@ -1,51 +1,95 @@
 import os
 import inspect
+import distutils.sysconfig
 
 # Configuring the build.
 
+# Get the mode flag from the command line.
+# Default to 'release' if the user didn't specify.
+buildtype = ARGUMENTS.get('buildtype', 'release')
+if buildtype not in ['debug', 'release']:
+   print "Error: expected 'debug' or 'release', found: %s" % (buildtype,)
+   Exit(1)
+
+# It is strictly prohibited to build the application in the source directory.
+build_in_repository = not bool(GetOption('repository'))
+if not build_in_repository:
+    for dir in GetOption('repository'):
+        if Dir(dir).abspath == Dir('.').abspath:
+            build_in_repository = True
+if build_in_repository:
+    print 'Error:'
+    print 'Avoid building the application in the source directory.'
+    print 'Print \'scons -Y source_directory\' in the build directory.'
+    Exit(1)
+
+VariantDir('.', GetOption('repository'), duplicate=True)
+
+# Setting the platform specific options.
 platform = ARGUMENTS.get('OS', Platform())
 
 if platform.name in ['posix', 'linux', 'unix']:
-    ccflags_debug = ' -Wall -g'
-    ccflags_release = ' -O2'
+    if buildtype=='release':
+        ccflags = ' -O2'
+    else:
+        ccflags = ' -Wall -g'
     tools = 'default'
 
 if platform.name in ['win32', 'windows']:
-    ccflags_debug = ' -Wall -g'
-    ccflags_release = ' -O2'
+    if buildtype=='release':
+        ccflags = ' -O2'
+    else:
+        ccflags = ' -Wall -g'
     tools = 'mingw'
 
-debug = Environment(
+env = Environment(
     PLATFORM=platform.name,
-    CPPPATH=[Dir('include').abspath],
-    CCFLAGS=ccflags_debug,
+    CPPPATH=[Dir('include').abspath, distutils.sysconfig.get_python_inc()],
+    CCFLAGS=ccflags,
     tools=[tools],
-    BUILDTYPE='debug',
-    LIBPATH=os.path.join('#lib', platform.name, 'debug')
+    BUILDTYPE=buildtype,
+    LIBPATH=os.path.join('#lib', 'static', platform.name, buildtype),
+    ROOTBUILDDIR=Dir('.').abspath,
     )
 
-release = Environment(
-    PLATFORM=platform.name,
-    CPPPATH=[],
-    CCFLAGS=ccflags_release,
-    tools=[tools],
-    BUILDTYPE='release'
-    )
-
-libBioLCCC=SConscript(
+libBioLCCC_static=SConscript(
     os.path.join('src', 'core', 'SConscript'),
-    exports = {'env':debug},
+    exports = {'env':env},
     variant_dir=os.path.join(
-        'build', platform.name, debug['BUILDTYPE'], 'core'), 
+        'build', platform.name, env['BUILDTYPE'], 'core'), 
     duplicate=True
     )
 
 theorchromo_app=SConscript(
     os.path.join('src', 'apps', 'SConscript'),
-    exports={'env':debug},
+    exports={'env':env},
     variant_dir=os.path.join(
-        'build', platform.name, debug['BUILDTYPE'], 'apps'), 
+        'build', platform.name, env['BUILDTYPE'], 'apps'), 
+    duplicate=True,
+    )
+Requires(theorchromo_app, libBioLCCC_static)
+
+pyBioLCCC_so = SConscript(
+    os.path.join('src', 'bindings', 'SConscript'),
+    exports = {'env':env},
+    variant_dir=os.path.join(
+        'build', platform.name, env['BUILDTYPE'], 'bindings'), 
     duplicate=True,
     )
 
-Requires(theorchromo_app, libBioLCCC)
+env.AddPostAction(pyBioLCCC_so, Copy(
+    os.path.join(Dir('#.').abspath, 'src', 'bindings', 'pyBioLCCC.py'),
+    os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
+        'pyBioLCCC.py')))
+env.AddPostAction(pyBioLCCC_so, Copy(
+    os.path.join(Dir('#.').abspath, 'src', 'bindings', 'pyBioLCCC_wrap.cc'),
+    os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
+        'pyBioLCCC_wrap.cc')))
+env.AddPostAction(pyBioLCCC_so, Touch(
+    os.path.join(Dir('#.').abspath, 'src', 'bindings', '__init__.py')))
+
+Depends(pyBioLCCC_so, 'setup.py')
+Depends(pyBioLCCC_so, 'VERSION')
+Depends(pyBioLCCC_so, 'MANIFEST.in')
+Depends(pyBioLCCC_so, 'pyBioLCCC.README')
+

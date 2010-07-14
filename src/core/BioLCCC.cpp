@@ -352,9 +352,9 @@ double calculateKdCoilBoltzmann(
 
     // Cleaning memory.
     try {
-        delete density;
-        delete densityBuffer;
-        delete transitionMatrix;
+        delete[] density;
+        delete[] densityBuffer;
+        delete[] transitionMatrix;
     }
     catch (...) {
         return MEMORY_ERROR;
@@ -546,9 +546,9 @@ double calculateKdCoilBoltzmannDoubleLayer(
 
     // Cleaning memory.
     try {
-        delete density;
-        delete densityBuffer;
-        delete transitionMatrix;
+        delete[] density;
+        delete[] densityBuffer;
+        delete[] transitionMatrix;
     }
     catch (...) {
         return MEMORY_ERROR;
@@ -723,9 +723,9 @@ double calculateKdCoilSnyder(
 
     // Cleaning memory.
     try {
-        delete density;
-        delete densityBuffer;
-        delete transitionMatrix;
+        delete[] density;
+        delete[] densityBuffer;
+        delete[] transitionMatrix;
     }
     catch (...) {
         return MEMORY_ERROR;
@@ -1027,20 +1027,27 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
     // and the y-coordinate to the scale of second solvent concentration.
     std::vector<std::pair<int, double> > convertedGradient;
     
-    //BOOST_FOREACH(GradientPoint currentGradientPoint, conditions.gradient()) {
-    for (Gradient::const_iterator currentGradientPoint =
-            conditions.gradient().begin();
-        currentGradientPoint != conditions.gradient().end();
-        currentGradientPoint++) {
+    std::cout << conditions.gradient().size() << " ";
+    // We've dropped the const_iterator version, since it didn't work 
+    // on WinGW32.
+    //BOOST_FOREACH(GradientPoint currentGradientPoint, conditions.gradient()){
+    //for (Gradient::const_iterator currentGradientPoint =
+    //        conditions.gradient().begin();
+    //    currentGradientPoint < conditions.gradient().end();
+    //    ++currentGradientPoint) {
+    for (Gradient::size_type i = 0;
+        i != conditions.gradient().size();
+        i++) {
         convertedGradient.push_back(
                 std::pair<int,double>(
-                    int(floor(currentGradientPoint->time() * 
+                    int(floor(conditions.gradient()[i].time() * 
                          conditions.flowRate() / dV)),
-                    (100.0 - currentGradientPoint->concentrationB()) / 100.0 *
+                    (100.0 - conditions.gradient()[i].concentrationB())/100.0 *
                         conditions.secondSolventConcentrationA() + 
-                        currentGradientPoint->concentrationB() / 100.0 *
+                        conditions.gradient()[i].concentrationB() / 100.0 *
                         conditions.secondSolventConcentrationB()));
     }
+    std::cout << convertedGradient.size() << " ";
     
      // The part of a column passed by molecules. When it exceeds 1.0,
      // molecule elute from the column.
@@ -1050,9 +1057,9 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
     double secondSolventConcentration = 0.0;
 
 
-    std::vector<std::pair<int, double> >::const_iterator currentGradientPoint =
+    std::vector<std::pair<int, double> >::const_iterator currentGradientPoint=
         convertedGradient.begin();
-    std::vector<std::pair<int, double> >::const_iterator previousGradientPoint =
+    std::vector<std::pair<int, double> >::const_iterator previousGradientPoint=
         convertedGradient.begin();
     while (S < 1.0) {
         j++;
