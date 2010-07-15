@@ -1027,7 +1027,6 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
     // and the y-coordinate to the scale of second solvent concentration.
     std::vector<std::pair<int, double> > convertedGradient;
     
-    std::cout << conditions.gradient().size() << " ";
     // We've dropped the const_iterator version, since it didn't work 
     // on WinGW32.
     //BOOST_FOREACH(GradientPoint currentGradientPoint, conditions.gradient()){
@@ -1047,10 +1046,9 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                         conditions.gradient()[i].concentrationB() / 100.0 *
                         conditions.secondSolventConcentrationB()));
     }
-    std::cout << convertedGradient.size() << " ";
     
-     // The part of a column passed by molecules. When it exceeds 1.0,
-     // molecule elute from the column.
+    // The part of a column passed by molecules. When it exceeds 1.0,
+    // molecule elute from the column.
     double S = 0.0;
     // The current iteration number. 
     int j = 0;      

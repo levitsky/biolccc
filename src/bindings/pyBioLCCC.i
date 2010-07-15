@@ -1,6 +1,8 @@
 // pyBioLCCC.i - SWIG interface
 %module pyBioLCCC 
 
+%feature("autodoc", "0");
+
 %{
 #include "auxiliary.hpp"
 #include "aminoacid.h"

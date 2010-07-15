@@ -1,0 +1,7 @@
+* Class documentation, docstrings.
+
+* Decide how to merge NTerminus and CTerminus and may be even merge them with
+Aminoacid.
+
+* Switch from errorcodes to exceptions? At least, make errorcodes more
+comprehensible.
