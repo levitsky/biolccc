@@ -1,0 +1,14 @@
+import os
+
+Import('env')
+
+local_env = env.Clone()
+local_env['SWIGPATH'] = local_env['CPPPATH']
+local_env['SWIGFLAGS'] = '-python -c++'
+local_env['SHLIBPREFIX'] = ''
+
+pyBioLCCC_so = local_env.SharedLibrary(
+    target = '_pyBioLCCC',
+    source = ['pyBioLCCC.i'] + Glob('../core/*.cpp'))
+
+Return('pyBioLCCC_so')

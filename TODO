@@ -1,7 +1,18 @@
+* Add the new sets of coefficients for FA and HILIC.
+
+* Add the import and export functions for ChemicalBasis and ChromoConditions.
+
 * Class documentation, docstrings.
+
+* Go open source!!
+
+* Switch to hg from bzr.
+
+* Do something with min_inf()!
 
 * Decide how to merge NTerminus and CTerminus and may be even merge them with
 Aminoacid.
 
 * Switch from errorcodes to exceptions? At least, make errorcodes more
 comprehensible.
+
