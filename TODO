@@ -1,3 +1,7 @@
+* Tests!
+
+* Code refactoring.
+
 * Add the new sets of coefficients for FA and HILIC.
 
 * Add the import and export functions for ChemicalBasis and ChromoConditions.
