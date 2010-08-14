@@ -52,22 +52,14 @@ env = Environment(
     ROOTBUILDDIR=Dir('.').abspath,
     )
 
-libBioLCCC_static=SConscript(
+# Building targets.
+libBioLCCC_static = SConscript(
     os.path.join('src', 'core', 'SConscript'),
     exports = {'env':env},
     variant_dir=os.path.join(
         'build', platform.name, env['BUILDTYPE'], 'core'), 
     duplicate=True
     )
-
-theorchromo_app=SConscript(
-    os.path.join('src', 'apps', 'SConscript'),
-    exports={'env':env},
-    variant_dir=os.path.join(
-        'build', platform.name, env['BUILDTYPE'], 'apps'), 
-    duplicate=True,
-    )
-Requires(theorchromo_app, libBioLCCC_static)
 
 pyBioLCCC_so = SConscript(
     os.path.join('src', 'bindings', 'SConscript'),
@@ -77,6 +69,25 @@ pyBioLCCC_so = SConscript(
     duplicate=True,
     )
 
+libgtest_static = SConscript(
+    os.path.join('src', 'gtest', 'SConscript'),
+    exports = {'env':env},
+    variant_dir=os.path.join(
+        'build', platform.name, env['BUILDTYPE'], 'gtest'), 
+    duplicate=True,
+    )
+
+tests_app=SConscript(
+    os.path.join('src', 'apps', 'SConscript'),
+    exports={'env':env},
+    variant_dir=os.path.join(
+        'build', platform.name, env['BUILDTYPE'], 'apps'), 
+    duplicate=True,
+    )
+Requires(tests_app, libBioLCCC_static)
+Requires(tests_app, libgtest_static)
+
+# Copying source files required for the python source package.
 env.AddPostAction(pyBioLCCC_so, Copy(
     os.path.join(Dir('#.').abspath, 'src', 'bindings', 'pyBioLCCC.py'),
     os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
@@ -88,6 +99,7 @@ env.AddPostAction(pyBioLCCC_so, Copy(
 env.AddPostAction(pyBioLCCC_so, Touch(
     os.path.join(Dir('#.').abspath, 'src', 'bindings', '__init__.py')))
 
+# Copying the documentation to the build dir.
 Depends(pyBioLCCC_so, 'setup.py')
 Depends(pyBioLCCC_so, 'VERSION')
 Depends(pyBioLCCC_so, 'MANIFEST.in')

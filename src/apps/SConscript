@@ -3,10 +3,10 @@ import os
 Import('env')
 
 local_env = env.Clone()
-local_env.Append(LIBS='BioLCCC')
-theorchromo_bin = local_env.Program(
+local_env.Append(LIBS=['BioLCCC', 'gtest', 'pthread'])
+tests_app = local_env.Program(
     target = '#'+os.path.join('bin',
-        local_env['PLATFORM'], local_env['BUILDTYPE'], 'theorchromo_bin'),
-    source = 'main.cpp')
+        local_env['PLATFORM'], local_env['BUILDTYPE'], 'tests'),
+    source = 'tests.cpp')
 
-Return('theorchromo_bin')
+Return('tests_app')
