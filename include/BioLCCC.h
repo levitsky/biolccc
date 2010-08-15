@@ -20,6 +20,19 @@ static const ChromoConditions standardChromoConditions = ChromoConditions();
 static const ChemicalBasis standardChemicalBasis = ChemicalBasis();
 
 /*!
+    Parses a given string representation of a peptide using given chemical
+    basis. Returns parsed peptide structure, terminal groups and energy profile
+    of a peptide.
+*/
+bool parseSequence(
+    const std::string &source, 
+    const ChemicalBasis &chemBasis,
+    std::vector<ChemicalGroup> *parsedPeptideStructure,
+    ChemicalGroup *NTerminus,
+    ChemicalGroup *CTerminus,
+    std::vector<double> *peptideEnergyProfile);
+
+/*!
     Calculates the retention time of a peptide with given sequence 
     using given table of peptide chemicals and chromatographic 
     conditions.
@@ -57,65 +70,8 @@ double calculateKd(const std::string &sequence,
     const double calibrationParameter = 1.0,
     const double temperature = 293.0);
 
-///*!
-//    Calculates the distribution coefficient (Kd) of a peptide with
-//    given sequence with the BioLCCC model for a coil using the Boltzmann 
-//    equation with given table of peptide chemicals, the name of the second 
-//    solvent, its concentration, the size of adsorbent's pores, calibration 
-//    parameter and temperature.
-//*/
-//double calculateKdCoilBoltzmann(const std::string &sequence,
-//    const double secondSolventConcentration,
-//    const ChemicalBasis &chemBasis = standardChemicalBasis,
-//    const double columnPoreSize = 100.0,
-//    const double calibrationParameter = 1.0,
-//    const double temperature = 293.0);
-//
-///*!
-//    Calculates the distribution coefficient (Kd) of a peptide with
-//    given sequence with the BioLCCC model for a coil using the Boltzmann 
-//    equation with given table of peptide chemicals, the name of the second 
-//    solvent, its concentration, the size of adsorbent's pores, calibration 
-//    parameter and temperature. DOUBLE LAYER MODIFICATION!
-//*/
-//
-//double calculateKdCoilBoltzmannDoubleLayer(const std::string &sequence,
-//    const double secondSolventConcentration,
-//    const ChemicalBasis &chemBasis = standardChemicalBasis,
-//    const double columnPoreSize = 100.0,
-//    const double calibrationParameter = 1.0,
-//    const double temperature = 293.0);
-//
-///*!
-//    Calculates the distribution coefficient (Kd) of a peptide with
-//    given sequence with the BioLCCC model for a coil using the Snyder equation 
-//    given table of peptide chemicals, the name of the second solvent, its 
-//    concentration, the size of adsorbent's pores, calibration parameter and 
-//    temperature.
-//*/
-//double calculateKdCoilSnyder(const std::string &sequence,
-//    const double secondSolventConcentration,
-//    const ChemicalBasis &chemBasis = standardChemicalBasis,
-//    const double columnPoreSize = 100.0,
-//    const double calibrationParameter = 1.0,
-//    const double temperature = 293.0);
-//
-///*!
-//    Calculates the distribution coefficient (Kd) of a peptide with
-//    given sequence with the BioLCCC model for a rod using given table of 
-//    peptide chemicals, the name of the second solvent, its concentration, 
-//    the size of adsorbent's pores, calibration parameter and 
-//    temperature.
-//*/
-//double calculateKdRod(const std::string &sequence,
-//    const double secondSolventConcentration,
-//    const ChemicalBasis &chemBasis = standardChemicalBasis,
-//    const double columnPoreSize = 100.0,
-//    const double calibrationParameter = 1.0,
-//    const double temperature = 293.0);
-
 /*!
-    Created as a transient solution for fast calculation of RTBioLCCC 
+    Created as a transient solution for the fast calculation of RTBioLCCC 
     and masses.
 */
 bool calculatePeptideProperties(const std::string &sequence,
@@ -125,13 +81,5 @@ bool calculatePeptideProperties(const std::string &sequence,
     double *averageMass,
     double *monoisotopicMass);
 
-/*    
-ChemicalBasis calibrateBioLCCC(
-        std::vector<std::string> calibrationMixture,
-        std::vector<double> retentionTimes,
-        ChromoConditions chromatograph,
-        ChemicalBasis initialChemicalBasis,
-        std::vector<std::string> energiesToCalibrate);
-*/
 }
 #endif
