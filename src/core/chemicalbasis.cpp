@@ -167,7 +167,8 @@ ChemicalBasis::ChemicalBasis() {
     setPersistentLength(1);
 }
 
-const std::map<std::string,ChemicalGroup> & ChemicalBasis::aminoacids() const{
+const std::map<std::string,ChemicalGroup> & ChemicalBasis::chemicalGroups() const
+{
     return mChemicalGroups;
 }
 

@@ -5,8 +5,7 @@
 
 %{
 #include "auxiliary.hpp"
-#include "aminoacid.h"
-#include "terminus.h"
+#include "chemicalgroup.h"
 #include "chemicalbasis.h"
 #include "gradientpoint.h"
 #include "gradient.h"
@@ -18,8 +17,7 @@
 %include "std_map.i"
 %include "std_vector.i"
 %template(GradientPointVector) std::vector<BioLCCC::GradientPoint>;
-%template(StringAminoacidMap) std::map<std::string,BioLCCC::Aminoacid>;
-%template(StringTerminusMap) std::map<std::string,BioLCCC::Terminus>;
+%template(StringAminoacidMap) std::map<std::string,BioLCCC::ChemicalGroup>;
 
 %extend BioLCCC::Aminoacid {
     %insert("python") %{
