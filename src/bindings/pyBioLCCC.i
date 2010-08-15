@@ -17,22 +17,9 @@
 %include "std_map.i"
 %include "std_vector.i"
 %template(GradientPointVector) std::vector<BioLCCC::GradientPoint>;
-%template(StringAminoacidMap) std::map<std::string,BioLCCC::ChemicalGroup>;
+%template(StringChemicalGroupMap) std::map<std::string,BioLCCC::ChemicalGroup>;
 
-%extend BioLCCC::Aminoacid {
-    %insert("python") %{
-        def __getstate__(self):
-            output_dict = {}
-            output_dict['name'] = self.name()
-            output_dict['label'] = self.label()
-            output_dict['bindEnergy'] = self.bindEnergy()
-            output_dict['averageMass'] = self.averageMass()
-            output_dict['monoisotopicMass'] = self.monoisotopicMass()
-            return output_dict
-    %}
-}
-
-%extend BioLCCC::Terminus {
+%extend BioLCCC::ChemicalGroup{
     %insert("python") %{
         def __getstate__(self):
             output_dict = {}
@@ -59,17 +46,11 @@
             output_dict['secondSolventBindEnergy'] = \
                 self.secondSolventBindEnergy()
 
-            output_dict['aminoacids'] = {}
-            for label, aminoacid in self.aminoacids().items():
-                output_dict['aminoacids'][label] = aminoacid.__getstate__()
+            output_dict['chemicalGroups'] = {}
+            for label, chemical_group in self.chemicalGroups().items():
+                output_dict['chemicalGroups'][label] = (
+                    chemical_group.__getstate__())
 
-            output_dict['CTermini'] = {}
-            for label, CTerminus in self.CTermini().items():
-                output_dict['CTermini'][label] = CTerminus.__getstate__()
-
-            output_dict['NTermini'] = {}
-            for label, NTerminus in self.NTermini().items():
-                output_dict['NTermini'][label] = NTerminus.__getstate__()
             return output_dict
 
         def __setstate__(self, chembasis_dict):
@@ -79,30 +60,15 @@
             self.setAdsorbtionLayerWidth(chembasis_dict['adsorbtionLayerWidth'])
             self.setSecondSolventBindEnergy(
                 chembasis_dict['secondSolventBindEnergy'])
-            self.clearAminoacids()
-            for aminoacid_dict in chembasis_dict['aminoacids'].values():
-                aminoacid = Aminoacid(aminoacid_dict['name'],
-                                      aminoacid_dict['label'],
-                                      aminoacid_dict['bindEnergy'],
-                                      aminoacid_dict['averageMass'],
-                                      aminoacid_dict['monoisotopicMass'])
-                self.addAminoacid(aminoacid)
-            self.clearCTermini()
-            for CTerminus_dict in chembasis_dict['CTermini'].values():
-                CTerminus = Terminus(CTerminus_dict['name'],
-                                     CTerminus_dict['label'],
-                                     CTerminus_dict['bindEnergy'],
-                                     CTerminus_dict['averageMass'],
-                                     CTerminus_dict['monoisotopicMass'])
-                self.addCTerminus(CTerminus)
-            self.clearNTermini()
-            for NTerminus_dict in chembasis_dict['NTermini'].values():
-                NTerminus = Terminus(NTerminus_dict['name'],
-                                     NTerminus_dict['label'],
-                                     NTerminus_dict['bindEnergy'],
-                                     NTerminus_dict['averageMass'],
-                                     NTerminus_dict['monoisotopicMass'])
-                self.addNTerminus(NTerminus)
+            self.clearChemicalGroups()
+            for chemical_group_dict in chembasis_dict['chemicalGroups'].values():
+                chemical_group = ChemicalGroup(
+                    chemical_group_dict['name'],
+                    chemical_group_dict['label'],
+                    chemical_group_dict['bindEnergy'],
+                    chemical_group_dict['averageMass'],
+                    chemical_group_dict['monoisotopicMass'])
+                self.addChemicalGroup(chemical_group)
 
         def min_inf(self):
             output_dict = {}
@@ -113,14 +79,8 @@
             output_dict['secondSolventBindEnergy'] = \
                 self.secondSolventBindEnergy()
 
-            for label, aminoacid in self.aminoacids().items():
-                output_dict[label] = aminoacid.bindEnergy()
-
-            for label, CTerminus in self.CTermini().items():
-                output_dict[label] = CTerminus.bindEnergy()
-
-            for label, NTerminus in self.NTermini().items():
-                output_dict[label] = NTerminus.bindEnergy()
+            for label, chemical_group in self.chemicalGroups().items():
+                output_dict[label] = chemical_group.bindEnergy()
             return output_dict
 
         def set_min_inf_element(self, key, value):
@@ -135,27 +95,10 @@
             elif key == 'secondSolventBindEnergy':
                 self.setSecondSolventBindEnergy(value)
             else:
-                if key.endswith('-'):
-                    if key in self.NTermini():
-                        self.setNTerminusBindEnergy(key, value) 
-                    else:
-                        self.addNTerminus(Terminus("",
-                                                   key, 
-                                                   value))
-                elif key.startswith('-'):
-                    if key in self.CTermini():
-                        self.setCTerminusBindEnergy(key, value) 
-                    else:
-                        self.addCTerminus(Terminus("",
-                                                   key, 
-                                                   value))
+                if key in self.chemicalGroups():
+                    self.setChemicalGroupBindEnergy(key, value) 
                 else:
-                    if key in self.aminoacids():
-                        self.setAminoacidBindEnergy(key, value) 
-                    else:
-                        self.addAminoacid(Aminoacid("",
-                                                    key, 
-                                                    value))
+                    self.addChemicalGroup(ChemicalGroup("", key, value))
 
         def set_min_inf(self, min_inf_dict):
             for key, value in min_inf_dict.items():
@@ -220,8 +163,7 @@
 
 // Parse the original header file
 %include "auxiliary.hpp"
-%include "aminoacid.h"
-%include "terminus.h"
+%include "chemicalgroup.h"
 %include "chemicalbasis.h"
 %include "gradientpoint.h"
 %include "gradient.h"
