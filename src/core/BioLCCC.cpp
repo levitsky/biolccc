@@ -2,10 +2,6 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
-//#include "boost/foreach.hpp"
-//#include "boost/function.hpp"
-//#include "boost/bind.hpp"
-//#include "boost/ref.hpp"
 #include "BioLCCC.h"
 
 #define MEMORY_ERROR    -2.0
@@ -21,6 +17,7 @@ namespace BioLCCC {
 // Auxiliary functions that shouldn't be exposed to user at this
 // point.
 namespace {
+
 std::vector<double> calculateRT(std::vector<std::string> mixture,
                                 ChromoConditions chromatograph,
                                 ChemicalBasis chemicalBasis) {
@@ -31,156 +28,6 @@ std::vector<double> calculateRT(std::vector<std::string> mixture,
     return times;
 }
 
-bool parseSequence(
-    const std::string &source, 
-    const ChemicalBasis &chemBasis,
-    std::vector<Aminoacid> *parsedPeptideStructure,
-    Terminus *NTerminus,
-    Terminus *CTerminus,
-    std::vector<double> *peptideEnergyProfile
-) {
-    parsedPeptideStructure->clear();
-    
-    // At first we need to strip the sequence from adjacent aminoacids.
-    // If a source sequence contains them, it should contain two dots, so we 
-    // need the part of sequence between them.
-    std::size_t firstDotPosition = 0;
-    std::size_t secondDotPosition = 0;
-    
-    // We'll use this variable to contain peptide sequence without adjacent 
-    // aminoacids. 
-    std::string strippedSource = source;
-    
-    firstDotPosition = source.find(".");
-    
-    if (firstDotPosition != std::string::npos) {
-        secondDotPosition = source.find(".", firstDotPosition+1);
-        if (secondDotPosition != std::string::npos) {  
-      
-            // If a source sequence contains more that two dots, it's broken.
-            if (source.find(".", secondDotPosition+1) != std::string::npos) {
-                return false;
-            }
-            else {
-                strippedSource = source.substr(firstDotPosition+1, 
-                    secondDotPosition - firstDotPosition - 1);
-            }
-        }
-        // If a source sequence contains only one dot, it's broken.
-        else {
-            return false;
-        }
-    }
-    
-    
-    // Than goes parsing.
-    std::size_t NTerminusPosition = 0;
-    
-    // First we need to check the stripped source sequence for 
-    // the N-Terminal group.
-    *NTerminus = chemBasis.defaultNTerminus();
-    //std::pair<std::string,Terminus> NTerminusIterator;
-    //BOOST_FOREACH(NTerminusIterator, chemBasis.NTermini()) {
-    for (std::map<std::string,Terminus>::const_iterator NTerminusIterator = 
-             chemBasis.NTermini().begin();
-         NTerminusIterator != chemBasis.NTermini().end();
-         NTerminusIterator++) {
-        if (strippedSource.find(NTerminusIterator->second.label())== (size_t)0){
-            *NTerminus = NTerminusIterator->second;
-            NTerminusPosition = NTerminusIterator->second.label().size();
-        }
-    }
-    
-    // Then we need to found the location of the C-Terminus.
-    *CTerminus = chemBasis.defaultCTerminus();
-    std::size_t CTerminusPosition;
-    CTerminusPosition = strippedSource.find("-", NTerminusPosition);
-    if (CTerminusPosition != std::string::npos){
-        
-        // The sequence should not contain hyphens after C-terminal group.
-        if (strippedSource.find("-", CTerminusPosition+1) != std::string::npos){
-            return false;
-        }
-        
-        // Searching for known C-terminal groups.
-        //std::pair<std::string,Terminus> CTerminusIterator;
-        //BOOST_FOREACH(CTerminusIterator, chemBasis.CTermini()) {
-        for (std::map<std::string,Terminus>::const_iterator CTerminusIterator = 
-                 chemBasis.CTermini().begin();
-             CTerminusIterator != chemBasis.CTermini().end();
-             CTerminusIterator++) {
-            if (strippedSource.find(CTerminusIterator->second.label(), 
-                CTerminusPosition ) != std::string::npos) {
-                *CTerminus = CTerminusIterator->second;
-            }
-        }
-    }
-    else {
-        CTerminusPosition = strippedSource.size();
-    }
-        
-    // At this step we obtain the sequence of a peptide without adjacent 
-    // aminoacids and terminal groups.
-    strippedSource = strippedSource.substr(NTerminusPosition, 
-                     CTerminusPosition-NTerminusPosition);
-
-    // We need to check whether it contains any non-letter characters.
-    for (std::size_t i=0; i<strippedSource.size(); i++) {
-        if (!(((int(strippedSource[i]) >= int('a')) && 
-               (int(strippedSource[i]) <= int('z'))) ||
-              ((int(strippedSource[i]) >= int('A')) && 
-               (int(strippedSource[i]) <= int('Z'))))) {
-            return false;
-        }
-    }
-
-    // Then we divide the whole sequence into aminoacids. 
-    bool aminoacidFound;
-    size_t curPos = 0;
-    while (curPos < strippedSource.size()) {
-        aminoacidFound = false;
-        //std::pair<std::string,Aminoacid> aminoacidIterator;
-        //BOOST_FOREACH(aminoacidIterator, chemBasis.aminoacids()) {
-        for (std::map<std::string,Aminoacid>::const_iterator aminoacidIterator= 
-                 chemBasis.aminoacids().begin();
-             aminoacidIterator != chemBasis.aminoacids().end();
-             aminoacidIterator++) {
-            if (strippedSource.compare(curPos, 
-                    aminoacidIterator->second.label().size(), 
-                    aminoacidIterator->second.label()) == 0) {
-                curPos += aminoacidIterator->second.label().size();
-                parsedPeptideStructure -> push_back(aminoacidIterator->second);
-                aminoacidFound = true;
-                break;
-            }
-        }
-  
-        if (!aminoacidFound) {
-            return false;
-        }
-    }
-    
-    // Finally, we build an energy profile if it was defined.
-    if (peptideEnergyProfile != NULL)
-    {
-        peptideEnergyProfile->clear();
-        //BOOST_FOREACH(Aminoacid currentAminoacid, *parsedPeptideStructure){
-        for (std::vector<Aminoacid>::const_iterator currentAminoacid =
-                parsedPeptideStructure->begin();
-            currentAminoacid != parsedPeptideStructure->end();
-            currentAminoacid++) {
-            peptideEnergyProfile->push_back(currentAminoacid->bindEnergy());
-        }
-        
-        // Modifing energies of terminal aminoacid residues.
-        *(peptideEnergyProfile->begin()) = *(peptideEnergyProfile->begin()) +
-            NTerminus->bindEnergy();
-        *(--peptideEnergyProfile->end()) = *(--peptideEnergyProfile->end()) + 
-            CTerminus->bindEnergy();
-    }
-
-    return true;
-}
 
 double calculateKdCoilBoltzmann(
     const std::vector<double> &peptideEnergyProfile,
@@ -266,7 +113,8 @@ double calculateKdCoilBoltzmann(
         return MEMORY_ERROR;
     }
 
-    // Now we need to construct a density vector for the last aminoacid residue.
+    // Now we need to construct a density vector for the first amino acid 
+    // residue.
     // A density is distributed uniformely over all layers of the lattice, 
     // except for the wall layers. There a density is multiplied by Boltzmann 
     // factor due to interaction of a residue with a solid phase.
@@ -305,7 +153,7 @@ double calculateKdCoilBoltzmann(
         }
     }
     
-    // On the each step we calculate a density vector for the n-th aminoacid 
+    // On the each step we calculate a density vector for the n-th amino acid 
     // residue by multiplication of the transition matrix and the density vector
     // for the (n-1)th residue.
     for (std::vector<double>::const_iterator residueBoltzmannFactor =
@@ -431,7 +279,8 @@ double calculateKdCoilBoltzmannDoubleLayer(
         return MEMORY_ERROR;
     }
 
-    // Now we need to construct a density vector for the last aminoacid residue.
+    // Now we need to construct a density vector for the first amino acid 
+    // residue.
     // A density is distributed uniformely over all layers of the lattice, 
     // except for the wall layers. There a density is multiplied by Boltzmann 
     // factor due to interaction of a residue with a solid phase.
@@ -489,7 +338,7 @@ double calculateKdCoilBoltzmannDoubleLayer(
     transitionMatrix[poreSteps * poreSteps - 2] = 1.0/6.0;
     transitionMatrix[poreSteps * poreSteps - 1] = 4.0/6.0;
     
-    // On the each step we calculate a density vector for the n-th aminoacid 
+    // On the each step we calculate a density vector for the n-th amino acid 
     // residue by multiplication of the transition matrix and the density vector
     // for the (n-1)th residue.
     for (std::vector<double>::const_iterator residueBoltzmannFactor =
@@ -623,7 +472,8 @@ double calculateKdCoilSnyder(
         return MEMORY_ERROR;
     }
 
-    // Now we need to construct a density vector for the last aminoacid residue.
+    // Now we need to construct a density vector for the first amino acid
+    // residue.
     // A density is distributed uniformely over all layers of the lattice, 
     // except for the wall layers. There a density is multiplied by Boltzmann 
     // factor due to interaction of a residue with a solid phase.
@@ -676,7 +526,7 @@ double calculateKdCoilSnyder(
     transitionMatrix[poreSteps * poreSteps - 2] = 1.0/6.0;
     transitionMatrix[poreSteps * poreSteps - 1] = 4.0/6.0;
     
-    // On the each step we calculate a density vector for the n-th aminoacid 
+    // On the each step we calculate a density vector for the n-th amino acid 
     // residue by multiplication of the transition matrix and the density vector
     // for the (n-1)th residue.
     for (std::vector<double>::const_iterator residueBoltzmannFactor =
@@ -938,7 +788,7 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
     const double temperature
 ) {
     // Choosing the appropriate model.
-    if (chemBasis.model()=="CoilBoltzmann") {
+    if (chemBasis.model()==COIL_BOLTZMANN) {
         if (peptideEnergyProfile.size() % chemBasis.persistentLength() == 0) {
             return calculateKdCoilBoltzmann(peptideEnergyProfile,
                 secondSolventConcentration, chemBasis, columnPoreSize,
@@ -956,7 +806,7 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
                 calibrationParameter, temperature)) / 2.0 ;
         }
     }
-    else if (chemBasis.model()=="CoilBoltzmannDoubleLayer") {
+    else if (chemBasis.model()==COIL_BOLTZMANN_DOUBLE_LAYER) {
         return calculateKdCoilBoltzmannDoubleLayer(peptideEnergyProfile,
             secondSolventConcentration,
             chemBasis,
@@ -964,7 +814,7 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
             calibrationParameter,
             temperature);
     }
-    else if (chemBasis.model() == "CoilSnyder") {
+    else if (chemBasis.model() == COIL_SNYDER) {
         return calculateKdCoilSnyder(peptideEnergyProfile,
             secondSolventConcentration,
             chemBasis,
@@ -972,16 +822,13 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
             calibrationParameter,
             temperature);
     }
-    else if (chemBasis.model() == "RodBoltzmann") {
+    else if (chemBasis.model() == ROD_BOLTZMANN) {
         return calculateKdRod(peptideEnergyProfile,
             secondSolventConcentration,
             chemBasis,
             columnPoreSize,
             calibrationParameter,
             temperature);
-    }
-    else {
-        return MODEL_ERROR;
     }
 }                                
 
@@ -1137,14 +984,171 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
 
 }
 
+bool parseSequence(
+    const std::string &source, 
+    const ChemicalBasis &chemBasis,
+    std::vector<ChemicalGroup> *parsedPeptideStructure,
+    ChemicalGroup *NTerminus,
+    ChemicalGroup *CTerminus,
+    std::vector<double> *peptideEnergyProfile
+) {
+    parsedPeptideStructure->clear();
+    
+    // At first we need to strip the sequence from adjacent amino acids.
+    // If a source sequence contains them, it should contain two dots, so we 
+    // need the part of sequence between them.
+    std::size_t firstDotPosition = 0;
+    std::size_t secondDotPosition = 0;
+    
+    // We'll use this variable to contain peptide sequence without adjacent 
+    // amino acids. 
+    std::string strippedSource = source;
+    
+    firstDotPosition = source.find(".");
+    
+    if (firstDotPosition != std::string::npos) {
+        secondDotPosition = source.find(".", firstDotPosition+1);
+        if (secondDotPosition != std::string::npos) {  
+      
+            // If a source sequence contains more that two dots, it's broken.
+            if (source.find(".", secondDotPosition+1) != std::string::npos) {
+                return false;
+            }
+            else {
+                strippedSource = source.substr(firstDotPosition+1, 
+                    secondDotPosition - firstDotPosition - 1);
+            }
+        }
+        // If a source sequence contains only one dot, it's broken.
+        else {
+            return false;
+        }
+    }
+    
+    
+    // Than goes parsing.
+    std::size_t NTerminusPosition = 0;
+    
+    // First we need to check the stripped source sequence for 
+    // the N-Terminal group.
+    *NTerminus = chemBasis.defaultNTerminus();
+    for (std::map<std::string,ChemicalGroup>::const_iterator 
+            NTerminusIterator = chemBasis.ChemicalGroup().begin();
+        NTerminusIterator != chemBasis.ChemicalGroup().end();
+        NTerminusIterator++) 
+    {
+        if NTerminusIterator->isNTerminal() {
+            if (strippedSource.find(NTerminusIterator->second.label()) ==
+                (size_t)0)
+            {
+                *NTerminus = NTerminusIterator->second;
+                NTerminusPosition = NTerminusIterator->second.label().size();
+            }
+        }
+    }
+    
+    // Then we need to found the location of the C-Terminus.
+    *CTerminus = chemBasis.defaultCTerminus();
+    std::size_t CTerminusPosition;
+    CTerminusPosition = strippedSource.find("-", NTerminusPosition);
+    if (CTerminusPosition != std::string::npos){
+        // The sequence should not contain hyphens after C-terminal group.
+        if (strippedSource.find("-", CTerminusPosition+1) != std::string::npos){
+            return false;
+        }
+        
+        // Searching for known C-terminal groups.
+        //std::pair<std::string,Terminus> CTerminusIterator;
+        //BOOST_FOREACH(CTerminusIterator, chemBasis.CTermini()) {
+        for (std::map<std::string,ChemicalGroup>::const_iterator
+                CTerminusIterator = chemBasis.ChemicalGroup().begin();
+            CTerminusIterator != chemBasis.ChemicalGroup().end();
+            CTerminusIterator++) 
+        {
+            if (CTerminusIterator->isCTerminal())
+            {
+                if (strippedSource.find(CTerminusIterator->second.label(), 
+                    CTerminusPosition ) != std::string::npos) {
+                    *CTerminus = CTerminusIterator->second;
+                }
+            }
+        }
+    }
+    else {
+        CTerminusPosition = strippedSource.size();
+    }
+        
+    // At this step we obtain the sequence of a peptide without adjacent 
+    // amino acids and terminal groups.
+    strippedSource = strippedSource.substr(NTerminusPosition, 
+                     CTerminusPosition-NTerminusPosition);
+
+    // We need to check whether it contains any non-letter characters.
+    for (std::size_t i=0; i<strippedSource.size(); i++) {
+        if (!(((int(strippedSource[i]) >= int('a')) && 
+               (int(strippedSource[i]) <= int('z'))) ||
+              ((int(strippedSource[i]) >= int('A')) && 
+               (int(strippedSource[i]) <= int('Z'))))) {
+            return false;
+        }
+    }
+
+    // Then we divide the whole sequence into aminoacids. 
+    bool aminoAcidFound;
+    size_t curPos = 0;
+    while (curPos < strippedSource.size()) {
+        aminoAcidFound = false;
+        for (std::map<std::string,ChemicalGroup>::const_iterator 
+                aminoAcidIterator = chemBasis.aminoAcids().begin();
+            aminoAcidIterator != chemBasis.aminoAcids().end();
+            aminoAcidIterator++) 
+        {
+            if (strippedSource.compare(curPos, 
+                aminoAcidIterator->second.label().size(), 
+                aminoAcidIterator->second.label()) == 0) 
+            {
+                curPos += aminoAcidIterator->second.label().size();
+                parsedPeptideStructure -> push_back(aminoAcidIterator->second);
+                aminoAcidFound = true;
+                break;
+            }
+        }
+  
+        if (!aminoAcidFound) 
+        {
+            return false;
+        }
+    }
+    
+    // Finally, we build an energy profile if it was defined.
+    if (peptideEnergyProfile != NULL)
+    {
+        peptideEnergyProfile->clear();
+        for (std::vector<ChemicalGroup>::const_iterator currentAminoAcid =
+                parsedPeptideStructure->begin();
+            currentAminoAcid != parsedPeptideStructure->end();
+            currentAminoAcid++) 
+        {
+            peptideEnergyProfile->push_back(currentAminoAcid->bindEnergy());
+        }
+        
+        // Modifing energies of terminal amino acid residues.
+        *(peptideEnergyProfile->begin()) = *(peptideEnergyProfile->begin()) +
+            NTerminus->bindEnergy();
+        *(--peptideEnergyProfile->end()) = *(--peptideEnergyProfile->end()) + 
+            CTerminus->bindEnergy();
+    }
+
+    return true;
+}
 double calculateRT(const std::string &sequence,
     const ChromoConditions &conditions,
     const ChemicalBasis &chemBasis,
     const bool continueGradient
 ) {
-    std::vector<Aminoacid> parsedPeptideStructure;
-    Terminus NTerminus;    
-    Terminus CTerminus;
+    std::vector<ChemicalGroup> parsedPeptideStructure;
+    ChemicalGroup NTerminus;    
+    ChemicalGroup CTerminus;
     std::vector<double> peptideEnergyProfile;
     
    if (parseSequence(sequence, 
@@ -1171,9 +1175,9 @@ double calculateKd(const std::string &sequence,
     const double calibrationParameter,
     const double temperature
 ) {
-    std::vector<Aminoacid> parsedPeptideStructure;
-    Terminus NTerminus;    
-    Terminus CTerminus;
+    std::vector<ChemicalGroup> parsedPeptideStructure;
+    ChemicalGroup NTerminus;    
+    ChemicalGroup CTerminus;
     std::vector<double> peptideEnergyProfile;
     
     if (parseSequence(sequence, 
@@ -1198,14 +1202,14 @@ double calculateKd(const std::string &sequence,
 double calculateAverageMass(const std::string &sequence,
     const ChemicalBasis &chemBasis
 ){
-    std::vector<Aminoacid> parsedPeptideStructure;
-    Terminus NTerminus;
-    Terminus CTerminus;
+    std::vector<ChemicalGroup> parsedPeptideStructure;
+    ChemicalGroup NTerminus;
+    ChemicalGroup CTerminus;
     double peptideAverageMass = 0;
     
     if (parseSequence(sequence, chemBasis, &parsedPeptideStructure, 
                       &NTerminus, &CTerminus, NULL)) {
-        for (std::vector<Aminoacid>::const_iterator i = 
+        for (std::vector<ChemicalGroup>::const_iterator i = 
                  parsedPeptideStructure.begin(); 
              i < parsedPeptideStructure.end(); 
              i++) {
@@ -1221,14 +1225,14 @@ double calculateAverageMass(const std::string &sequence,
 double calculateMonoisotopicMass(const std::string &sequence,
     const ChemicalBasis &chemBasis
 ) {
-    std::vector<Aminoacid> parsedPeptideStructure;
-    Terminus NTerminus;
-    Terminus CTerminus;
+    std::vector<ChemicalGroup> parsedPeptideStructure;
+    ChemicalGroup NTerminus;
+    ChemicalGroup CTerminus;
     double monoisotopicMass = 0;
     
     if (parseSequence(sequence, chemBasis, &parsedPeptideStructure, 
                       &NTerminus, &CTerminus, NULL) ) {
-        for (std::vector<Aminoacid>::const_iterator i = 
+        for (std::vector<ChemicalGroup>::const_iterator i = 
                  parsedPeptideStructure.begin(); 
              i < parsedPeptideStructure.end(); 
              i++) {
@@ -1248,9 +1252,9 @@ bool calculatePeptideProperties(const std::string &sequence,
          double *averageMass,
          double *monoisotopicMass
 ) {
-   std::vector<Aminoacid> parsedPeptideStructure;
-    Terminus NTerminus;    
-    Terminus CTerminus;
+    std::vector<ChemicalGroup> parsedPeptideStructure;
+    ChemicalGroup NTerminus;    
+    ChemicalGroup CTerminus;
     std::vector<double> peptideEnergyProfile;
     
    if (parseSequence(sequence, 
@@ -1264,7 +1268,7 @@ bool calculatePeptideProperties(const std::string &sequence,
                                  true);
         
         *averageMass = 0;
-        for (std::vector<Aminoacid>::const_iterator i = 
+        for (std::vector<ChemicalGroup>::const_iterator i = 
                  parsedPeptideStructure.begin(); 
              i < parsedPeptideStructure.end(); 
              i++) {
@@ -1274,7 +1278,7 @@ bool calculatePeptideProperties(const std::string &sequence,
         *averageMass += CTerminus.averageMass();
         
         *monoisotopicMass = 0;
-        for (std::vector<Aminoacid>::const_iterator i = 
+        for (std::vector<ChemicalGroup>::const_iterator i = 
                  parsedPeptideStructure.begin(); 
              i < parsedPeptideStructure.end();
              i++) {
