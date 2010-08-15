@@ -1,4 +1,4 @@
-#include "chemicalGroup.h"
+#include "chemicalgroup.h"
 
 namespace BioLCCC {
 
@@ -36,15 +36,15 @@ double ChemicalGroup::monoisotopicMass() const{
 }
 
 bool ChemicalGroup::isNTerminal() const{
-    return (mLabel.at(mLabel.size()-1)=="-");
+    return (mLabel.find("-") == (size_t)(mLabel.size()-1));
 }
 
 bool ChemicalGroup::isCTerminal() const{
-    return (mLabel.at(0)=="-");
+    return (mLabel.find("-") == (size_t)(0));
 }
 
 bool ChemicalGroup::isAminoAcid() const{
-    return (!(self->isCTerminal() || self->isNTerminal()));
+    return (!(isCTerminal() || isNTerminal()));
 }
 
 void ChemicalGroup::setBindEnergy(double newBindEnergy){

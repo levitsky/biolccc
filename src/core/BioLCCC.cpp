@@ -830,6 +830,9 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
             calibrationParameter,
             temperature);
     }
+    else {
+        return MODEL_ERROR;
+    }
 }                                
 
 double calculateRT(const std::vector<double> &peptideEnergyProfile,
@@ -1033,11 +1036,11 @@ bool parseSequence(
     // the N-Terminal group.
     *NTerminus = chemBasis.defaultNTerminus();
     for (std::map<std::string,ChemicalGroup>::const_iterator 
-            NTerminusIterator = chemBasis.ChemicalGroup().begin();
-        NTerminusIterator != chemBasis.ChemicalGroup().end();
+            NTerminusIterator = chemBasis.chemicalGroups().begin();
+        NTerminusIterator != chemBasis.chemicalGroups().end();
         NTerminusIterator++) 
     {
-        if NTerminusIterator->isNTerminal() {
+        if (NTerminusIterator->second.isNTerminal()) {
             if (strippedSource.find(NTerminusIterator->second.label()) ==
                 (size_t)0)
             {
@@ -1061,11 +1064,11 @@ bool parseSequence(
         //std::pair<std::string,Terminus> CTerminusIterator;
         //BOOST_FOREACH(CTerminusIterator, chemBasis.CTermini()) {
         for (std::map<std::string,ChemicalGroup>::const_iterator
-                CTerminusIterator = chemBasis.ChemicalGroup().begin();
-            CTerminusIterator != chemBasis.ChemicalGroup().end();
+                CTerminusIterator = chemBasis.chemicalGroups().begin();
+            CTerminusIterator != chemBasis.chemicalGroups().end();
             CTerminusIterator++) 
         {
-            if (CTerminusIterator->isCTerminal())
+            if (CTerminusIterator->second.isCTerminal())
             {
                 if (strippedSource.find(CTerminusIterator->second.label(), 
                     CTerminusPosition ) != std::string::npos) {
@@ -1099,8 +1102,8 @@ bool parseSequence(
     while (curPos < strippedSource.size()) {
         aminoAcidFound = false;
         for (std::map<std::string,ChemicalGroup>::const_iterator 
-                aminoAcidIterator = chemBasis.aminoAcids().begin();
-            aminoAcidIterator != chemBasis.aminoAcids().end();
+                aminoAcidIterator = chemBasis.chemicalGroups().begin();
+            aminoAcidIterator != chemBasis.chemicalGroups().end();
             aminoAcidIterator++) 
         {
             if (strippedSource.compare(curPos, 

@@ -82,17 +82,17 @@ class ChemicalGroup {
         /*!
             Shows whether the group is N-Terminal.
         */
-        bool isNTerminal();
+        bool isNTerminal() const;
 
         /*!
             Shows whether the group is C-Terminal.
         */
-        bool isCTerminal();
+        bool isCTerminal() const;
 
         /*!
             Shows whether the group is an amino acid.
         */
-        bool isAminoAcid();
+        bool isAminoAcid() const;
 
         /*!
             Set the binding energy value.
