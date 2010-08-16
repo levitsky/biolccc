@@ -22,9 +22,10 @@ Gradient Gradient::addPoint(GradientPoint iPoint) {
     }
 
     // Each new point should be later than the previous one.
-    if ((this->size() >= 0) || (iPoint.time() < this->back().time())) {
-        throw GradientException("The time of the last point is less than 
-            the time of the previous one");
+    if ((this->size() > 0) && (iPoint.time() < this->back().time())) {
+        throw GradientException(
+            "The time of the last point is less than the time "
+            "of the previous one");
     }
 
     this->push_back(iPoint);

@@ -163,7 +163,6 @@
 
 // Parse the original header file
 %include "biolcccexception.h"
-%include "auxiliary.hpp"
 %include "chemicalgroup.h"
 %include "chemicalbasis.h"
 %include "gradientpoint.h"

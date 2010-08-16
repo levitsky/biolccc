@@ -43,7 +43,7 @@ double calculateKdCoilBoltzmann(
     // parameter) are introduced.
 
     if (peptideEnergyProfile.size() == 0) {
-        return 0.0
+        return 0.0;
     }
     
     // Due to the preliminary scaling the binding energy of water equals zero.
@@ -230,7 +230,7 @@ double calculateKdCoilBoltzmannDoubleLayer(
     // parameter) are introduced.
 
     if (peptideEnergyProfile.size() == 0) {
-        return 0.0
+        return 0.0;
     }
     
     // Due to the preliminary scaling the binding energy of water equals zero.
@@ -430,7 +430,7 @@ double calculateKdCoilSnyder(
     // parameter) are introduced.
 
     if (peptideEnergyProfile.size() == 0) {
-        return 0.0
+        return 0.0;
     }
     
     // Due to the preliminary scaling the binding energy of water equals zero.
@@ -703,7 +703,7 @@ double calculateKdRod(
     // parameter) are introduced.
     
     if (peptideEnergyProfile.size() == 0) {
-        return 0.0
+        return 0.0;
     }
     
     // Due to the preliminary scaling the binding energy of water equals zero.
@@ -986,7 +986,7 @@ void parseSequence(
             // If a source sequence contains more that two dots, it's broken.
             if (source.find(".", secondDotPosition+1) != std::string::npos) {
                 throw ParsingException(
-                    "The sequence " + source +" contains more than two dots.")
+                    "The sequence " + source +" contains more than two dots.");
             }
             else {
                 strippedSource = source.substr(firstDotPosition+1, 
@@ -996,7 +996,7 @@ void parseSequence(
         // If a source sequence contains only one dot, it's broken.
         else {
             throw ParsingException(
-                "The sequence " + source + " contains only one dot.")
+                "The sequence " + source + " contains only one dot.");
         }
     }
     
@@ -1030,7 +1030,7 @@ void parseSequence(
         if (strippedSource.find("-", CTerminusPosition+1) != std::string::npos){
             throw ParsingException(
                 "The sequence " + source + 
-                " contains hyphen after C-terminal group.")
+                " contains hyphen after C-terminal group.");
         }
         
         // Searching for known C-terminal groups.
@@ -1065,7 +1065,7 @@ void parseSequence(
                (int(strippedSource[i]) <= int('Z'))))) {
             throw ParsingException(
                 "The sequence " + source + 
-                " contains a non-letter character.")
+                " contains a non-letter character.");
         }
     }
 
@@ -1128,7 +1128,7 @@ double calculateRT(const std::string &sequence,
     ChemicalGroup CTerminus;
     std::vector<double> peptideEnergyProfile;
     
-   parseSequence(sequence, 
+    parseSequence(sequence, 
                     chemBasis,
                     &parsedPeptideStructure,
                     &NTerminus,

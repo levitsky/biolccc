@@ -1,7 +1,6 @@
 #ifndef BIOLCCCEXCEPTION_H
 #define BIOLCCCEXCEPTION_H
 
-#include <exception>
 #include <string>
 
 namespace BioLCCC {
