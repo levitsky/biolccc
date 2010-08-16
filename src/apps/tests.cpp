@@ -34,9 +34,9 @@ TEST_F(BioLCCCTest, parsesStandardAminoacids) {
     std::vector<double> peptideEnergyProfile;
     std::string peptideSource("QWERTYIPASDFGHKLCVNM");
 
-    ASSERT_TRUE(BioLCCC::parseSequence(peptideSource,
+    BioLCCC::parseSequence(peptideSource,
         BioLCCC::standardChemicalBasis, &parsedPeptideStructure, 
-        &NTerminus, &CTerminus, &peptideEnergyProfile));
+        &NTerminus, &CTerminus, &peptideEnergyProfile);
 
     for (unsigned int i=0; i<peptideSource.size(); i++) {
         ASSERT_EQ(parsedPeptideStructure[i].label(),
@@ -51,9 +51,9 @@ TEST_F(BioLCCCTest, parsesPhosphoAminoacids) {
     std::vector<double> peptideEnergyProfile;
     std::string peptideSource("pSpTpY");
 
-    ASSERT_TRUE(BioLCCC::parseSequence(peptideSource,
+    BioLCCC::parseSequence(peptideSource,
         BioLCCC::standardChemicalBasis, &parsedPeptideStructure, 
-        &NTerminus, &CTerminus, &peptideEnergyProfile));
+        &NTerminus, &CTerminus, &peptideEnergyProfile);
 
     for (unsigned int i=0; i<peptideSource.size()/2; i++) {
         ASSERT_EQ(parsedPeptideStructure[i].label(),
@@ -67,21 +67,21 @@ TEST_F(BioLCCCTest, parsesStandardTerminalGroups) {
     BioLCCC::ChemicalGroup CTerminus;
     std::vector<double> peptideEnergyProfile;
 
-    ASSERT_TRUE(BioLCCC::parseSequence("GGGG",
+    BioLCCC::parseSequence("GGGG",
         BioLCCC::standardChemicalBasis, &parsedPeptideStructure, 
-        &NTerminus, &CTerminus, &peptideEnergyProfile));
+        &NTerminus, &CTerminus, &peptideEnergyProfile);
     ASSERT_EQ(NTerminus.label(), "H-");
     ASSERT_EQ(CTerminus.label(), "-COOH");
 
-    ASSERT_TRUE(BioLCCC::parseSequence("H-GGGG-COOH",
+    BioLCCC::parseSequence("H-GGGG-COOH",
         BioLCCC::standardChemicalBasis, &parsedPeptideStructure, 
-        &NTerminus, &CTerminus, &peptideEnergyProfile));
+        &NTerminus, &CTerminus, &peptideEnergyProfile);
     ASSERT_EQ(NTerminus.label(), "H-");
     ASSERT_EQ(CTerminus.label(), "-COOH");
 
-    ASSERT_TRUE(BioLCCC::parseSequence("Ac-GGGG-NH2",
+    BioLCCC::parseSequence("Ac-GGGG-NH2",
         BioLCCC::standardChemicalBasis, &parsedPeptideStructure, 
-        &NTerminus, &CTerminus, &peptideEnergyProfile));
+        &NTerminus, &CTerminus, &peptideEnergyProfile);
     ASSERT_EQ(NTerminus.label(), "Ac-");
     ASSERT_EQ(CTerminus.label(), "-NH2");
 }

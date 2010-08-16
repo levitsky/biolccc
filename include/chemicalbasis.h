@@ -2,6 +2,7 @@
 #define CHEMICALBASIS_H
 
 #include <map>
+#include "biolcccexception.h"
 #include "chemicalgroup.h"
 
 namespace BioLCCC {

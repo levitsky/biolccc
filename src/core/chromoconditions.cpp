@@ -155,13 +155,13 @@ void ChromoConditions::setSecondSolventConcentrationA(
 ) {
     if (newSecondSolventConcentrationA < 0.0) {
         throw(ChromoConditionsException(
-            "The new concentration of second solvent in the component A
-            is negative."));
+            "The new concentration of second solvent in the component A "
+            "is negative."));
     }
     if (newSecondSolventConcentrationA > 100.0) {
         throw(ChromoConditionsException(
-            "The new concentration of second solvent in the component A
-            is greater than 100%."));
+            "The new concentration of second solvent in the component A "
+            "is greater than 100%."));
     }
     mSecondSolventConcentrationA = newSecondSolventConcentrationA;
 }
@@ -175,13 +175,13 @@ void ChromoConditions::setSecondSolventConcentrationB(
 ) {
     if (newSecondSolventConcentrationB < 0.0) {
         throw(ChromoConditionsException(
-            "The new concentration of second solvent in the component A
-            is negative."));
+            "The new concentration of second solvent in the component A " 
+            "is negative."));
     }
     if (newSecondSolventConcentrationB > 100.0) {
         throw(ChromoConditionsException(
-            "The new concentration of second solvent in the component A
-            is greater than 100%."));
+            "The new concentration of second solvent in the component A " 
+            "is greater than 100%."));
     }
     mSecondSolventConcentrationB = newSecondSolventConcentrationB;
 }

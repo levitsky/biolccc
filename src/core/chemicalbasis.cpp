@@ -175,7 +175,7 @@ const std::map<std::string,ChemicalGroup> & ChemicalBasis::chemicalGroups() cons
 }
 
 const ChemicalGroup & ChemicalBasis::defaultNTerminus() const {
-    std::map::const_iterator<std::string, ChemicalGroup> NTerminusIterator = 
+    std::map<std::string, ChemicalGroup>::const_iterator NTerminusIterator = 
         mChemicalGroups.find("H-");
     if (NTerminusIterator == mChemicalGroups.end()) {
         throw ChemicalBasisException("The default H- N-terminus not found.");
@@ -184,9 +184,9 @@ const ChemicalGroup & ChemicalBasis::defaultNTerminus() const {
 }
 
 const ChemicalGroup & ChemicalBasis::defaultCTerminus() const{
-    std::map::const_iterator<std::string, ChemicalGroup> CTerminusIterator = 
+    std::map<std::string, ChemicalGroup>::const_iterator CTerminusIterator = 
         mChemicalGroups.find("-COOH");
-    if (NTerminusIterator == mChemicalGroups.end()) {
+    if (CTerminusIterator == mChemicalGroups.end()) {
         throw ChemicalBasisException("The default -COOH C-terminus not found.");
     }
     return CTerminusIterator->second;
@@ -230,7 +230,7 @@ double ChemicalBasis::adsorbtionLayerWidth() const {
     return mAdsorbtionLayerWidth;
 }
 
-bool ChemicalBasis::setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth) {
+void ChemicalBasis::setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth) {
     if (newAdsorbtionLayerWidth < 0.0) {
         throw ChemicalBasisException(
             "The new adsorbtion layer width is negative.");

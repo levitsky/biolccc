@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 
+#include "biolcccexception.h"
 #include "gradient.h"
 
 //! This class encapsulates all parameters of chromatographic equipment.
