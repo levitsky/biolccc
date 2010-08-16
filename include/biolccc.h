@@ -1,10 +1,10 @@
-#ifndef PEPTIDEMETHODS_H
-#define PEPTIDEMETHODS_H
+#ifndef BIOLCCC_H
+#define BIOLCCC_H
 
 #include <math.h>
+#include "biolcccexception.h"
 #include "chemicalbasis.h"
 #include "chromoconditions.h"
-#include "auxiliary.hpp"
 
 //! This is the main header for the whole BioLCCC library project. 
 
@@ -16,6 +16,11 @@
 
 namespace BioLCCC {
 
+class ParsingException : public BioLCCCException {
+    public:
+        ParsingException(std::string message);
+};
+
 static const ChromoConditions standardChromoConditions = ChromoConditions();
 static const ChemicalBasis standardChemicalBasis = ChemicalBasis();
 
@@ -24,7 +29,7 @@ static const ChemicalBasis standardChemicalBasis = ChemicalBasis();
     basis. Returns parsed peptide structure, terminal groups and energy profile
     of a peptide.
 */
-bool parseSequence(
+void parseSequence(
     const std::string &source, 
     const ChemicalBasis &chemBasis,
     std::vector<ChemicalGroup> *parsedPeptideStructure,
@@ -74,7 +79,7 @@ double calculateKd(const std::string &sequence,
     Created as a transient solution for the fast calculation of RTBioLCCC 
     and masses.
 */
-bool calculatePeptideProperties(const std::string &sequence,
+void calculatePeptideProperties(const std::string &sequence,
     const ChromoConditions &conditions,
     const ChemicalBasis &chemBasis,
     double *RTBioLCCC,

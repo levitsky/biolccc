@@ -1,10 +1,17 @@
 #ifndef GRADIENTPOINT_H
 #define GRADIENTPOINT_H
 
+#include "biolcccexception.h"
+
 //! The GradientPoint class encapsulates all properties of a point of a
 //gradient.
 
 namespace BioLCCC {
+
+class GradientPointException : public BioLCCCException {
+    public:
+        GradientPointException(std::string message);
+};
 
 class GradientPoint {
     public:

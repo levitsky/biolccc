@@ -26,6 +26,11 @@ namespace BioLCCC {
     corresponding vector!
 */
 
+class ChemicalBasisException : public BioLCCCException {
+    public:
+        ChemicalBasisException(std::string message);
+};
+
 enum ModelType {
     COIL_BOLTZMANN,
     COIL_BOLTZMANN_DOUBLE_LAYER,
@@ -77,13 +82,13 @@ class ChemicalBasis {
         /*!
             Sets the length between two peptide bonds, angstroms.
         */
-        bool setSegmentLength(double newSegmentLength);
+        void setSegmentLength(double newSegmentLength);
 
         /*!
             Sets the persistent length of a biopolymer. Persistent length equals
             the number of amino acids between the joints of a polymer.
         */
-        bool setPersistentLength(int newPersistentLength);
+        void setPersistentLength(int newPersistentLength);
 
         /*!
             Returns the persistent length of a biopolymer. Persistent length 
@@ -99,7 +104,7 @@ class ChemicalBasis {
         /*!
             Sets a new value of the width of a solid phase adsorbtion layer.
         */
-        bool setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth);
+        void setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth);
 
         /*!
             Adds a new chemical group.
@@ -107,10 +112,10 @@ class ChemicalBasis {
         void addChemicalGroup(ChemicalGroup newChemicalGroup);
 
         /*!
-            Removes the chemical group with the given label; returns 'true' on 
-            success.
+            Removes the chemical group with the given label;
+            Throws ChemicalBasisException if the chemical group is not found.
         */
-        bool removeChemicalGroup(std::string label);
+        void removeChemicalGroup(std::string label);
 
         /*!
             Removes all chemical groups in a basis.
@@ -120,16 +125,14 @@ class ChemicalBasis {
         /*!
             Sets the value of binding energy for the chemical group with the 
             given label;
-            Returns 'true' on success or 'false' if the chemical group is not 
-            found.
+            Throws ChemicalBasisException if the chemical group is not found.
         */
-        bool setChemicalGroupBindEnergy(std::string label,double newBindEnergy);
+        void setChemicalGroupBindEnergy(std::string label,double newBindEnergy);
 
         /*!
-            Sets the type of BioLCCC model (e.g. CoilBoltzmann, CoilSnyder,
-            RodBoltzmann and so on).
+            Sets the type of BioLCCC model (e.g. CoilBoltzmann, CoilSnydel).
         */
-        bool setModel(ModelType newModel);
+        void setModel(ModelType newModel);
 
         /*!
             Returns the type of BioLCCC model which is used in calculations with
