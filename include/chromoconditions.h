@@ -11,6 +11,11 @@
 
 namespace BioLCCC {
 
+class ChromoConditionsException : public BioLCCCException {
+    public:
+        ChromoConditionsException(std::string message);
+};
+
 class ChromoConditions {  
     public:
         

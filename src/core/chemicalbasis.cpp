@@ -1,6 +1,8 @@
 #include "chemicalbasis.h"
 
 namespace BioLCCC {
+ChemicalBasisException::ChemicalBasisException(std::string message):
+    BioLCCCException(message) {};
 
 ChemicalBasis::ChemicalBasis() {
     setModel(COIL_BOLTZMANN);
@@ -173,11 +175,21 @@ const std::map<std::string,ChemicalGroup> & ChemicalBasis::chemicalGroups() cons
 }
 
 const ChemicalGroup & ChemicalBasis::defaultNTerminus() const {
-    return mChemicalGroups.find("H-")->second;
+    std::map::const_iterator<std::string, ChemicalGroup> NTerminusIterator = 
+        mChemicalGroups.find("H-");
+    if (NTerminusIterator == mChemicalGroups.end()) {
+        throw ChemicalBasisException("The default H- N-terminus not found.");
+    }
+    return NTerminusIterator->second;
 }
 
 const ChemicalGroup & ChemicalBasis::defaultCTerminus() const{
-    return mChemicalGroups.find("-COOH")->second;
+    std::map::const_iterator<std::string, ChemicalGroup> CTerminusIterator = 
+        mChemicalGroups.find("-COOH");
+    if (NTerminusIterator == mChemicalGroups.end()) {
+        throw ChemicalBasisException("The default -COOH C-terminus not found.");
+    }
+    return CTerminusIterator->second;
 }
 
 double ChemicalBasis::secondSolventBindEnergy() const{
@@ -192,28 +204,26 @@ double ChemicalBasis::segmentLength() const {
     return mSegmentLength;
 }
 
-bool ChemicalBasis::setSegmentLength(double newSegmentLength) {
-    if (newSegmentLength > 0.0) {
-        mSegmentLength = newSegmentLength;
-        return true;
+void ChemicalBasis::setSegmentLength(double newSegmentLength) {
+    if (newSegmentLength <= 0.0) {
+        throw ChemicalBasisException(
+            "The new length of a segment is not positive.");
     }
-    else {
-        return false;
-    }
+
+    mSegmentLength = newSegmentLength;
 }
 
 int ChemicalBasis::persistentLength() const {
     return mPeristentLength;
 }
 
-bool ChemicalBasis::setPersistentLength(int newPersistentLength) {
-    if (newPersistentLength > 0) {
-        mPeristentLength = newPersistentLength;
-        return true;
+void ChemicalBasis::setPersistentLength(int newPersistentLength) {
+    if (newPersistentLength <= 0) {
+        throw ChemicalBasisException(
+            "The new persistent length is not positive.");
     }
-    else {
-        return false;
-    }
+
+    mPeristentLength = newPersistentLength;
 }
 
 double ChemicalBasis::adsorbtionLayerWidth() const {
@@ -221,46 +231,47 @@ double ChemicalBasis::adsorbtionLayerWidth() const {
 }
 
 bool ChemicalBasis::setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth) {
-    if (newAdsorbtionLayerWidth > 0.0) {
-        mAdsorbtionLayerWidth = newAdsorbtionLayerWidth;
-        return true;
+    if (newAdsorbtionLayerWidth < 0.0) {
+        throw ChemicalBasisException(
+            "The new adsorbtion layer width is negative.");
     }
-    else {
-        return false;
-    }
+
+    mAdsorbtionLayerWidth = newAdsorbtionLayerWidth;
 }
 
 void ChemicalBasis::addChemicalGroup(ChemicalGroup newChemicalGroup){
     mChemicalGroups[newChemicalGroup.label()] = newChemicalGroup;
 }
 
-bool ChemicalBasis::removeChemicalGroup(std::string label){
-    return (bool) mChemicalGroups.erase(label);
+void ChemicalBasis::removeChemicalGroup(std::string label){
+    if (mChemicalGroups.erase(label) == (std::size_t)0) {
+        throw ChemicalBasisException(
+            "The chemical group " + label + " is not found.");
+    }
 }
 
 void ChemicalBasis::clearChemicalGroups(){
     mChemicalGroups.clear();
 }
 
-bool ChemicalBasis::setChemicalGroupBindEnergy(std::string label, 
+void ChemicalBasis::setChemicalGroupBindEnergy(std::string label, 
     double newBindEnergy)
 {
     std::map<std::string,ChemicalGroup>::iterator it = 
         mChemicalGroups.find(label);
     if (it == mChemicalGroups.end()) {
-        return false;
+        throw ChemicalBasisException(
+            "The chemical group " + label + " is not found.");
     }
     it->second.setBindEnergy(newBindEnergy);
-    return true;
 }
 
 const ModelType ChemicalBasis::model() const{
     return mModel;
 }
 
-bool ChemicalBasis::setModel(ModelType newModel){
+void ChemicalBasis::setModel(ModelType newModel){
     mModel = newModel;
-    return true;
 }
 }
 

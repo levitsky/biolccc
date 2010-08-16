@@ -1,4 +1,4 @@
-#include "BioLCCC.h"
+#include "biolccc.h"
 #include <gtest/gtest.h>
 #include <vector>
 

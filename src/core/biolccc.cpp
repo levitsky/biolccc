@@ -2,17 +2,14 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
-#include "BioLCCC.h"
-
-#define MEMORY_ERROR    -2.0
-#define PARSING_ERROR   -3.0
-#define PORESIZE_ERROR  -4.0
-#define GRADIENT_ERROR  -5.0
-#define MODEL_ERROR     -6.0 
+#include "biolccc.h"
 
 #define PI 3.14159265
 
 namespace BioLCCC {
+
+ParsingException::ParsingException(std::string message):
+    BioLCCCException(message) {};
 
 // Auxiliary functions that shouldn't be exposed to user at this
 // point.
@@ -27,7 +24,6 @@ std::vector<double> calculateRT(std::vector<std::string> mixture,
     }
     return times;
 }
-
 
 double calculateKdCoilBoltzmann(
     const std::vector<double> &peptideEnergyProfile,
@@ -45,6 +41,10 @@ double calculateKdCoilBoltzmann(
     // also corrections of energies due to temperature (energies in exponents 
     // are scaled to the new temperature) and column aging (calibration
     // parameter) are introduced.
+
+    if (peptideEnergyProfile.size() == 0) {
+        return 0.0
+    }
     
     // Due to the preliminary scaling the binding energy of water equals zero.
     double Q = exp((0 + chemBasis.secondSolventBindEnergy()) * 
@@ -100,7 +100,8 @@ double calculateKdCoilBoltzmann(
     const int poreSteps = (int) (columnPoreSize / 
         chemBasis.segmentLength() / (double)(chemBasis.persistentLength())) ;
     if (poreSteps <=2) {
-        return PORESIZE_ERROR;
+        throw BioLCCCException(
+            "The pore size is too small for Kd calculation.");
     }
     
     // Memory managment.
@@ -110,7 +111,7 @@ double calculateKdCoilBoltzmann(
         transitionMatrix = new double[poreSteps*poreSteps];
     }
     catch (...) {
-        return MEMORY_ERROR;
+        throw BioLCCCException("Cannot allocate memory for calculations");
     }
 
     // Now we need to construct a density vector for the first amino acid 
@@ -205,7 +206,7 @@ double calculateKdCoilBoltzmann(
         delete[] transitionMatrix;
     }
     catch (...) {
-        return MEMORY_ERROR;
+        throw BioLCCCException("Cannot allocate memory for calculations");
     }
 
     return Kd;
@@ -227,6 +228,10 @@ double calculateKdCoilBoltzmannDoubleLayer(
     // also corrections of energies due to temperature (energies in exponents 
     // are scaled to the new temperature) and column aging (calibration
     // parameter) are introduced.
+
+    if (peptideEnergyProfile.size() == 0) {
+        return 0.0
+    }
     
     // Due to the preliminary scaling the binding energy of water equals zero.
     double Q = exp((0 + chemBasis.secondSolventBindEnergy()) * 
@@ -265,8 +270,9 @@ double calculateKdCoilBoltzmannDoubleLayer(
     // PoreSteps is a number of nodes in a lattice between two walls. Because of
     // the features of the following calculation it should be more than 2.
     const int poreSteps = (int) (columnPoreSize / chemBasis.segmentLength());
-    if (poreSteps <=2) {
-        return PORESIZE_ERROR;
+    if (poreSteps <=4) {
+        throw BioLCCCException(
+            "The pore size is too small for Kd calculation.");
     }
     
     // Memory managment.
@@ -276,7 +282,7 @@ double calculateKdCoilBoltzmannDoubleLayer(
         transitionMatrix = new double[poreSteps*poreSteps];
     }
     catch (...) {
-        return MEMORY_ERROR;
+        throw BioLCCCException("Cannot allocate memory for calculations");
     }
 
     // Now we need to construct a density vector for the first amino acid 
@@ -400,7 +406,7 @@ double calculateKdCoilBoltzmannDoubleLayer(
         delete[] transitionMatrix;
     }
     catch (...) {
-        return MEMORY_ERROR;
+        throw BioLCCCException("Cannot allocate memory for calculations");
     }
 
     return Kd;
@@ -422,6 +428,10 @@ double calculateKdCoilSnyder(
     // also corrections of energies due to temperature (energies in exponents 
     // are scaled to the new temperature) and column aging (calibration
     // parameter) are introduced.
+
+    if (peptideEnergyProfile.size() == 0) {
+        return 0.0
+    }
     
     // Due to the preliminary scaling the binding energy of water equals zero.
     double Nb = 0;
@@ -459,7 +469,8 @@ double calculateKdCoilSnyder(
     // the features of a following calculation it should be more than 2.
     const int poreSteps = (int)(columnPoreSize / chemBasis.segmentLength());
     if (poreSteps <=2) {
-        return PORESIZE_ERROR;
+        throw BioLCCCException(
+            "The pore size is too small for Kd calculation.");
     }
     
     // Memory managment.
@@ -469,7 +480,7 @@ double calculateKdCoilSnyder(
         transitionMatrix = new double[poreSteps*poreSteps];
     }
     catch (...) {
-        return MEMORY_ERROR;
+        throw BioLCCCException("Cannot allocate memory for calculations");
     }
 
     // Now we need to construct a density vector for the first amino acid
@@ -578,7 +589,7 @@ double calculateKdCoilSnyder(
         delete[] transitionMatrix;
     }
     catch (...) {
-        return MEMORY_ERROR;
+        throw BioLCCCException("Cannot allocate memory for calculations");
     }
 
     return Kd;
@@ -588,11 +599,11 @@ double rodAdsorbtionEnergy(const std::vector<double> & peptideEnergyProfile,
                            unsigned int n,
                            bool reversed = false
 ) {
-    double init = 0;
-    if (n > peptideEnergyProfile.size()){
-        // TODO: make an exception.
-        return -65536;
+    if ((n < 0) || (n > peptideEnergyProfile.size())){
+        throw BioLCCCException("Index is out of range.");
     }
+
+    double init = 0;
     if (reversed) {
         return std::accumulate(peptideEnergyProfile.end()-n,
                                peptideEnergyProfile.end(),
@@ -625,14 +636,14 @@ double partitionFunctionRodFreeSlit(double rodLength,
 double partitionFunctionRodFreeSlitA(double rodLength,
                                      double slitWidth
 ) {
-        return (4 * PI * slitWidth * rodLength * rodLength -
-                2 * PI * rodLength * rodLength * rodLength);
+    return (4 * PI * slitWidth * rodLength * rodLength -
+            2 * PI * rodLength * rodLength * rodLength);
 }
 
 double partitionFunctionRodFreeSlitC(double rodLength,
                                      double slitWidth
 ) {
-        return (2 * PI * slitWidth * slitWidth * rodLength);
+    return (2 * PI * slitWidth * slitWidth * rodLength);
 }
 
 double partitionFunctionRodSubmergedIntoLayer(
@@ -691,6 +702,10 @@ double calculateKdRod(
     // are scaled to the new temperature) and column aging (calibration
     // parameter) are introduced.
     
+    if (peptideEnergyProfile.size() == 0) {
+        return 0.0
+    }
+    
     // Due to the preliminary scaling the binding energy of water equals zero.
     double Q = exp((0 + chemBasis.secondSolventBindEnergy()) * 
                293.0 / temperature);
@@ -703,7 +718,6 @@ double calculateKdRod(
     // 293.0 Kelvins. This probability is used later in the transition matrix.
     std::vector<double> effectiveEnergyProfile;
 
-    //BOOST_FOREACH(double residueEnergy, peptideEnergyProfile) {
     for (std::vector<double>::const_iterator residueEnergy=
             peptideEnergyProfile.begin();
         residueEnergy != peptideEnergyProfile.end();
@@ -716,40 +730,6 @@ double calculateKdRod(
             (*residueEnergy - Eab) * 293.0 / temperature);
     }
    
-    //std::cout << "Calculating Kd:\n";
-    //std::cout << 
-    //    partitionFunctionRodFreeSlit(
-    //    chemBasis.segmentLength() * (effectiveEnergyProfile.size() - 1),
-    //    columnPoreSize)<< "\n";
-
-    //std::cout << 
-    //    2.0 * partitionFunctionRodFreeSlit(
-    //            chemBasis.segmentLength() * (effectiveEnergyProfile.size() - 1),
-    //            chemBasis.adsorbtionLayerWidth()) 
-    //    * exp(rodAdsorbtionEnergy(
-    //        effectiveEnergyProfile,
-    //        effectiveEnergyProfile.size()))<< "\n";
-
-    //std::cout << 
-    //2.0 * partitionFunctionRodSubmergedIntoLayer(
-    //    chemBasis.segmentLength(),
-    //    columnPoreSize,
-    //    chemBasis.adsorbtionLayerWidth(),
-    //    effectiveEnergyProfile,
-    //    false) << "\n";
-
-    //std::cout << 2.0 * partitionFunctionRodSubmergedIntoLayer(
-    //    chemBasis.segmentLength(),
-    //    columnPoreSize,
-    //    chemBasis.adsorbtionLayerWidth(),
-    //    effectiveEnergyProfile,
-    //    true) << "\n";
-
-    //std::cout << 
-    //    partitionFunctionRodFreeVolume(
-    //    (effectiveEnergyProfile.size() - 1) * chemBasis.segmentLength(),
-    //    columnPoreSize) << "\n"; 
-
     double Kd = 
     (partitionFunctionRodFreeSlit(
         chemBasis.segmentLength() * (effectiveEnergyProfile.size() - 1),
@@ -831,7 +811,7 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
             temperature);
     }
     else {
-        return MODEL_ERROR;
+        throw BioLCCCException("Model error.");
     }
 }                                
 
@@ -857,20 +837,10 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
         dV = conditions.flowRate() / 20.0;
     }
 
-    // Because of the features of the BioLCCC model, size of the pore should be 
-    // more than 20A.
-    if (conditions.columnPoreSize() <= 15.0) {
-        return PORESIZE_ERROR;
-    }
-
-    // A gradient should start at time 0.
-    if (conditions.gradient().begin()->time() != 0.0) {
-        return GRADIENT_ERROR;
-    }
-    
     // A gradient should contain at least two points.
     if (conditions.gradient().size() < 2) {
-        return GRADIENT_ERROR;
+        throw BioLCCCException(
+            "The gradient must contain at least two points.");
     }
     
     // Converting the x-coordinate of the gradient to the scale of iterations
@@ -886,7 +856,8 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
     //    ++currentGradientPoint) {
     for (Gradient::size_type i = 0;
         i != conditions.gradient().size();
-        i++) {
+        i++) 
+    {
         convertedGradient.push_back(
                 std::pair<int,double>(
                     int(floor(conditions.gradient()[i].time() * 
@@ -903,7 +874,6 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
     // The current iteration number. 
     int j = 0;      
     double secondSolventConcentration = 0.0;
-
 
     std::vector<std::pair<int, double> >::const_iterator currentGradientPoint=
         convertedGradient.begin();
@@ -987,7 +957,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
 
 }
 
-bool parseSequence(
+void parseSequence(
     const std::string &source, 
     const ChemicalBasis &chemBasis,
     std::vector<ChemicalGroup> *parsedPeptideStructure,
@@ -1015,7 +985,8 @@ bool parseSequence(
       
             // If a source sequence contains more that two dots, it's broken.
             if (source.find(".", secondDotPosition+1) != std::string::npos) {
-                return false;
+                throw ParsingException(
+                    "The sequence " + source +" contains more than two dots.")
             }
             else {
                 strippedSource = source.substr(firstDotPosition+1, 
@@ -1024,10 +995,10 @@ bool parseSequence(
         }
         // If a source sequence contains only one dot, it's broken.
         else {
-            return false;
+            throw ParsingException(
+                "The sequence " + source + " contains only one dot.")
         }
     }
-    
     
     // Than goes parsing.
     std::size_t NTerminusPosition = 0;
@@ -1057,12 +1028,12 @@ bool parseSequence(
     if (CTerminusPosition != std::string::npos){
         // The sequence should not contain hyphens after C-terminal group.
         if (strippedSource.find("-", CTerminusPosition+1) != std::string::npos){
-            return false;
+            throw ParsingException(
+                "The sequence " + source + 
+                " contains hyphen after C-terminal group.")
         }
         
         // Searching for known C-terminal groups.
-        //std::pair<std::string,Terminus> CTerminusIterator;
-        //BOOST_FOREACH(CTerminusIterator, chemBasis.CTermini()) {
         for (std::map<std::string,ChemicalGroup>::const_iterator
                 CTerminusIterator = chemBasis.chemicalGroups().begin();
             CTerminusIterator != chemBasis.chemicalGroups().end();
@@ -1092,7 +1063,9 @@ bool parseSequence(
                (int(strippedSource[i]) <= int('z'))) ||
               ((int(strippedSource[i]) >= int('A')) && 
                (int(strippedSource[i]) <= int('Z'))))) {
-            return false;
+            throw ParsingException(
+                "The sequence " + source + 
+                " contains a non-letter character.")
         }
     }
 
@@ -1119,7 +1092,9 @@ bool parseSequence(
   
         if (!aminoAcidFound) 
         {
-            return false;
+            throw ParsingException(
+                "The sequence " + source + 
+                " contains unknown amin acid" + source.substr(curPos, 1) + ".");
         }
     }
     
@@ -1141,9 +1116,8 @@ bool parseSequence(
         *(--peptideEnergyProfile->end()) = *(--peptideEnergyProfile->end()) + 
             CTerminus->bindEnergy();
     }
-
-    return true;
 }
+
 double calculateRT(const std::string &sequence,
     const ChromoConditions &conditions,
     const ChemicalBasis &chemBasis,
@@ -1154,21 +1128,16 @@ double calculateRT(const std::string &sequence,
     ChemicalGroup CTerminus;
     std::vector<double> peptideEnergyProfile;
     
-   if (parseSequence(sequence, 
+   parseSequence(sequence, 
                     chemBasis,
                     &parsedPeptideStructure,
                     &NTerminus,
                     &CTerminus,
-                    &peptideEnergyProfile))
-    {
-        return calculateRT(peptideEnergyProfile,
-            conditions,
-            chemBasis,
-            continueGradient);
-    }
-    else {
-        return PARSING_ERROR;
-    }
+                    &peptideEnergyProfile);
+    return calculateRT(peptideEnergyProfile,
+        conditions,
+        chemBasis,
+        continueGradient);
 }
 
 double calculateKd(const std::string &sequence,
@@ -1183,23 +1152,18 @@ double calculateKd(const std::string &sequence,
     ChemicalGroup CTerminus;
     std::vector<double> peptideEnergyProfile;
     
-    if (parseSequence(sequence, 
+    parseSequence(sequence, 
                      chemBasis,
                      &parsedPeptideStructure,
                      &NTerminus,
                      &CTerminus,
-                     &peptideEnergyProfile))
-    {
-        return calculateKd(peptideEnergyProfile,
-            secondSolventConcentration,
-            chemBasis,
-            columnPoreSize,
-            calibrationParameter,
-            temperature);
-    }
-    else {
-        return PARSING_ERROR;
-    }
+                     &peptideEnergyProfile);
+    return calculateKd(peptideEnergyProfile,
+        secondSolventConcentration,
+        chemBasis,
+        columnPoreSize,
+        calibrationParameter,
+        temperature);
 }                                
 
 double calculateAverageMass(const std::string &sequence,
@@ -1210,17 +1174,16 @@ double calculateAverageMass(const std::string &sequence,
     ChemicalGroup CTerminus;
     double peptideAverageMass = 0;
     
-    if (parseSequence(sequence, chemBasis, &parsedPeptideStructure, 
-                      &NTerminus, &CTerminus, NULL)) {
-        for (std::vector<ChemicalGroup>::const_iterator i = 
-                 parsedPeptideStructure.begin(); 
-             i < parsedPeptideStructure.end(); 
-             i++) {
-            peptideAverageMass += i -> averageMass();
-        }
-        peptideAverageMass += NTerminus.averageMass();
-        peptideAverageMass += CTerminus.averageMass();
+    parseSequence(sequence, chemBasis, &parsedPeptideStructure, 
+                      &NTerminus, &CTerminus, NULL);
+    for (std::vector<ChemicalGroup>::const_iterator i = 
+             parsedPeptideStructure.begin(); 
+         i < parsedPeptideStructure.end(); 
+         i++) {
+        peptideAverageMass += i -> averageMass();
     }
+    peptideAverageMass += NTerminus.averageMass();
+    peptideAverageMass += CTerminus.averageMass();
     
     return peptideAverageMass;
 }
@@ -1233,22 +1196,21 @@ double calculateMonoisotopicMass(const std::string &sequence,
     ChemicalGroup CTerminus;
     double monoisotopicMass = 0;
     
-    if (parseSequence(sequence, chemBasis, &parsedPeptideStructure, 
-                      &NTerminus, &CTerminus, NULL) ) {
-        for (std::vector<ChemicalGroup>::const_iterator i = 
-                 parsedPeptideStructure.begin(); 
-             i < parsedPeptideStructure.end(); 
-             i++) {
-            monoisotopicMass += i -> monoisotopicMass();
-        }
-        monoisotopicMass += NTerminus.monoisotopicMass();
-        monoisotopicMass += CTerminus.monoisotopicMass();
+    parseSequence(sequence, chemBasis, &parsedPeptideStructure, 
+                      &NTerminus, &CTerminus, NULL);
+    for (std::vector<ChemicalGroup>::const_iterator i = 
+             parsedPeptideStructure.begin(); 
+         i < parsedPeptideStructure.end(); 
+         i++) {
+        monoisotopicMass += i -> monoisotopicMass();
     }
+    monoisotopicMass += NTerminus.monoisotopicMass();
+    monoisotopicMass += CTerminus.monoisotopicMass();
     
     return monoisotopicMass;
 }
 
-bool calculatePeptideProperties(const std::string &sequence,
+void calculatePeptideProperties(const std::string &sequence,
          const ChromoConditions &conditions,
          const ChemicalBasis &chemBasis,
          double *RTBioLCCC,
@@ -1260,41 +1222,35 @@ bool calculatePeptideProperties(const std::string &sequence,
     ChemicalGroup CTerminus;
     std::vector<double> peptideEnergyProfile;
     
-   if (parseSequence(sequence, 
+    parseSequence(sequence, 
                      chemBasis,
                      &parsedPeptideStructure,
                      &NTerminus,
                      &CTerminus,
-                     &peptideEnergyProfile))
-    {
-        *RTBioLCCC = calculateRT(peptideEnergyProfile, conditions, chemBasis,
-                                 true);
-        
-        *averageMass = 0;
-        for (std::vector<ChemicalGroup>::const_iterator i = 
-                 parsedPeptideStructure.begin(); 
-             i < parsedPeptideStructure.end(); 
-             i++) {
-            *averageMass += i -> averageMass();
-        }
-        *averageMass += NTerminus.averageMass();
-        *averageMass += CTerminus.averageMass();
-        
-        *monoisotopicMass = 0;
-        for (std::vector<ChemicalGroup>::const_iterator i = 
-                 parsedPeptideStructure.begin(); 
-             i < parsedPeptideStructure.end();
-             i++) {
-            *monoisotopicMass += i -> monoisotopicMass();
-        }
-        *monoisotopicMass += NTerminus.monoisotopicMass();
-        *monoisotopicMass += CTerminus.monoisotopicMass();
-        
-        return true;
+                     &peptideEnergyProfile);
+
+    *RTBioLCCC = calculateRT(peptideEnergyProfile, conditions, chemBasis,
+                             true);
+
+    *averageMass = 0;
+    for (std::vector<ChemicalGroup>::const_iterator i = 
+             parsedPeptideStructure.begin(); 
+         i < parsedPeptideStructure.end(); 
+         i++) {
+        *averageMass += i -> averageMass();
     }
-    else {
-        return false;
+    *averageMass += NTerminus.averageMass();
+    *averageMass += CTerminus.averageMass();
+
+    *monoisotopicMass = 0;
+    for (std::vector<ChemicalGroup>::const_iterator i = 
+             parsedPeptideStructure.begin(); 
+         i < parsedPeptideStructure.end();
+         i++) {
+        *monoisotopicMass += i -> monoisotopicMass();
     }
+    *monoisotopicMass += NTerminus.monoisotopicMass();
+    *monoisotopicMass += CTerminus.monoisotopicMass();
 }
 
 //ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,

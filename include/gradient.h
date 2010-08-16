@@ -3,10 +3,16 @@
 
 #include <vector>
 #include "gradientpoint.h" 
+#include "biolcccexception.h"
 
 //! The Gradient class encapsulates all properties of an elution gradient.
 
 namespace BioLCCC {
+
+class GradientException : public BioLCCCException {
+    public:
+        GradientException(std::string message);
+};
 
 class Gradient: public std::vector<GradientPoint> {
     public:

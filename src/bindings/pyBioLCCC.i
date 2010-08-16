@@ -4,13 +4,13 @@
 %feature("autodoc", "0");
 
 %{
-#include "auxiliary.hpp"
+#include "biolcccexception.h"
 #include "chemicalgroup.h"
 #include "chemicalbasis.h"
 #include "gradientpoint.h"
 #include "gradient.h"
 #include "chromoconditions.h"
-#include "BioLCCC.h"
+#include "biolccc.h"
 %}
 
 %include "std_string.i"
@@ -162,13 +162,14 @@
 };
 
 // Parse the original header file
+%include "biolcccexception.h"
 %include "auxiliary.hpp"
 %include "chemicalgroup.h"
 %include "chemicalbasis.h"
 %include "gradientpoint.h"
 %include "gradient.h"
 %include "chromoconditions.h"
-%include "BioLCCC.h"
+%include "biolccc.h"
 
 // Instantiate some templates
 
