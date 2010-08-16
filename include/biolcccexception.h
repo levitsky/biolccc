@@ -3,15 +3,17 @@
 
 #include <string>
 
-namespace BioLCCC {
+namespace BioLCCC
+{
 
-class BioLCCCException : public std::exception {
-    public:
-        BioLCCCException(std::string message);
-        ~BioLCCCException() throw();
-        virtual const char* what() const throw();
-    private:
-        std::string mMessage;
+class BioLCCCException : public std::exception
+{
+public:
+    BioLCCCException(std::string message);
+    ~BioLCCCException() throw();
+    virtual const char* what() const throw();
+private:
+    std::string mMessage;
 };
 }
 
