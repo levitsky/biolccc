@@ -45,7 +45,8 @@ void parseSequence(
     conditions.
 */
 double calculateRT(const std::string &sequence,
-                   const ChromoConditions & conditions = standardChromoConditions,
+                   const ChromoConditions & conditions = 
+                       standardChromoConditions,
                    const ChemicalBasis & chemBasis = standardChemicalBasis,
                    const bool continueGradient = true);
 
@@ -54,14 +55,16 @@ double calculateRT(const std::string &sequence,
     sequence using given table of peptide chemicals.
 */
 double calculateAverageMass(const std::string &sequence,
-                            const ChemicalBasis &chemBasis = standardChemicalBasis);
+                            const ChemicalBasis &chemBasis = 
+                                standardChemicalBasis);
 
 /*!
     Calculates the monoisotopic mass of a peptide with given sequence
     using given table of peptide chemicals.
 */
 double calculateMonoisotopicMass(const std::string &sequence,
-                                 const ChemicalBasis &chemBasis = standardChemicalBasis);
+                                 const ChemicalBasis &chemBasis = 
+                                     standardChemicalBasis);
 
 /*!
     Calculates the distribution coefficient (Kd) of a peptide with
