@@ -1,22 +1,27 @@
 #include "gradientpoint.h"
 
-namespace BioLCCC {
+namespace BioLCCC
+{
 GradientPointException::GradientPointException(std::string message):
-    BioLCCCException(message) {};
+        BioLCCCException(message) {};
 
 GradientPoint::GradientPoint(double time,
-    double concentrationB
-) {
-    if (time < 0.0) {
+                             double concentrationB
+                            )
+{
+    if (time < 0.0)
+    {
         throw GradientPointException("Time is negative.");
     }
 
-    if (concentrationB < 0.0) {
+    if (concentrationB < 0.0)
+    {
         throw GradientPointException(
             "The concentration of B component is negative.");
     }
 
-    if (concentrationB > 100.0) {
+    if (concentrationB > 100.0)
+    {
         throw GradientPointException(
             "The concentration of B component is greater than 100%.");
     }
@@ -25,11 +30,13 @@ GradientPoint::GradientPoint(double time,
     mConcentrationB = concentrationB;
 }
 
-double GradientPoint::time() const{
+double GradientPoint::time() const
+{
     return mTime;
 }
 
-double GradientPoint::concentrationB() const{
+double GradientPoint::concentrationB() const
+{
     return mConcentrationB;
 }
 
