@@ -23,6 +23,11 @@ public:
     ParsingException(std::string message);
 };
 
+
+//! Blahblah.
+/*!
+    Blahblah.
+ */
 static const ChromoConditions standardChromoConditions = ChromoConditions();
 static const ChemicalBasis standardChemicalBasis = ChemicalBasis();
 

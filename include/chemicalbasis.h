@@ -53,105 +53,132 @@ enum ModelType
 class ChemicalBasis
 {
 public:
-
+    //! Constructs a new ChemicalBasis instance, same as TFACoilChemicalBasis.
     /*!
-        Constructs a new ChemicalBasis object with the standard BioLCCC list
-        of amino acids, termini and the standard energy of second solvent.
+        By default, an instance of ChemicalBasis is filled with the energies
+        calibrated for reversed phase chromatography, acetonitrile as a eluent, 
+        trifluoracetic acid as ion paring agent (pH 2.0) and
+        COILBOLTZMANN type of model. See the source code for the details.
+        \sa standardChemicalBasis
     */
     ChemicalBasis();
 
+    //! Returns the map of all chemical groups.
     /*!
-        Returns the map of all chemical groups.
-    */
+        A chemical group can be retrieved from the map by its label.
+     */
     const std::map<std::string, ChemicalGroup> & chemicalGroups() const;
 
-    /*!
-        Returns an iterator to the default N-terminal group.
-    */
+    //! Returns the default N-terminal group.
     const ChemicalGroup & defaultNTerminus() const;
 
-    /*!
-        Returns an iterator to the default N-terminal group.
-    */
+    //! Returns the default C-terminal group.
     const ChemicalGroup & defaultCTerminus() const;
 
+    //! Adds a given chemical group to the ChemicalBasis.
     /*!
-        Returns the bind energy of the second solvent. The zero is the bind
-        energy of water and the unit is kT.
-    */
-    double secondSolventBindEnergy() const;
-
-    /*!
-        Sets a new value of the bind energy for the second solvent. The zero
-        is bind energy of water and the unit is kT.
-    */
-    void setSecondSolventBindEnergy(double newEnergy);
-
-    /*!
-        Return the length between two peptide bonds, angstroms.
-    */
-    double segmentLength() const;
-
-    /*!
-        Sets the length between two peptide bonds, angstroms.
-    */
-    void setSegmentLength(double newSegmentLength);
-
-    /*!
-        Sets the persistent length of a biopolymer. Persistent length equals
-        the number of amino acids between the joints of a polymer.
-    */
-    void setKuhnLength(int newKuhnLength);
-
-    /*!
-        Returns the persistent length of a biopolymer. Persistent length
-        equals the number of amino acids between the joints of a polymer.
-    */
-    int kuhnLength() const;
-
-    /*!
-        Return the width of a solid phase adsorbtion layer.
-    */
-    double adsorbtionLayerWidth() const;
-
-    /*!
-        Sets a new value of the width of a solid phase adsorbtion layer.
-    */
-    void setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth);
-
-    /*!
-        Adds a new chemical group.
-    */
+        If an instance of ChemicalBasis already contains a chemical group with
+        the same label than it is overwritten.
+     */
     void addChemicalGroup(ChemicalGroup newChemicalGroup);
 
+    //! Removes a chemical group with a given label;
     /*!
-        Removes the chemical group with the given label;
-        Throws ChemicalBasisException if the chemical group is not found.
+        Throws ChemicalBasisException if a chemical group with the given label
+        is not found.
     */
     void removeChemicalGroup(std::string label);
 
-    /*!
-        Removes all chemical groups in a basis.
-    */
+    //! Removes all chemical groups in a ChemicalBasis.
     void clearChemicalGroups();
 
+    //! Sets a new value of the binding energy for a chemical group.
     /*!
-        Sets the value of binding energy for the chemical group with the
-        given label;
         Throws ChemicalBasisException if the chemical group is not found.
+        \param label The label of the chemical group to be modified.
+        \param newBindEnergy The new value of the bind energy.
     */
-    void setChemicalGroupBindEnergy(std::string label,double newBindEnergy);
+    void setChemicalGroupBindEnergy(std::string label, double newBindEnergy);
 
-    /*!
-        Sets the type of BioLCCC model (e.g. CoilBoltzmann, CoilSnydel).
+    //! Returns the bind energy of the second solvent. 
+    /*! 
+        Note, that the bind energy of water is zero and the unit is kT.
     */
+    double secondSolventBindEnergy() const;
+
+    //! Sets a new value of the bind energy for the second solvent. 
+    /*!
+        Note, that the bind energy of water is zero and the unit is kT.
+    */
+    void setSecondSolventBindEnergy(double newEnergy);
+
+    //! Sets the type of BioLCCC model (e.g. CoilBoltzmann, CoilSnydel).
     void setModel(ModelType newModel);
 
-    /*!
-        Returns the type of BioLCCC model which is used in calculations with
-        this ChemicalBasis.
-    */
+    //! Returns the type of BioLCCC model (e.g. CoilBoltzmann, CoilSnydel).
     const ModelType model() const;
+
+    //! Returns the length of a single amino acid residue in angstroms.
+    /*!
+        Due to the complex geometry of peptide molecule, this length is defined
+        only approximately. The definition is the average length of an amino
+        acid residue along backbone. In other terms, it is the length of 
+        a backbone divided by the number of amino acid residues.
+     */
+    double segmentLength() const;
+
+    //! Sets the length between two peptide bonds in angstroms.
+    /*!
+        Due to the complex geometry of peptide molecule, this length is defined
+        only approximately. The definition is the average length of an amino
+        acid residue along backbone. In other terms, it is the length of 
+        a backbone divided by the number of amino acid residues.
+     */
+    void setSegmentLength(double newSegmentLength);
+
+    //! Returns the Kuhn length of a molecule in amino acid residues.
+    /*!
+        A polymer molecule can be modelled as a chain of equal-sized rigid rods,
+        freely joined with each other. In this case, the rods would be called 
+        Kuhn segments and the length of a segment would be the Kuhn length.
+        In BioLCCC model the Kuhn length is measured as a number of amino acid 
+        residues comprising one rigid segment.
+
+        This value is used only for COIL_* types of model.
+    */
+    int kuhnLength() const;
+
+    //! Sets the Kuhn length of a molecule in amino acid residues.
+    /*!
+        A polymer molecule can be modelled as a chain of equal-sized rigid rods,
+        freely joined with each other. In this case, the rods would be called 
+        Kuhn segments and the length of a segment would be the Kuhn length.
+        In BioLCCC model the Kuhn length is measured as a number of amino acid 
+        residues comprising one rigid segment.
+
+        This value is used only for COIL_* types of model.
+    */
+    void setKuhnLength(int newKuhnLength);
+
+    //! Returns the width of a solid phase adsorption layer.
+    /*!
+        The width of a solid phase adsorption layer can be defined as a
+        characteristic distance of interaction between an amino acid residue and
+        the surface of a solid phase. 
+
+        This value is used only for ROD_* types of model.
+    */
+    double adsorbtionLayerWidth() const;
+
+    //! Sets the width of a solid phase adsorption layer.
+    /*!
+        The width of a solid phase adsorption layer can be defined as a
+        characteristic distance of interaction between an amino acid residue and
+        the surface of a solid phase. 
+
+        This value is used only for ROD_* types of model.
+    */
+    void setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth);
 
 private:
     std::map<std::string,ChemicalGroup> mChemicalGroups;

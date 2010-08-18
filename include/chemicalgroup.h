@@ -72,7 +72,7 @@ public:
 
     //! Returns the energy of binding to the surface of a solid phase.
     /*!
-        Note, that the zero is bind energy of water.
+        The bind energy of water is zero and unit is kT.
         The bind energy of a terminal group is added to the binding group of
         the corresponding terminal amino acid.
     */
