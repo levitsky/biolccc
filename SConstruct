@@ -151,8 +151,16 @@ Depends(pyBioLCCC, 'MANIFEST.in')
 Depends(pyBioLCCC, 'pyBioLCCC.README')
 Alias('pyBioLCCC', pyBioLCCC)
 
+# Doxygen documentation.
+#------------------------
+doc = env.Command('doc', 'Doxyfile', 'doxygen $SOURCE')
+Depends(doc, 'Doxyfile')
+# Source code needs to be copied.
+Depends(doc, libBioLCCC_shared)
+
 # Final configuration of the build.
 #===================================
 env.Default([libBioLCCC_shared, pyBioLCCC])
 Alias('all', 
-    [libBioLCCC_shared, libBioLCCC_shared, libgtest_static, tests, pyBioLCCC])
+    [libBioLCCC_shared, libBioLCCC_shared, libgtest_static,
+     tests, pyBioLCCC, doc])
