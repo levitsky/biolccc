@@ -8,40 +8,48 @@
 namespace BioLCCC
 {
 
-//! The ChemicalBasis class manages amino acids and terminal groups.
-/*!
-    <b>Discussing the internal structure of a ChemicalBasis class.</b>
-    There are two possible ways to store amino acids here: a map and a vector.
-    - A map is simple in realization. We could write a public function
-    getAminoacid(std::string) and use it to parse peptide sequence. But in this
-    case we have a problem with two-and-more-letters labels. Actually, we need
-    to have the full list of amino acids to be sure, whether peptide sequence
-    contains an unidentifiable label, or we just need to check more letters
-    from the sequence.
-    - A vector needs to implement two functions, beginIterator and endIterator
-    to incapsulate all data. But in that case we could easily check the whole
-    list at one time.
-    BUT! I've found that map could be used as a vector too, so we implement
-    a map.
-    <b>Default terminal group</b>
-    Be careful, the default terminal groups should be the first in the
-    corresponding vector!
-*/
-
+//! This exception is raised when something goes wrong with a ChemicalBasis.
 class ChemicalBasisException : public BioLCCCException
 {
 public:
+    //! Constructs an instance of ChemicalBasis with a given message.
     ChemicalBasisException(std::string message);
 };
 
+//! A set of assumptions of the BioLCCC model.
+/*!
+    Different models come from different sets of initial assumption. For the
+    better explanation see the theory of the BioLCCC model.
+ */
 enum ModelType
 {
-    COIL_BOLTZMANN,
-    COIL_BOLTZMANN_DOUBLE_LAYER,
-    COIL_SNYDER,
-    ROD_BOLTZMANN
+    COIL_BOLTZMANN, /*!< The standard BioLCCC model with the assumption 
+        of an absolute flexibility of a protein molecule. */
+    ROD_BOLTZMANN, /*!< The BioLCCC model with the assumption of absolute 
+        rigidity of a peptide molecule. It works better for short molecules. */
+    COIL_BOLTZMANN_DOUBLE_LAYER, /*!< EXPERIMENTAL. Modification of the 
+        standard model in which the adsorption occurs in a volume, 
+        i.e. in two near-wall layers. */
+    COIL_SNYDER /*! EXPERIMENTAL. Modification of the standard model in which
+        the adsorption is described by the linear Snyder's theory. */
 };
 
+//! An instance of ChemicalBasis contains a set of BioLCCC constants.
+/*!
+    An instance of ChemicalBasis manages all the physicochemical constants,
+    which are used in the calculations. Currently, it contains:
+        - The list of amino acids and peptide terminal groups.
+        - The terminal groups which are set by default (cannon be changed).
+        - The Energy of binding between a solvent and the surface of a solid 
+          phase.
+        - The type of BioLCCC model being used in calculations. 
+        - Peptide geometry: the length of amino acid and the Kuhn length.
+        - The width of the adsorbing layer.
+       
+    Note, that the set of constants is highly interconnected. Usually the change
+    in one constant, like the width of adsorbing layer or type of BioLCCC model,
+    would only deteriorate the quality of RT prediction.
+ */
 class ChemicalBasis
 {
 public:
