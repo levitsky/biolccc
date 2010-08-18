@@ -101,13 +101,13 @@ public:
         Sets the persistent length of a biopolymer. Persistent length equals
         the number of amino acids between the joints of a polymer.
     */
-    void setPersistentLength(int newPersistentLength);
+    void setKuhnLength(int newKuhnLength);
 
     /*!
         Returns the persistent length of a biopolymer. Persistent length
         equals the number of amino acids between the joints of a polymer.
     */
-    int persistentLength() const;
+    int kuhnLength() const;
 
     /*!
         Return the width of a solid phase adsorbtion layer.
@@ -157,7 +157,7 @@ private:
     std::map<std::string,ChemicalGroup> mChemicalGroups;
     double mSecondSolventBindEnergy;
     double mSegmentLength;
-    int mPeristentLength;
+    int mKuhnLength;
     double mAdsorbtionLayerWidth;
     ModelType mModel;
 };

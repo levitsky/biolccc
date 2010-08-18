@@ -41,7 +41,7 @@
             output_dict = {}
             output_dict['model'] = self.model()
             output_dict['segmentLength'] = self.segmentLength()
-            output_dict['persistentLength'] = self.persistentLength()
+            output_dict['kuhnLength'] = self.kuhnLength()
             output_dict['adsorbtionLayerWidth'] = self.adsorbtionLayerWidth()
             output_dict['secondSolventBindEnergy'] = \
                 self.secondSolventBindEnergy()
@@ -56,7 +56,7 @@
         def __setstate__(self, chembasis_dict):
             self.setModel(chembasis_dict['model'])
             self.setSegmentLength(chembasis_dict['segmentLength'])
-            self.setPersistentLength(chembasis_dict['persistentLength'])
+            self.setKuhnLength(chembasis_dict['kuhnLength'])
             self.setAdsorbtionLayerWidth(chembasis_dict['adsorbtionLayerWidth'])
             self.setSecondSolventBindEnergy(
                 chembasis_dict['secondSolventBindEnergy'])
@@ -74,7 +74,7 @@
             output_dict = {}
             output_dict['model'] = self.model()
             output_dict['segmentLength'] = self.segmentLength()
-            output_dict['persistentLength'] = self.persistentLength()
+            output_dict['kuhnLength'] = self.kuhnLength()
             output_dict['adsorbtionLayerWidth'] = self.adsorbtionLayerWidth()
             output_dict['secondSolventBindEnergy'] = \
                 self.secondSolventBindEnergy()
@@ -88,8 +88,8 @@
                 self.setModel(value)
             elif key == 'segmentLength':
                 self.setSegmentLength(value)
-            elif key == 'persistentLength':
-                self.setPersistentLength(value)
+            elif key == 'kuhnLength':
+                self.setKuhnLength(value)
             elif key == 'adsorbtionLayerWidth':
                 self.setAdsorbtionLayerWidth(value)
             elif key == 'secondSolventBindEnergy':

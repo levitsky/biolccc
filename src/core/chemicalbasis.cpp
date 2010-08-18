@@ -168,7 +168,7 @@ ChemicalBasis::ChemicalBasis()
     setAdsorbtionLayerWidth(15.0);
 
     // setting the standard persistent length.
-    setPersistentLength(1);
+    setKuhnLength(1);
 }
 
 const std::map<std::string,ChemicalGroup> & 
@@ -225,20 +225,19 @@ void ChemicalBasis::setSegmentLength(double newSegmentLength)
     mSegmentLength = newSegmentLength;
 }
 
-int ChemicalBasis::persistentLength() const
+int ChemicalBasis::kuhnLength() const
 {
-    return mPeristentLength;
+    return mKuhnLength;
 }
 
-void ChemicalBasis::setPersistentLength(int newPersistentLength)
+void ChemicalBasis::setKuhnLength(int newKuhnLength)
 {
-    if (newPersistentLength <= 0)
+    if (newKuhnLength <= 0)
     {
         throw ChemicalBasisException(
             "The new persistent length is not positive.");
     }
-
-    mPeristentLength = newPersistentLength;
+    mKuhnLength = newKuhnLength;
 }
 
 double ChemicalBasis::adsorbtionLayerWidth() const
@@ -253,7 +252,6 @@ void ChemicalBasis::setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth)
         throw ChemicalBasisException(
             "The new adsorbtion layer width is negative.");
     }
-
     mAdsorbtionLayerWidth = newAdsorbtionLayerWidth;
 }
 

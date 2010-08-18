@@ -82,7 +82,7 @@ double calculateKdCoilBoltzmann(
         residueNumber++;
         energySum += calibrationParameter * (*residueEnergy - Eab) *
                      293.0 / temperature;
-        if ((residueNumber % chemBasis.persistentLength()) == 0)
+        if ((residueNumber % chemBasis.kuhnLength()) == 0)
         {
             boltzmannFactorProfile.push_back(exp(energySum));
             energySum = 0.0;
@@ -90,7 +90,7 @@ double calculateKdCoilBoltzmann(
     }
 
     // If the last persistent block is incomplete, we should add it manually.
-    if ((residueNumber % chemBasis.persistentLength()) != 0)
+    if ((residueNumber % chemBasis.kuhnLength()) != 0)
     {
         boltzmannFactorProfile.push_back(exp(energySum));
     }
@@ -108,7 +108,7 @@ double calculateKdCoilBoltzmann(
     // Because of the calculation features it have to be greater than 2.
     const int poreSteps = (int) (columnPoreSize /
                                  chemBasis.segmentLength() / 
-                                 (double)(chemBasis.persistentLength())) ;
+                                 (double)(chemBasis.kuhnLength())) ;
     if (poreSteps <2)
     {
         throw BioLCCCException(
@@ -303,7 +303,7 @@ double calculateKdCoilBoltzmannDoubleLayer(
     // Because of the calculation features it have to be greater than 4.
     const int poreSteps = (int) (columnPoreSize /
                                  chemBasis.segmentLength() / 
-                                 (double)(chemBasis.persistentLength())) ;
+                                 (double)(chemBasis.kuhnLength())) ;
     if (poreSteps <4)
     {
         throw BioLCCCException(
@@ -526,7 +526,7 @@ double calculateKdCoilSnyder(
     // Because of the calculation features it have to be greater than 4.
     const int poreSteps = (int) (columnPoreSize /
                                  chemBasis.segmentLength() / 
-                                 (double)(chemBasis.persistentLength())) ;
+                                 (double)(chemBasis.kuhnLength())) ;
     if (poreSteps <2)
     {
         throw BioLCCCException(
@@ -873,7 +873,7 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
     // Choosing the appropriate model.
     if (chemBasis.model()==COIL_BOLTZMANN)
     {
-        if (peptideEnergyProfile.size() % chemBasis.persistentLength() == 0)
+        if (peptideEnergyProfile.size() % chemBasis.kuhnLength() == 0)
         {
             return calculateKdCoilBoltzmann(peptideEnergyProfile,
                                             secondSolventConcentration, 
