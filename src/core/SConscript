@@ -1,10 +1,21 @@
 import os
 
 Import('env')
+Import('libtype')
 
-libBioLCCC_static = env.StaticLibrary(
-    target = '#'+os.path.join('lib', 'static',
-        env['PLATFORM'], env['BUILDTYPE'],'libBioLCCC'),
-    source = Glob('*.cpp'))
+if libtype == 'static':
+    libBioLCCC_static = env.StaticLibrary(
+        target = '#'+os.path.join('lib', 'static',
+            env['PLATFORM'], env['BUILDTYPE'],'libBioLCCC'),
+        source = Glob('*.cpp'))
 
-Return('libBioLCCC_static')
+    Return('libBioLCCC_static')
+
+if libtype == 'shared':
+    libBioLCCC_shared = env.SharedLibrary(
+        target = '#'+os.path.join('lib', 'shared',
+            env['PLATFORM'], env['BUILDTYPE'],'libBioLCCC'),
+        source = Glob('*.cpp'))
+
+    Return('libBioLCCC_shared')
+
