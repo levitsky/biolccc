@@ -3,6 +3,26 @@ import inspect
 import distutils.sysconfig
 
 # Configuring the build.
+#========================
+
+Help("""
+libBioLCCC and pyBioLCCC build script. 
+Usage: scons -Y <path_to_repository> [OPTIONS] [TARGETS]
+Note that building in a source directory is strictly prohibited.
+
+Options:
+    buildtype=<buildtype>    Build type. Possible values are release and debug.
+
+Targets:
+    all                      All targets.
+
+    libBioLCCC_shared        Shared BioLCCC library. Compiled by default.
+    pyBioLCCC                pyBioLCCC package. Compiled by default.
+    libBioLCCC_static        Static BioLCCC library. 
+    libgtest_static          Static Google Test library. 
+    test                     A test suite.
+    doc                      A documentation for libBioLCCC and pyBioLCCC.
+""")
 
 # Get the mode flag from the command line.
 # Default to 'release' if the user didn't specify.
@@ -53,22 +73,32 @@ env = Environment(
     )
 
 # Building targets.
-libBioLCCC_static = SConscript(
+#===================
+
+# Shared BioLCCC library.
+#-------------------------
+libBioLCCC_shared = SConscript(
     os.path.join('src', 'core', 'SConscript'),
-    exports = {'env':env},
+    exports = {'env':env, 'libtype':'shared'},
     variant_dir=os.path.join(
-        'build', platform.name, env['BUILDTYPE'], 'core'), 
+        'build', platform.name, env['BUILDTYPE'], 'core', 'shared'), 
     duplicate=True
     )
+Alias('libBioLCCC_shared', libBioLCCC_shared)
 
-pyBioLCCC_so = SConscript(
-    os.path.join('src', 'bindings', 'SConscript'),
-    exports = {'env':env},
+# Static BioLCCC library.
+#-------------------------
+libBioLCCC_static = SConscript(
+    os.path.join('src', 'core', 'SConscript'),
+    exports = {'env':env, 'libtype':'static'},
     variant_dir=os.path.join(
-        'build', platform.name, env['BUILDTYPE'], 'bindings'), 
-    duplicate=True,
+        'build', platform.name, env['BUILDTYPE'], 'core', 'static'), 
+    duplicate=True
     )
+Alias('libBioLCCC_static', libBioLCCC_static)
 
+# Google test library.
+#----------------------
 libgtest_static = SConscript(
     os.path.join('src', 'gtest', 'SConscript'),
     exports = {'env':env},
@@ -76,32 +106,53 @@ libgtest_static = SConscript(
         'build', platform.name, env['BUILDTYPE'], 'gtest'), 
     duplicate=True,
     )
+Alias('libgtest_static', libgtest_static)
 
-tests_app=SConscript(
+# Test suite.
+#--------------
+tests = SConscript(
     os.path.join('src', 'apps', 'SConscript'),
     exports={'env':env},
     variant_dir=os.path.join(
         'build', platform.name, env['BUILDTYPE'], 'apps'), 
     duplicate=True,
     )
-Requires(tests_app, libBioLCCC_static)
-Requires(tests_app, libgtest_static)
+
+Requires(tests, libBioLCCC_static)
+Requires(tests, libgtest_static)
+Alias('tests', tests)
+
+# pyBioLCCC package.
+#---------------------
+pyBioLCCC = SConscript(
+    os.path.join('src', 'bindings', 'SConscript'),
+    exports = {'env':env},
+    variant_dir=os.path.join(
+        'build', platform.name, env['BUILDTYPE'], 'bindings'), 
+    duplicate=True,
+    )
 
 # Copying source files required for the python source package.
-env.AddPostAction(pyBioLCCC_so, Copy(
+env.AddPostAction(pyBioLCCC, Copy(
     os.path.join(Dir('#.').abspath, 'src', 'bindings', 'pyBioLCCC.py'),
     os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
         'pyBioLCCC.py')))
-env.AddPostAction(pyBioLCCC_so, Copy(
+env.AddPostAction(pyBioLCCC, Copy(
     os.path.join(Dir('#.').abspath, 'src', 'bindings', 'pyBioLCCC_wrap.cc'),
     os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
         'pyBioLCCC_wrap.cc')))
-env.AddPostAction(pyBioLCCC_so, Touch(
+env.AddPostAction(pyBioLCCC, Touch(
     os.path.join(Dir('#.').abspath, 'src', 'bindings', '__init__.py')))
 
 # Copying the documentation to the build dir.
-Depends(pyBioLCCC_so, 'setup.py')
-Depends(pyBioLCCC_so, 'VERSION')
-Depends(pyBioLCCC_so, 'MANIFEST.in')
-Depends(pyBioLCCC_so, 'pyBioLCCC.README')
+Depends(pyBioLCCC, 'setup.py')
+Depends(pyBioLCCC, 'VERSION')
+Depends(pyBioLCCC, 'MANIFEST.in')
+Depends(pyBioLCCC, 'pyBioLCCC.README')
+Alias('pyBioLCCC', pyBioLCCC)
 
+# Final configuration of the build.
+#===================================
+env.Default([libBioLCCC_shared, pyBioLCCC])
+Alias('all', 
+    [libBioLCCC_shared, libBioLCCC_shared, libgtest_static, tests, pyBioLCCC])
