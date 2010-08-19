@@ -14,7 +14,7 @@ ChromoConditions::ChromoConditions(double iColumnLength,
                                    double iDelayTime,
                                    double iFlowRate,
                                    double iDV,
-                                   double iCalibrationParameter,
+                                   double iColumnRelativeStrength,
                                    double iColumnVpToVtot,
                                    double iColumnPorosity,
                                    double iTemperature
@@ -27,7 +27,7 @@ ChromoConditions::ChromoConditions(double iColumnLength,
     setColumnVpToVtot(iColumnVpToVtot);
     setColumnPorosity(iColumnPorosity);
     setTemperature(iTemperature);
-    setCalibrationParameter(iCalibrationParameter);
+    setColumnRelativeStrength(iColumnRelativeStrength);
     setFlowRate(iFlowRate);
     setDV(iDV);
     setDelayTime(iDelayTime);
@@ -133,14 +133,15 @@ void ChromoConditions::setTemperature(double newTemperature)
     mTemperature = newTemperature;
 }
 
-double ChromoConditions::calibrationParameter() const
+double ChromoConditions::columnRelativeStrength() const
 {
-    return mCalibrationParameter;
+    return mColumnRelativeStrength;
 }
 
-void ChromoConditions::setCalibrationParameter(double newCalibrationParameter)
+void ChromoConditions::setColumnRelativeStrength(
+    double newColumnRelativeStrength)
 {
-    mCalibrationParameter = newCalibrationParameter;
+    mColumnRelativeStrength = newColumnRelativeStrength;
 }
 
 double ChromoConditions::flowRate() const

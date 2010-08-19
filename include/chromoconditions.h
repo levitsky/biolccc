@@ -51,7 +51,7 @@ public:
                      double iDelayTime = 0.0,
                      double iFlowRate = 0.0003,
                      double iDV = 0.0,
-                     double iCalibrationParameter = 1.0,
+                     double iColumnRelativeStrength = 1.0,
                      double iColumnVpToVtot = 0.5,
                      double iColumnPorosity = 0.9,
                      double iTemperature = 293.0);
@@ -108,21 +108,21 @@ public:
     //! Sets the temperature of the column in kelvin degrees.
     void setTemperature(double newTemperature);
 
-    //! Returns the calibration parameter.
+    //! Returns the relative strength of the adsorbent.
     /*!
-        The calibration parameter is used to describe aging of a column. 
-        Please, check the BioLCCC theory for the further details of
+        All the adsorption energies are multiplied by the relative strength of
+        the column. Please, check the BioLCCC theory for the further details of
         implementation.
      */
-    double calibrationParameter() const;
+    double columnRelativeStrength() const;
 
-    //! Sets the calibration parameter.
+    //! Sets the relative strength of the adsorbent.
     /*!
-        The calibration parameter is used to describe aging of a column. 
-        Please, check the BioLCCC theory for the further details of
+        All the adsorption energies are multiplied by the relative strength of
+        the column. Please, check the BioLCCC theory for the further details of
         implementation.
      */
-    void setCalibrationParameter(double newCalibrationParameter);
+    void setColumnRelativeStrength(double newColumnRelativeStrength);
 
     //! Returns the flow rate in ml/min.
     double flowRate() const;
@@ -193,7 +193,7 @@ private:
     double mColumnVpToVtot;
     double mColumnPorosity;
     double mTemperature;
-    double mCalibrationParameter;
+    double mColumnRelativeStrength;
     double mFlowRate;
     double mDV;
     double mDelayTime;

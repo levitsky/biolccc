@@ -34,7 +34,7 @@ double calculateKdCoilBoltzmann(
     const double secondSolventConcentration,
     const ChemicalBasis &chemBasis,
     const double columnPoreSize,
-    const double calibrationParameter,
+    const double columnRelativeStrength,
     const double temperature
 )
 {
@@ -60,7 +60,7 @@ double calculateKdCoilBoltzmann(
     Nb = secondSolventConcentration * 1.91 /
          (secondSolventConcentration * 1.91 +
           (100.0 - secondSolventConcentration) * 5.56);
-    Eab = 0.0 + 1.0 / calibrationParameter * log( 1.0 - Nb + Nb * Q );
+    Eab = 0.0 + 1.0 / columnRelativeStrength * log( 1.0 - Nb + Nb * Q );
 
     // A Boltzmann factor is an exponent of an energy of interaction between
     // an amino acid residue and a solid phase divided by a temperature *
@@ -80,7 +80,7 @@ double calculateKdCoilBoltzmann(
         // Where DensityA and DensityB are the corresponding densities and
         // MA and MB are the corresponding molecular weights.
         residueNumber++;
-        energySum += calibrationParameter * (*residueEnergy - Eab) *
+        energySum += columnRelativeStrength * (*residueEnergy - Eab) *
                      293.0 / temperature;
         if ((residueNumber % chemBasis.kuhnLength()) == 0)
         {
@@ -245,7 +245,7 @@ double calculateKdCoilBoltzmannDoubleLayer(
     const double secondSolventConcentration,
     const ChemicalBasis &chemBasis,
     const double columnPoreSize,
-    const double calibrationParameter,
+    const double columnRelativeStrength,
     const double temperature
 )
 {
@@ -284,8 +284,8 @@ double calculateKdCoilBoltzmannDoubleLayer(
         Nb = secondSolventConcentration * 1.91 /
              (secondSolventConcentration * 1.91 +
               (100.0 - secondSolventConcentration) * 5.56);
-        Eab = 0.0 + 1.0 / calibrationParameter * log( 1.0 - Nb + Nb * Q );
-        boltzmannFactorProfile.push_back(exp(calibrationParameter *
+        Eab = 0.0 + 1.0 / columnRelativeStrength * log( 1.0 - Nb + Nb * Q );
+        boltzmannFactorProfile.push_back(exp(columnRelativeStrength *
                                              (*residueEnergy - Eab) * 293.0 / 
                                              temperature));
     }
@@ -471,7 +471,7 @@ double calculateKdCoilSnyder(
     const double secondSolventConcentration,
     const ChemicalBasis &chemBasis,
     const double columnPoreSize,
-    const double calibrationParameter,
+    const double columnRelativeStrength,
     const double temperature
 )
 {
@@ -508,7 +508,7 @@ double calculateKdCoilSnyder(
              (secondSolventConcentration * 1.91 +
               (100.0 - secondSolventConcentration) * 5.56);
         boltzmannFactorProfile.push_back(
-            exp(calibrationParameter *
+            exp(columnRelativeStrength *
                 (*residueEnergy - chemBasis.secondSolventBindEnergy() * Nb) *
                 293.0 / temperature));
     }
@@ -788,7 +788,7 @@ double calculateKdRod(
     const double secondSolventConcentration,
     const ChemicalBasis &chemBasis,
     const double columnPoreSize,
-    const double calibrationParameter,
+    const double columnRelativeStrength,
     const double temperature
 )
 {
@@ -826,8 +826,8 @@ double calculateKdRod(
         Nb = secondSolventConcentration * 1.91 /
              (secondSolventConcentration * 1.91 +
               (100.0 - secondSolventConcentration) * 5.56);
-        Eab = 0.0 + 1.0 / calibrationParameter * log( 1.0 - Nb + Nb * Q );
-        effectiveEnergyProfile.push_back(calibrationParameter *
+        Eab = 0.0 + 1.0 / columnRelativeStrength * log( 1.0 - Nb + Nb * Q );
+        effectiveEnergyProfile.push_back(columnRelativeStrength *
                                          (*residueEnergy - Eab) * 293.0 / 
                                          temperature);
     }
@@ -866,7 +866,7 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
                    const double secondSolventConcentration,
                    const ChemicalBasis &chemBasis,
                    const double columnPoreSize,
-                   const double calibrationParameter,
+                   const double columnRelativeStrength,
                    const double temperature
                   )
 {
@@ -878,7 +878,7 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
             return calculateKdCoilBoltzmann(peptideEnergyProfile,
                                             secondSolventConcentration, 
                                             chemBasis, columnPoreSize,
-                                            calibrationParameter, temperature);
+                                            columnRelativeStrength, temperature);
         }
         else
         {
@@ -888,11 +888,11 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
             return (calculateKdCoilBoltzmann(peptideEnergyProfile,
                                              secondSolventConcentration, 
                                              chemBasis, columnPoreSize,
-                                             calibrationParameter, temperature)
+                                             columnRelativeStrength, temperature)
                     + calculateKdCoilBoltzmann(revPeptideEnergyProfile,
                                                secondSolventConcentration,
                                                chemBasis, columnPoreSize,
-                                               calibrationParameter, 
+                                               columnRelativeStrength, 
                                                temperature)) / 2.0 ;
         }
     }
@@ -902,7 +902,7 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
                 secondSolventConcentration,
                 chemBasis,
                 columnPoreSize,
-                calibrationParameter,
+                columnRelativeStrength,
                 temperature);
     }
     else if (chemBasis.model() == COIL_SNYDER)
@@ -911,7 +911,7 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
                                      secondSolventConcentration,
                                      chemBasis,
                                      columnPoreSize,
-                                     calibrationParameter,
+                                     columnRelativeStrength,
                                      temperature);
     }
     else if (chemBasis.model() == ROD_BOLTZMANN)
@@ -920,7 +920,7 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
                               secondSolventConcentration,
                               chemBasis,
                               columnPoreSize,
-                              calibrationParameter,
+                              columnRelativeStrength,
                               temperature);
     }
     else
@@ -1018,7 +1018,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                         ((1.0 - S) / dV * calculateKd(
                             peptideEnergyProfile, currentGradientPoint->second,
                             chemBasis, conditions.columnPoreSize(),
-                            conditions.calibrationParameter(),
+                            conditions.columnRelativeStrength(),
                             conditions.temperature()) * volumePore < 
                         (currentGradientPoint->first - j + 1));
                     if (peptideElutes ||
@@ -1029,7 +1029,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                                peptideEnergyProfile,
                                currentGradientPoint->second,
                                chemBasis, conditions.columnPoreSize(),
-                               conditions.calibrationParameter(),
+                               conditions.columnRelativeStrength(),
                                conditions.temperature()) *
                             volumePore);
                         break;
@@ -1043,7 +1043,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                                  currentGradientPoint->second,
                                  chemBasis,
                                  conditions.columnPoreSize(),
-                                 conditions.calibrationParameter(),
+                                 conditions.columnRelativeStrength(),
                                  conditions.temperature()) /
                              volumePore * (currentGradientPoint->first -
                                            previousGradientPoint->first);
@@ -1063,7 +1063,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
         S += dV / calculateKd(
                  peptideEnergyProfile, secondSolventConcentration,
                  chemBasis, conditions.columnPoreSize(),
-                 conditions.calibrationParameter(),
+                 conditions.columnRelativeStrength(),
                  conditions.temperature()) / volumePore;
     }
 
@@ -1276,7 +1276,7 @@ double calculateKd(const std::string &sequence,
                    const double secondSolventConcentration,
                    const ChemicalBasis & chemBasis,
                    const double columnPoreSize,
-                   const double calibrationParameter,
+                   const double columnRelativeStrength,
                    const double temperature
                   )
 {
@@ -1295,7 +1295,7 @@ double calculateKd(const std::string &sequence,
                        secondSolventConcentration,
                        chemBasis,
                        columnPoreSize,
-                       calibrationParameter,
+                       columnRelativeStrength,
                        temperature);
 }
 
@@ -1347,52 +1347,52 @@ double calculateMonoisotopicMass(const std::string &sequence,
     return monoisotopicMass;
 }
 
-void calculatePeptideProperties(const std::string &sequence,
-                                const ChromoConditions &conditions,
-                                const ChemicalBasis &chemBasis,
-                                double *RTBioLCCC,
-                                double *averageMass,
-                                double *monoisotopicMass
-                               )
-{
-    std::vector<ChemicalGroup> parsedPeptideStructure;
-    ChemicalGroup NTerminus;
-    ChemicalGroup CTerminus;
-    std::vector<double> peptideEnergyProfile;
-
-    parseSequence(sequence,
-                  chemBasis,
-                  &parsedPeptideStructure,
-                  &NTerminus,
-                  &CTerminus,
-                  &peptideEnergyProfile);
-
-    *RTBioLCCC = calculateRT(peptideEnergyProfile, conditions, chemBasis,
-                             true);
-
-    *averageMass = 0;
-    for (std::vector<ChemicalGroup>::const_iterator i =
-                parsedPeptideStructure.begin();
-            i < parsedPeptideStructure.end();
-            i++)
-    {
-        *averageMass += i -> averageMass();
-    }
-    *averageMass += NTerminus.averageMass();
-    *averageMass += CTerminus.averageMass();
-
-    *monoisotopicMass = 0;
-    for (std::vector<ChemicalGroup>::const_iterator i =
-                parsedPeptideStructure.begin();
-            i < parsedPeptideStructure.end();
-            i++)
-    {
-        *monoisotopicMass += i -> monoisotopicMass();
-    }
-    *monoisotopicMass += NTerminus.monoisotopicMass();
-    *monoisotopicMass += CTerminus.monoisotopicMass();
-}
-
+//void calculatePeptideProperties(const std::string &sequence,
+//                                const ChromoConditions &conditions,
+//                                const ChemicalBasis &chemBasis,
+//                                double *RTBioLCCC,
+//                                double *averageMass,
+//                                double *monoisotopicMass
+//                               )
+//{
+//    std::vector<ChemicalGroup> parsedPeptideStructure;
+//    ChemicalGroup NTerminus;
+//    ChemicalGroup CTerminus;
+//    std::vector<double> peptideEnergyProfile;
+//
+//    parseSequence(sequence,
+//                  chemBasis,
+//                  &parsedPeptideStructure,
+//                  &NTerminus,
+//                  &CTerminus,
+//                  &peptideEnergyProfile);
+//
+//    *RTBioLCCC = calculateRT(peptideEnergyProfile, conditions, chemBasis,
+//                             true);
+//
+//    *averageMass = 0;
+//    for (std::vector<ChemicalGroup>::const_iterator i =
+//                parsedPeptideStructure.begin();
+//            i < parsedPeptideStructure.end();
+//            i++)
+//    {
+//        *averageMass += i -> averageMass();
+//    }
+//    *averageMass += NTerminus.averageMass();
+//    *averageMass += CTerminus.averageMass();
+//
+//    *monoisotopicMass = 0;
+//    for (std::vector<ChemicalGroup>::const_iterator i =
+//                parsedPeptideStructure.begin();
+//            i < parsedPeptideStructure.end();
+//            i++)
+//    {
+//        *monoisotopicMass += i -> monoisotopicMass();
+//    }
+//    *monoisotopicMass += NTerminus.monoisotopicMass();
+//    *monoisotopicMass += CTerminus.monoisotopicMass();
+//}
+//
 //ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
 //                               std::vector<double> retentionTimes,
 //                               ChromoConditions chromatograph,
