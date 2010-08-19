@@ -12,7 +12,7 @@ namespace BioLCCC
 class ChemicalBasisException : public BioLCCCException
 {
 public:
-    //! Constructs an instance of ChemicalBasis with a given message.
+    //! Constructs an instance of ChemicalBasisException with the given message.
     ChemicalBasisException(std::string message);
 };
 
@@ -37,7 +37,7 @@ enum ModelType
 //! An instance of ChemicalBasis contains a set of BioLCCC constants.
 /*!
     An instance of ChemicalBasis manages all the physicochemical constants,
-    which are used in the calculations. Currently, it contains:
+    which are used in the calculations. Currently it contains:
         - The list of amino acids and peptide terminal groups.
         - The terminal groups which are set by default (cannon be changed).
         - The Energy of binding between a solvent and the surface of a solid 
@@ -75,14 +75,14 @@ public:
     //! Returns the default C-terminal group.
     const ChemicalGroup & defaultCTerminus() const;
 
-    //! Adds a given chemical group to the ChemicalBasis.
+    //! Adds \a newChemicalGroup to the ChemicalBasis.
     /*!
         If an instance of ChemicalBasis already contains a chemical group with
         the same label than it is overwritten.
      */
     void addChemicalGroup(ChemicalGroup newChemicalGroup);
 
-    //! Removes a chemical group with a given label;
+    //! Removes a chemical group with the given \a label;
     /*!
         Throws ChemicalBasisException if a chemical group with the given label
         is not found.
@@ -92,7 +92,7 @@ public:
     //! Removes all chemical groups in a ChemicalBasis.
     void clearChemicalGroups();
 
-    //! Sets a new value of the binding energy for a chemical group.
+    //! Sets \a newBindEnergy as the binding energy of chemical group \a label.
     /*!
         Throws ChemicalBasisException if the chemical group is not found.
         \param label The label of the chemical group to be modified.
@@ -106,7 +106,7 @@ public:
     */
     double secondSolventBindEnergy() const;
 
-    //! Sets a new value of the bind energy for the second solvent. 
+    //! Sets \a newEnergy as the bind energy of the second solvent. 
     /*!
         Note, that the bind energy of water is zero and the unit is kT.
     */

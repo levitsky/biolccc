@@ -91,6 +91,11 @@ void ChromoConditions::setColumnVpToVtot(double newColumnVpToVtot)
         throw(ChromoConditionsException(
             "The new column VpToVtot is negative."));
     }
+    if (newColumnVpToVtot > 1.0)
+    {
+        throw(ChromoConditionsException(
+            "The new column VpToVtot is greater than 1.0."));
+    }
     mColumnVpToVtot = newColumnVpToVtot;
 }
 
@@ -174,11 +179,6 @@ double ChromoConditions::delayTime() const
 void ChromoConditions::setDelayTime(double newDelayTime)
 {
     mDelayTime = newDelayTime;
-}
-
-std::string ChromoConditions::secondSolvent() const
-{
-    return mSecondSolvent;
 }
 
 double ChromoConditions::secondSolventConcentrationA() const

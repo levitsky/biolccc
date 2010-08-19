@@ -26,11 +26,11 @@ class GradientPoint
 public:
     //! Default constructor.
     /*!
-        Constructs a point of a gradient with the given time and the
-        concentration of the component B of binary solution.
-        \param iTime The time of the point. iTime >= 0.0
-        \param iConcentrationB The concentration of the component B at the point
-        in percents. 0.0 <= iConcentrationB <= 100.0
+        Constructs a point of a gradient with at time = \a iTime and 
+        with the concentration of component B of binary solution = \a
+        iConcentrationB.
+
+        Valid values are \a iTime >= 0.0 and 0.0 <= \a iConcentrationB <= 100.0
     */
     GradientPoint(double iTime = 0.0,
                   double iConcentrationB = 0.0
@@ -39,7 +39,7 @@ public:
     //! Returns the time of the point in minutes.
     double time() const;
 
-    //! Returns the concentration of the component B at the point in percents.
+    //! Returns the concentration of component B at the point in percents.
     double concentrationB() const;
 
 private:
