@@ -62,8 +62,7 @@ double calculateRT(const std::string &sequence,
     \a sequence using the given set of physicochemical constants \a chemBasis.
 */
 double calculateAverageMass(const std::string &sequence,
-                            const ChemicalBasis &chemBasis = 
-                                standardChemicalBasis);
+                            const ChemicalBasis &chemBasis);
 
 //! Calculates the monoisotopic mass of a peptide.
 /*!
@@ -71,8 +70,7 @@ double calculateAverageMass(const std::string &sequence,
     \a sequence using the given set of physicochemical constants \a chemBasis.
 */
 double calculateMonoisotopicMass(const std::string &sequence,
-                                 const ChemicalBasis &chemBasis = 
-                                     standardChemicalBasis);
+                                 const ChemicalBasis &chemBasis);
 
 //! Calculates the coefficient of distribution Kd for the given peptide.
 /*!
