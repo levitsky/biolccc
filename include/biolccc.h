@@ -19,7 +19,10 @@ public:
 };
 
 const ChromoConditions standardChromoConditions = ChromoConditions();
-const ChemicalBasis standardChemicalBasis = ChemicalBasis();
+const ChemicalBasis rpAcnTfaCoilBoltzmann =
+    ChemicalBasis().setPredefinedChemicalBasis(RP_ACN_TFA_COIL_BOLTZMANN);
+const ChemicalBasis rpAcnFaRodBoltzmann =
+    ChemicalBasis().setPredefinedChemicalBasis(RP_ACN_FA_ROD_BOLTZMANN);
 
 //! Parses the given peptide sequence.
 /*!
@@ -48,9 +51,9 @@ void parseSequence(
     prolonged.
 */
 double calculateRT(const std::string &sequence,
-                   const ChromoConditions & conditions = 
-                       standardChromoConditions,
-                   const ChemicalBasis & chemBasis = standardChemicalBasis,
+                   const ChemicalBasis & chemBasis,
+                   const ChromoConditions & conditions =
+                       standardChromoConditions
                    const bool continueGradient = true);
 
 //! Calculates the average (molar) mass of a peptide.
@@ -86,7 +89,7 @@ double calculateMonoisotopicMass(const std::string &sequence,
 */
 double calculateKd(const std::string &sequence,
                    const double secondSolventConcentration,
-                   const ChemicalBasis &chemBasis = standardChemicalBasis,
+                   const ChemicalBasis &chemBasis,
                    const double columnPoreSize = 100.0,
                    const double columnRelativeStrength = 1.0,
                    const double temperature = 293.0);
