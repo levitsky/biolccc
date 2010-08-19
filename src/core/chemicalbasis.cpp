@@ -14,6 +14,11 @@ ChemicalBasis::ChemicalBasis()
     setKuhnLength(1);
 }
 
+ChemicalBasis::ChemicalBasis(PredefinedChemicalBasis predefinedChemicalBasisId)
+{
+    setPredefinedChemicalBasis(predefinedChemicalBasisId);
+}
+
 const std::map<std::string,ChemicalGroup> & 
     ChemicalBasis::chemicalGroups() const
 {
@@ -138,7 +143,6 @@ const ModelType ChemicalBasis::model() const
 void ChemicalBasis::setModel(ModelType newModel)
 {
     mModel = newModel;
-}
 }
 
 ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
@@ -462,4 +466,5 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
     }
 
     return (*this);
+}
 }
