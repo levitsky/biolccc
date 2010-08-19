@@ -24,7 +24,7 @@ std::vector<double> calculateRT(std::vector<std::string> mixture,
     std::vector<double> times;
     for (unsigned int i = 0; i < mixture.size(); i++)
     {
-        times.push_back(calculateRT(mixture[i], chromatograph, chemicalBasis));
+        times.push_back(calculateRT(mixture[i], chemicalBasis, chromatograph));
     }
     return times;
 }

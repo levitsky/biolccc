@@ -42,16 +42,16 @@ enum ModelType
  */
 enum PredefinedChemicalBasis
 {
-    RP_ACN_TFA_COIL_BOLTZMANN, /*!< A ChemicalBasis, calibrated for reversed
+    RP_ACN_TFA_COIL_BOLTZMANN, /*!< A ChemicalBasis calibrated for reversed
     phase, ACN as a second solvent, 0.1% TFA and COIL_BOLTZMANN type of
     BioLCCC model. The data was obtained in Guo et.al., Journal of
     Chromatography, 359 (1986) 449-517. */
-    RP_ACN_FA_ROD_BOLTZMANN /*!< A ChemicalBasis, calibrated for reversed phase,
+    RP_ACN_FA_ROD_BOLTZMANN /*!< A ChemicalBasis calibrated for reversed phase,
     ACN as a second solvent, 0.1% FA and ROD_BOLTZMANN type of BioLCCC model.
     The data was obtained in the joint research of Harvard University and
     Institute for Energy Problems for Chemical Physics, Russian Academy of
     Science. The set includes phosphorylated aminoacids. */
-}
+};
 
 //! An instance of ChemicalBasis contains a set of BioLCCC constants.
 /*!
@@ -73,9 +73,10 @@ class ChemicalBasis
 {
 public:
     //! Constructs an empty ChemicalBasis instance.
-    /*!
-    */
     ChemicalBasis();
+
+    //! Constructs a ChemicalBasis instance with a predefined set of constants.
+    ChemicalBasis(PredefinedChemicalBasis predefinedChemicalBasisId);
 
     //! Returns the map of all chemical groups.
     /*!

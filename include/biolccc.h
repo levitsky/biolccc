@@ -20,9 +20,9 @@ public:
 
 const ChromoConditions standardChromoConditions = ChromoConditions();
 const ChemicalBasis rpAcnTfaCoilBoltzmann =
-    ChemicalBasis().setPredefinedChemicalBasis(RP_ACN_TFA_COIL_BOLTZMANN);
+    ChemicalBasis(RP_ACN_TFA_COIL_BOLTZMANN);
 const ChemicalBasis rpAcnFaRodBoltzmann =
-    ChemicalBasis().setPredefinedChemicalBasis(RP_ACN_FA_ROD_BOLTZMANN);
+    ChemicalBasis(RP_ACN_FA_ROD_BOLTZMANN);
 
 //! Parses the given peptide sequence.
 /*!
@@ -53,7 +53,7 @@ void parseSequence(
 double calculateRT(const std::string &sequence,
                    const ChemicalBasis & chemBasis,
                    const ChromoConditions & conditions =
-                       standardChromoConditions
+                       standardChromoConditions,
                    const bool continueGradient = true);
 
 //! Calculates the average (molar) mass of a peptide.

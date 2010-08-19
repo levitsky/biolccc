@@ -1,5 +1,6 @@
 #include "biolccc.h"
 #include <gtest/gtest.h>
+#include <math.h>
 #include <vector>
 
 // The fixture for testing BioLCCC functions.
@@ -147,24 +148,24 @@ TEST_F(BioLCCCTest, parsesStandardTerminalGroups)
 TEST_F(BioLCCCTest, calculatesMonoisotopicMass)
 {
     ASSERT_LE(
-        (BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM",
+        fabs(BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM",
             BioLCCC::rpAcnTfaCoilBoltzmann) - 2394.1248),
         0.0001);
     ASSERT_LE(
-        (BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM",
+        fabs(BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM",
             BioLCCC::rpAcnFaRodBoltzmann) - 2394.1248),
         0.0001);
     ASSERT_LE(
-        (BioLCCC::calculateMonoisotopicMass("Ac-QWERTYIPASDFGHKLCVNM",
+        fabs(BioLCCC::calculateMonoisotopicMass("Ac-QWERTYIPASDFGHKLCVNM",
             BioLCCC::rpAcnTfaCoilBoltzmann) - 2436.1354), 0.0001);
     ASSERT_LE(
-        (BioLCCC::calculateMonoisotopicMass("Ac-QWERTYIPASDFGHKLCVNM",
+        fabs(BioLCCC::calculateMonoisotopicMass("Ac-QWERTYIPASDFGHKLCVNM",
             BioLCCC::rpAcnFaRodBoltzmann) - 2436.1354), 0.0001);
     ASSERT_LE(
-        (BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM-NH2",
+        fabs(BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM-NH2",
             BioLCCC::rpAcnTfaCoilBoltzmann) - 2393.1408), 0.0001);
     ASSERT_LE(
-        (BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM-NH2",
+        fabs(BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM-NH2",
             BioLCCC::rpAcnFaRodBoltzmann) - 2393.1408), 0.0001);
 }
 
