@@ -81,14 +81,14 @@ double calculateMonoisotopicMass(const std::string &sequence,
     the liquid phase
     \param chemBasis The set of the physicochemical constants.
     \param columnPoreSize The size of adsorbent pores.
-    \param calibrationParameter The parameter of column aging.
+    \param columnRelativeStrength The parameter of column aging.
     \param temperature Temperature of the column.
 */
 double calculateKd(const std::string &sequence,
                    const double secondSolventConcentration,
                    const ChemicalBasis &chemBasis = standardChemicalBasis,
                    const double columnPoreSize = 100.0,
-                   const double calibrationParameter = 1.0,
+                   const double columnRelativeStrength = 1.0,
                    const double temperature = 293.0);
 
 ///*!
