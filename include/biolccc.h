@@ -28,7 +28,7 @@ static const ChemicalBasis standardChemicalBasis = ChemicalBasis();
     into \a NTerminus and \a CTerminus. Writes the energy profile of a peptide
     into \a peptideEnergyProfile.
 
-    Throws ParsingException if the peptide is not parsable.
+    Throws ParsingException if the peptide is not parseable.
 */
 void parseSequence(
     const std::string &source,

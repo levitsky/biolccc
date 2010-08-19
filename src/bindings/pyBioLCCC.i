@@ -124,14 +124,15 @@
             output_dict['columnDiameter'] = self.columnDiameter()
             output_dict['columnPoreSize'] = self.columnPoreSize()
             output_dict['gradient'] = [eval(str(i)) for i in self.gradient()]
-            output_dict['secondSolventConcentrationA'] = \
-                self.secondSolventConcentrationA()
-            output_dict['secondSolventConcentrationB'] = \
-                self.secondSolventConcentrationB()
+            output_dict['secondSolventConcentrationA'] = (
+                self.secondSolventConcentrationA())
+            output_dict['secondSolventConcentrationB'] = (
+                self.secondSolventConcentrationB())
             output_dict['delayTime'] = self.delayTime()
             output_dict['flowRate'] = self.flowRate()
             output_dict['dV'] = self.dV()
-            output_dict['calibrationParameter'] = self.calibrationParameter()
+            output_dict['columnRelativeStrength'] = (
+                self.columnRelativeStrength())
             output_dict['columnVpToVtot'] = self.columnVpToVtot()
             output_dict['columnPorosity'] = self.columnPorosity()
             output_dict['temperature'] = self.temperature()
@@ -154,7 +155,7 @@
             self.setDelayTime(input_dict['delayTime'])
             self.setFlowRate(input_dict['flowRate'])
             self.setDV(input_dict['dV'])
-            self.setCalibrationParameter(input_dict['calibrationParameter'])
+            self.setColumnRelativeStrength(input_dict['columnRelativeStrength'])
             self.setColumnVpToVtot(input_dict['columnVpToVtot'])
             self.setColumnPorosity(input_dict['columnPorosity'])
             self.setTemperature(input_dict['temperature'])
