@@ -8,25 +8,40 @@
 #include "biolcccexception.h"
 #include "gradient.h"
 
-//! This class encapsulates all parameters of chromatographic equipment.
-
 namespace BioLCCC
 {
 
+//! This exception is raised when something goes wrong with a ChromoConditions.
 class ChromoConditionsException : public BioLCCCException
 {
 public:
+    //! Constructs a ChromoConditionsException instance with a given message.
     ChromoConditionsException(std::string message);
 };
 
+//! A ChromoConditions instance describes conditions of chromatography.
+/*!
+    An instance of ChromoConditions manages all the parameters of
+    chromatographic equipment. It contains:
+        - The geometry of the column.
+        - The properties of the adsorbent: average size of the pores, porosity
+          (i.e. percentage of volume not filled with the solid phase) and 
+          (volume of pores)/(total volume of column) ratio.
+        - Elution parameters: the shape of a gradient, the composition of
+          components, flow rate, delay time.
+        - Temperature of a column (EXPERIMENTAL).
+        - The aging parameter.
+        - The step of integration.
+
+ */
 class ChromoConditions
 {
 public:
 
+    //! Constructs a custom ChromoConditions object.
     /*!
-        Constructs a custom ChromoConditions object with the standard
-        Dionex gradient conditions.
-    */
+        Default values are the same as for standardChromoConditions. 
+     */
     ChromoConditions(double iColumnLength = 150.0,
                      double iColumnDiameter = 0.075,
                      double iColumnPoreSize = 100.0,
@@ -41,150 +56,134 @@ public:
                      double iColumnPorosity = 0.9,
                      double iTemperature = 293.0);
 
+    //! Returns the length of the column in mm.
     /*!
-        Returns the length of the column in mm.
-    */
+        Note, that it is the length of the area filled with an adsorbent.
+     */
     double columnLength() const;
 
+    //!  Sets the length of the column in mm.
     /*!
-        Sets the length of the column in mm.
-    */
+        Note, that it is the length of the area filled with an adsorbent.
+     */
     void setColumnLength(double newColumnLength);
 
-    /*!
-        Returns the internal diameter of the column in mm.
-    */
+    //! Returns the internal diameter of the column in mm.
     double columnDiameter() const;
 
-    /*!
-        Sets the internal diameter of the column in mm.
-    */
+    //! Sets the internal diameter of the column in mm.
     void setColumnDiameter(double newColumnDiameter);
 
-    /*!
-        Returns the size of the pores in angstroms.
-    */
+    //! Returns the size of the pores in angstroms.
     double columnPoreSize() const;
 
-    /*!
-        Sets the size of the pores in angstroms.
-    */
+    //! Sets the size of the pores in angstroms.
     void setColumnPoreSize(double newColumnPoreSize);
 
-    /*!
-        Returns the volume of pores divided by the total column volume
-        (Pi * r^2 * l).
-    */
+    //! Returns the ratio of the volume of pores to the total column volume.
     double columnVpToVtot() const;
 
-    /*!
-        Sets the volume of the pores divided by the total column volume
-        (Pi * r^2 * l).
-    */
+    //! Sets the ratio of the volume of pores to the total column volume.
     void setColumnVpToVtot(double newColumnVpToVtot);
 
+    //! Returns the porosity of a column.
     /*!
-        Returns ( volume of pores + volume of liquid phase ) /
-        total column volume ( PI * r^2 * l)
-    */
+        Porosity of a column describes which part of the column in not filled
+        with a solid phase. This part is made up by pores and interstitial
+        volume.
+     */
     double columnPorosity() const;
 
+    //! Sets the porosity of a column.
     /*!
-        Sets ( volume of pores + volume of liquid phase ) /
-        total column volume ( PI * r^2 * l)
-    */
+        Porosity of a column describes which part of the column in not filled
+        with a solid phase. This part is made up by pores and interstitial
+        volume.
+     */
     void setColumnPorosity(double newColumnPorosity);
 
-    /*!
-        Returns the temperature in degrees of Kelvin.
-    */
+    //! Returns the temperature of the column in kelvin degrees.
     double temperature() const;
 
-    /*!
-        Sets the temperature in degrees of Kelvin.
-    */
+    //! Sets the temperature of the column in kelvin degrees.
     void setTemperature(double newTemperature);
 
+    //! Returns the calibration parameter.
     /*!
-        Returns the calibration parameter.
-    */
+        The calibration parameter is used to describe aging of a column. 
+        Please, check the BioLCCC theory for the further details of
+        implementation.
+     */
     double calibrationParameter() const;
 
+    //! Sets the calibration parameter.
     /*!
-        Sets the calibration parameter.
-    */
+        The calibration parameter is used to describe aging of a column. 
+        Please, check the BioLCCC theory for the further details of
+        implementation.
+     */
     void setCalibrationParameter(double newCalibrationParameter);
 
-    /*!
-        Returns the flow rate in ml/min.
-    */
+    //! Returns the flow rate in ml/min.
     double flowRate() const;
 
-    /*!
-        Sets the flow rate in ml/min.
-    */
+    //! Sets the flow rate in ml/min.
     void setFlowRate(double newFlowRate);
 
+    //! Returns the step of integration over volume in ml.
     /*!
-        Returns the volume of the pump mixer, ml.
-    */
+        The main equation of chromatography includes the integration over
+        retention volume. This parameter describes the step of this
+        intergration.
+        The physical interpretation could be a volume of the pump mixer.
+        
+        Note, that if the dV is set to zero, than it is assumed to be equal to
+        flowRate*1 min/20.
+     */
     double dV() const;
 
+    //! Sets the step of integration over volume in ml.
     /*!
-        Sets the volume of the pump mixer, ml.
-    */
+        The main equation of chromatography includes the integration over
+        retention volume. This parameter describes the step of this
+        intergration.
+        The physical interpretation could be a volume of the pump mixer.
+        
+        Note, that if the dV is set to zero, than it is assumed to be equal to
+        flowRate*1 min/20.
+     */
     void setDV(double newDV);
 
+    //! Returns the delay time.
     /*!
-        Returns the delay time;
-    */
+        Delay time is simply added to a calculated retention time.
+     */
     double delayTime() const;
 
+    //! Sets the delay time.
     /*!
-        Sets the delay time;
-    */
+        Delay time is simply added to a calculated retention time.
+     */
     void setDelayTime(double newDelayTime);
 
-    /*!
-        Returns the name of the second solvent.
-    */
-    std::string secondSolvent() const;
-
-    /*!
-        Sets the name of the second solvent.
-    */
-    //std::string setSecondSolvent(std::string);
-
-    /*!
-        Returns the concentration of the second solvent in the component A.
-    */
+    //! Returns the concentration of the second solvent in component A.
     double secondSolventConcentrationA() const;
 
-    /*!
-        Sets the concentration of the second solvent in the component A.
-    */
+    //!  Sets the concentration of the second solvent in component A.
     void setSecondSolventConcentrationA(
         double newSecondSolventConcentrationA);
 
-    /*!
-        Returns the concentration of the second solvent in the component B.
-    */
+    //! Returns the concentration of the second solvent in component B.
     double secondSolventConcentrationB() const;
 
-    /*!
-        Sets the concentration of the second solvent in the component B.
-    */
+    //! Sets the concentration of the second solvent in component B.
     void setSecondSolventConcentrationB(
         double newSecondSolventConcentrationB);
 
-    /*!
-        Returns the elution gradient.
-    */
+    //! Returns the elution gradient.
     Gradient gradient() const;
 
-    /*!
-        Sets the elution gradient.
-    */
+    //! Sets the elution gradient.
     void setGradient(Gradient newGradient);
 
 private:
@@ -199,7 +198,6 @@ private:
     double mDV;
     double mDelayTime;
     Gradient mGradient;
-    std::string mSecondSolvent;
     double mSecondSolventConcentrationA;
     double mSecondSolventConcentrationB;
 };

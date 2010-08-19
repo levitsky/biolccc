@@ -20,7 +20,7 @@ class ChemicalGroup
 {
 
 public:
-    //! Constructs a chemical group with given parameters.
+    //! Constructs a chemical group with the given parameters.
     /*!
         \param name The full name of the chemical group.
         \param label The label of the chemical group used in sequence notation.
