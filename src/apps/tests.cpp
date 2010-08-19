@@ -41,7 +41,18 @@ TEST_F(BioLCCCTest, parsesStandardAminoacids)
     std::string peptideSource("QWERTYIPASDFGHKLCVNM");
 
     BioLCCC::parseSequence(peptideSource,
-                           BioLCCC::standardChemicalBasis, 
+                           BioLCCC::rpAcnTfaCoilBoltzmann, 
+                           &parsedPeptideStructure,
+                           &NTerminus, &CTerminus, &peptideEnergyProfile);
+
+    for (unsigned int i=0; i<peptideSource.size(); i++)
+    {
+        ASSERT_EQ(parsedPeptideStructure[i].label(),
+                  peptideSource.substr(i, 1));
+    }
+
+    BioLCCC::parseSequence(peptideSource,
+                           BioLCCC::rpAcnFaRodBoltzmann, 
                            &parsedPeptideStructure,
                            &NTerminus, &CTerminus, &peptideEnergyProfile);
 
@@ -61,7 +72,18 @@ TEST_F(BioLCCCTest, parsesPhosphoAminoacids)
     std::string peptideSource("pSpTpY");
 
     BioLCCC::parseSequence(peptideSource,
-                           BioLCCC::standardChemicalBasis, 
+                           BioLCCC::rpAcnTfaCoilBoltzmann, 
+                           &parsedPeptideStructure,
+                           &NTerminus, &CTerminus, &peptideEnergyProfile);
+
+    for (unsigned int i=0; i<peptideSource.size()/2; i++)
+    {
+        ASSERT_EQ(parsedPeptideStructure[i].label(),
+                  peptideSource.substr(i*2, 2));
+    }
+
+    BioLCCC::parseSequence(peptideSource,
+                           BioLCCC::rpAcnFaRodBoltzmann, 
                            &parsedPeptideStructure,
                            &NTerminus, &CTerminus, &peptideEnergyProfile);
 
@@ -80,21 +102,42 @@ TEST_F(BioLCCCTest, parsesStandardTerminalGroups)
     std::vector<double> peptideEnergyProfile;
 
     BioLCCC::parseSequence("GGGG",
-                           BioLCCC::standardChemicalBasis, 
+                           BioLCCC::rpAcnTfaCoilBoltzmann, 
                            &parsedPeptideStructure,
                            &NTerminus, &CTerminus, &peptideEnergyProfile);
     ASSERT_EQ(NTerminus.label(), "H-");
     ASSERT_EQ(CTerminus.label(), "-COOH");
 
     BioLCCC::parseSequence("H-GGGG-COOH",
-                           BioLCCC::standardChemicalBasis, 
+                           BioLCCC::rpAcnTfaCoilBoltzmann, 
                            &parsedPeptideStructure,
                            &NTerminus, &CTerminus, &peptideEnergyProfile);
     ASSERT_EQ(NTerminus.label(), "H-");
     ASSERT_EQ(CTerminus.label(), "-COOH");
 
     BioLCCC::parseSequence("Ac-GGGG-NH2",
-                           BioLCCC::standardChemicalBasis,
+                           BioLCCC::rpAcnTfaCoilBoltzmann,
+                           &parsedPeptideStructure,
+                           &NTerminus, &CTerminus, &peptideEnergyProfile);
+    ASSERT_EQ(NTerminus.label(), "Ac-");
+    ASSERT_EQ(CTerminus.label(), "-NH2");
+
+    BioLCCC::parseSequence("GGGG",
+                           BioLCCC::rpAcnFaRodBoltzmann, 
+                           &parsedPeptideStructure,
+                           &NTerminus, &CTerminus, &peptideEnergyProfile);
+    ASSERT_EQ(NTerminus.label(), "H-");
+    ASSERT_EQ(CTerminus.label(), "-COOH");
+
+    BioLCCC::parseSequence("H-GGGG-COOH",
+                           BioLCCC::rpAcnFaRodBoltzmann, 
+                           &parsedPeptideStructure,
+                           &NTerminus, &CTerminus, &peptideEnergyProfile);
+    ASSERT_EQ(NTerminus.label(), "H-");
+    ASSERT_EQ(CTerminus.label(), "-COOH");
+
+    BioLCCC::parseSequence("Ac-GGGG-NH2",
+                           BioLCCC::rpAcnFaRodBoltzmann,
                            &parsedPeptideStructure,
                            &NTerminus, &CTerminus, &peptideEnergyProfile);
     ASSERT_EQ(NTerminus.label(), "Ac-");
@@ -104,26 +147,50 @@ TEST_F(BioLCCCTest, parsesStandardTerminalGroups)
 TEST_F(BioLCCCTest, calculatesMonoisotopicMass)
 {
     ASSERT_LE(
-        (BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM")-2394.1248),
+        (BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM",
+            BioLCCC::rpAcnTfaCoilBoltzmann) - 2394.1248),
         0.0001);
     ASSERT_LE(
-        (BioLCCC::calculateMonoisotopicMass("Ac-QWERTYIPASDFGHKLCVNM")-
-         2436.1354), 0.0001);
+        (BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM",
+            BioLCCC::rpAcnFaRodBoltzmann) - 2394.1248),
+        0.0001);
     ASSERT_LE(
-        (BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM-NH2")-
-         2393.1408), 0.0001);
+        (BioLCCC::calculateMonoisotopicMass("Ac-QWERTYIPASDFGHKLCVNM",
+            BioLCCC::rpAcnTfaCoilBoltzmann) - 2436.1354), 0.0001);
+    ASSERT_LE(
+        (BioLCCC::calculateMonoisotopicMass("Ac-QWERTYIPASDFGHKLCVNM",
+            BioLCCC::rpAcnFaRodBoltzmann) - 2436.1354), 0.0001);
+    ASSERT_LE(
+        (BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM-NH2",
+            BioLCCC::rpAcnTfaCoilBoltzmann) - 2393.1408), 0.0001);
+    ASSERT_LE(
+        (BioLCCC::calculateMonoisotopicMass("QWERTYIPASDFGHKLCVNM-NH2",
+            BioLCCC::rpAcnFaRodBoltzmann) - 2393.1408), 0.0001);
 }
 
 TEST_F(BioLCCCTest, calculatesKd)
 {
-    ASSERT_GT(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 0.0), 0.0);
-    ASSERT_GT(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 50.0), 0.0);
-    ASSERT_GT(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 100.0), 0.0);
+    ASSERT_GT(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 0.0,
+        BioLCCC::rpAcnTfaCoilBoltzmann), 0.0);
+    ASSERT_GT(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 50.0,
+        BioLCCC::rpAcnTfaCoilBoltzmann), 0.0);
+    ASSERT_GT(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 100.0,
+        BioLCCC::rpAcnTfaCoilBoltzmann), 0.0);
+
+    ASSERT_GT(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 0.0,
+        BioLCCC::rpAcnFaRodBoltzmann), 0.0);
+    ASSERT_GT(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 50.0,
+        BioLCCC::rpAcnFaRodBoltzmann), 0.0);
+    ASSERT_GT(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 100.0,
+        BioLCCC::rpAcnFaRodBoltzmann), 0.0);
 }
 
 TEST_F(BioLCCCTest, calculatesRT)
 {
-    ASSERT_GT(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM"), 0.0);
+    ASSERT_GT(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM",
+        BioLCCC::rpAcnTfaCoilBoltzmann), 0.0);
+    ASSERT_GT(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM",
+        BioLCCC::rpAcnFaRodBoltzmann), 0.0);
 }
 
 int main(int argc, char **argv)
