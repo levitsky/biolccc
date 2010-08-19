@@ -58,13 +58,13 @@ public:
 
     //! Returns the length of the column in mm.
     /*!
-        Note, that it is the length of the area filled with an adsorbent.
+        Note that it is the length of the area filled with an adsorbent.
      */
     double columnLength() const;
 
     //!  Sets the length of the column in mm.
     /*!
-        Note, that it is the length of the area filled with an adsorbent.
+        Note that it is the length of the area filled with an adsorbent.
      */
     void setColumnLength(double newColumnLength);
 
@@ -137,7 +137,7 @@ public:
         intergration.
         The physical interpretation could be a volume of the pump mixer.
         
-        Note, that if the dV is set to zero, than it is assumed to be equal to
+        Note that if the dV is set to zero, than it is assumed to be equal to
         flowRate*1 min/20.
      */
     double dV() const;
@@ -149,7 +149,7 @@ public:
         intergration.
         The physical interpretation could be a volume of the pump mixer.
         
-        Note, that if the dV is set to zero, than it is assumed to be equal to
+        Note that if the dV is set to zero, than it is assumed to be equal to
         flowRate*1 min/20.
      */
     void setDV(double newDV);

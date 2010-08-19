@@ -6,6 +6,7 @@
 #include "chemicalbasis.h"
 #include "chromoconditions.h"
 
+//! Apart from classes, BioLCCC contains calculation methods and constants.
 namespace BioLCCC
 {
 
@@ -17,9 +18,8 @@ public:
     ParsingException(std::string message);
 };
 
-
-static const ChromoConditions standardChromoConditions = ChromoConditions();
-static const ChemicalBasis standardChemicalBasis = ChemicalBasis();
+const ChromoConditions standardChromoConditions = ChromoConditions();
+const ChemicalBasis standardChemicalBasis = ChemicalBasis();
 
 //! Parses the given peptide sequence.
 /*!
