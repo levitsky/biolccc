@@ -18,8 +18,8 @@ namespace
 {
 
 std::vector<double> calculateRT(std::vector<std::string> mixture,
-                                ChromoConditions chromatograph,
-                                ChemicalBasis chemicalBasis)
+                                ChemicalBasis chemicalBasis,
+                                ChromoConditions chromatograph)
 {
     std::vector<double> times;
     for (unsigned int i = 0; i < mixture.size(); i++)
@@ -930,8 +930,8 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
 }
 
 double calculateRT(const std::vector<double> &peptideEnergyProfile,
-                   const ChromoConditions &conditions,
                    const ChemicalBasis &chemBasis,
+                   const ChromoConditions &conditions,
                    const bool continueGradient
                   )
 {
@@ -1250,8 +1250,8 @@ void parseSequence(
 }
 
 double calculateRT(const std::string &sequence,
-                   const ChromoConditions &conditions,
                    const ChemicalBasis &chemBasis,
+                   const ChromoConditions &conditions,
                    const bool continueGradient
                   )
 {
@@ -1267,8 +1267,8 @@ double calculateRT(const std::string &sequence,
                   &CTerminus,
                   &peptideEnergyProfile);
     return calculateRT(peptideEnergyProfile,
-                       conditions,
                        chemBasis,
+                       conditions,
                        continueGradient);
 }
 
