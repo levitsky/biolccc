@@ -24,7 +24,7 @@ public:
     concentration in a moment of time between any two points is linearly 
     interpolated.
 
-    Note, that gradient must start with point at 0.0 min and contain only
+    Note that gradient must start with point at 0.0 min and contain only
     successive points.
 
     Gradient is a public "heir" of std::vector, so see the corresponding

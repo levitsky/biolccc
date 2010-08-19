@@ -34,6 +34,25 @@ enum ModelType
         the adsorption is described by the linear Snyder's theory. */
 };
 
+//! This enum describes the predefined sets of physicochemical constants.
+/*!
+    The BioLCCC library contains several predifined sets of physicochemical
+    constants. Please note that usually changing only one parameter in a whole
+    set of constants deteriorate the quality of prediction.
+ */
+enum PredefinedChemicalBasis
+{
+    RP_ACN_TFA_COIL_BOLTZMANN, /*!< A ChemicalBasis, calibrated for reversed
+    phase, ACN as a second solvent, 0.1% TFA and COIL_BOLTZMANN type of
+    BioLCCC model. The data was obtained in Guo et.al., Journal of
+    Chromatography, 359 (1986) 449-517. */
+    RP_ACN_FA_ROD_BOLTZMANN /*!< A ChemicalBasis, calibrated for reversed phase,
+    ACN as a second solvent, 0.1% FA and ROD_BOLTZMANN type of BioLCCC model.
+    The data was obtained in the joint research of Harvard University and
+    Institute for Energy Problems for Chemical Physics, Russian Academy of
+    Science. The set includes phosphorylated aminoacids. */
+}
+
 //! An instance of ChemicalBasis contains a set of BioLCCC constants.
 /*!
     An instance of ChemicalBasis manages all the physicochemical constants,
@@ -46,20 +65,15 @@ enum ModelType
         - Peptide geometry: the length of amino acid and the Kuhn length.
         - The width of the adsorbing layer.
        
-    Note, that the set of constants is highly interconnected. Usually the change
+    Note that the set of constants is highly interconnected. Usually the change
     in one constant, like the width of adsorbing layer or type of BioLCCC model,
     would only deteriorate the quality of RT prediction.
  */
 class ChemicalBasis
 {
 public:
-    //! Constructs a new ChemicalBasis instance, same as TFACoilChemicalBasis.
+    //! Constructs an empty ChemicalBasis instance.
     /*!
-        By default, an instance of ChemicalBasis is filled with the energies
-        calibrated for reversed phase chromatography, acetonitrile as a eluent, 
-        trifluoracetic acid as ion paring agent (pH 2.0) and
-        COILBOLTZMANN type of model. See the source code for the details.
-        \sa standardChemicalBasis
     */
     ChemicalBasis();
 
@@ -102,13 +116,13 @@ public:
 
     //! Returns the bind energy of the second solvent. 
     /*! 
-        Note, that the bind energy of water is zero and the unit is kT.
+        Note that the bind energy of water is zero and the unit is kT.
     */
     double secondSolventBindEnergy() const;
 
     //! Sets \a newEnergy as the bind energy of the second solvent. 
     /*!
-        Note, that the bind energy of water is zero and the unit is kT.
+        Note that the bind energy of water is zero and the unit is kT.
     */
     void setSecondSolventBindEnergy(double newEnergy);
 
@@ -179,6 +193,10 @@ public:
         This value is used only for ROD_* types of model.
     */
     void setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth);
+
+    //! Sets one of predefined chemical basis.
+    ChemicalBasis setPredefinedChemicalBasis(
+        PredefinedChemicalBasis predefinedChemicalBasisId);
 
 private:
     std::map<std::string,ChemicalGroup> mChemicalGroups;

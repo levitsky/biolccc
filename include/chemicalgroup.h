@@ -6,6 +6,7 @@
 namespace BioLCCC
 {
 
+//! A ChemicalGroup instance contains the properties of a group of atoms.
 /*!
     An instance of ChemicalGroup contains the physical properties of a group of
     atoms inside a protein molecule.
