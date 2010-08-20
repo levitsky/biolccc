@@ -18,9 +18,14 @@ public:
     ParsingException(std::string message);
 };
 
+//! A ChromoConditions instance with the standard chromatographic conditions.
 const ChromoConditions standardChromoConditions = ChromoConditions();
+
+//! A ChemicalBasis instance of predefined RP_ACN_TFA_COIL_BOLTZMANN.
 const ChemicalBasis rpAcnTfaCoilBoltzmann =
     ChemicalBasis(RP_ACN_TFA_COIL_BOLTZMANN);
+
+//! A ChemicalBasis instance of predefined RP_ACN_FA_ROD_BOLTZMANN.
 const ChemicalBasis rpAcnFaRodBoltzmann =
     ChemicalBasis(RP_ACN_FA_ROD_BOLTZMANN);
 

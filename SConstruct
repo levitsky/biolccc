@@ -17,11 +17,16 @@ Targets:
     all                      All targets.
 
     libBioLCCC_shared        Shared BioLCCC library. Compiled by default.
-    pyBioLCCC                pyBioLCCC package. Compiled by default.
+    pyBioLCCC                Preparations for pyBioLCCC package. The building
+                             process is finished by invoking setup.py.
+                             Compiled by default.
     libBioLCCC_static        Static BioLCCC library. 
     libgtest_static          Static Google Test library. 
     test                     A test suite.
-    doc                      A documentation for libBioLCCC and pyBioLCCC.
+    doc_doxygen              API documentation for libBioLCCC.
+    doc_sphinx               A general documentation for libBioLCCC and 
+                             pyBioLCCC.
+    doc                      Both types of documentation.
 """)
 
 # Get the mode flag from the command line.
@@ -144,23 +149,42 @@ env.AddPostAction(pyBioLCCC, Copy(
 env.AddPostAction(pyBioLCCC, Touch(
     os.path.join(Dir('#.').abspath, 'src', 'bindings', '__init__.py')))
 
-# Copying the documentation to the build dir.
+# Copying the remaining files for pyBioLCCC.
 Depends(pyBioLCCC, 'setup.py')
-Depends(pyBioLCCC, 'VERSION')
 Depends(pyBioLCCC, 'MANIFEST.in')
-Depends(pyBioLCCC, 'pyBioLCCC.README')
+# Copying the documentation to the build dir.
+Depends(pyBioLCCC, 'VERSION')
+Depends(pyBioLCCC, 'README')
 Alias('pyBioLCCC', pyBioLCCC)
 
 # Doxygen documentation.
 #------------------------
-doc = env.Command('doc', 'Doxyfile', 'doxygen $SOURCE')
-Depends(doc, 'Doxyfile')
+doc_doxygen = env.Command('doc_doxygen', 'Doxyfile', 
+    [Mkdir('doc'), 'doxygen $SOURCE'])
+Depends(doc_doxygen, 'Doxyfile')
 # Source code needs to be copied.
-Depends(doc, libBioLCCC_shared)
+Depends(doc_doxygen, libBioLCCC_shared)
+
+# Sphinx documentation.
+#-----------------------
+doc_sphinx = env.Command('doc_sphinx', '', 'cd ./doc/sphinx; make html; cd ../')
+Depends(doc_sphinx, Glob('doc/sphinx/*'))
+Depends(doc_sphinx, Glob('doc/sphinx/build/*'))
+Depends(doc_sphinx, Glob('doc/sphinx/source/*'))
+Depends(doc_sphinx, Glob('doc/sphinx/source/_static/*'))
+Depends(doc_sphinx, Glob('doc/sphinx/source/_templates/*'))
+Depends(doc_sphinx, 'VERSION')
+Depends(doc_sphinx, 'README')
+Depends(doc_sphinx, 'INSTALL')
+
+# Both types of documentation.
+#------------------------------
+Alias('doc', [doc_doxygen, doc_sphinx])
 
 # Final configuration of the build.
 #===================================
 env.Default([libBioLCCC_shared, pyBioLCCC])
 Alias('all', 
     [libBioLCCC_shared, libBioLCCC_shared, libgtest_static,
-     tests, pyBioLCCC, doc])
+     tests, pyBioLCCC, doc_doxygen, doc_sphinx])
+
