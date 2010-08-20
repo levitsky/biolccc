@@ -5,19 +5,21 @@ setup.py file for pyBioLCCC
 """
 
 from distutils.core import setup, Extension
+import glob
 #from setuptools import setup, Extension
 
-sources=[
-    './src/core/aminoacid.cpp',
-    './src/core/terminus.cpp',
-    './src/core/chemicalbasis.cpp',
-    './src/core/gradientpoint.cpp',
-    './src/core/gradient.cpp',
-    './src/core/chromoconditions.cpp',
-    './src/core/BioLCCC.cpp',
-    './src/bindings/pyBioLCCC_wrap.cc',
-    #'./src/bindings/pyBioLCCC.i',
-    ]
+sources = glob.glob("src/core/*.cpp") + ['./src/bindings/pyBioLCCC_wrap.cc']
+#sources=[
+#    './src/core/biolcccexception.cpp',
+#    './src/core/chemicalgroup.cpp',
+#    './src/core/chemicalbasis.cpp',
+#    './src/core/gradientpoint.cpp',
+#    './src/core/gradient.cpp',
+#    './src/core/chromoconditions.cpp',
+#    './src/core/biolccc.cpp',
+#    './src/bindings/pyBioLCCC_wrap.cc',
+#    #'./src/bindings/pyBioLCCC.i',
+#    ]
 
 pyBioLCCC_ext = Extension(
     '_pyBioLCCC',
@@ -29,7 +31,7 @@ version = open('./VERSION').readline().strip()
 setup(name = 'pyBioLCCC',
     version = version,
     description      = """Bindings for the libBioLCCC""",
-    long_description = ''.join(open('pyBioLCCC.README').readlines()),
+    long_description = ''.join(open('README').readlines()),
     author           = 'Anton Goloborodko',
     author_email     = 'goloborodko.anton@gmail.com',
     url              = 'http://theorchromo.ru',

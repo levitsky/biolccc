@@ -1,13 +1,13 @@
 * Tests!
 
-* Add the new sets of coefficients for FA and HILIC.
+* Add the new sets of coefficients for HILIC.
 
-* Add the import and export functions for ChemicalBasis and ChromoConditions.
+* ? Add the import and export functions for ChemicalBasis and ChromoConditions.
 
-* Class documentation, docstrings.
-
-* Go open source!!
+* docstrings, manual.
 
 * Do something with min_inf()!
 
 * columnRelativeStrength in Q
+
+* Go open source!!

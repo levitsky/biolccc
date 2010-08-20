@@ -23,15 +23,18 @@ public:
  */
 enum ModelType
 {
-    COIL_BOLTZMANN, /*!< The standard BioLCCC model with the assumption 
-        of an absolute flexibility of a protein molecule. */
-    ROD_BOLTZMANN, /*!< The BioLCCC model with the assumption of absolute 
-        rigidity of a peptide molecule. It works better for short molecules. */
-    COIL_BOLTZMANN_DOUBLE_LAYER, /*!< EXPERIMENTAL. Modification of the 
-        standard model in which the adsorption occurs in a volume, 
-        i.e. in two near-wall layers. */
-    COIL_SNYDER /*! EXPERIMENTAL. Modification of the standard model in which
-        the adsorption is described by the linear Snyder's theory. */
+    /*! The standard BioLCCC model with the assumption of absolute 
+        flexibility of a protein molecule. */
+    COIL_BOLTZMANN,
+    /*! The BioLCCC model with the assumption of absolute rigidity of 
+        a protein molecule. It works better for short molecules. */
+    ROD_BOLTZMANN,
+    /*! EXPERIMENTAL. Modification of the standard model in which adsorption 
+        occurs in a volume, i.e. in two near-wall layers. */
+    COIL_BOLTZMANN_DOUBLE_LAYER, 
+    /*! EXPERIMENTAL. Modification of the standard model in which adsorption 
+        is described by the linear Snyder's theory. */
+    COIL_SNYDER 
 };
 
 //! This enum describes the predefined sets of physicochemical constants.
@@ -42,15 +45,17 @@ enum ModelType
  */
 enum PredefinedChemicalBasis
 {
-    RP_ACN_TFA_COIL_BOLTZMANN, /*!< A ChemicalBasis calibrated for reversed
-    phase, ACN as a second solvent, 0.1% TFA and COIL_BOLTZMANN type of
-    BioLCCC model. The data was obtained in Guo et.al., Journal of
-    Chromatography, 359 (1986) 449-517. */
-    RP_ACN_FA_ROD_BOLTZMANN /*!< A ChemicalBasis calibrated for reversed phase,
-    ACN as a second solvent, 0.1% FA and ROD_BOLTZMANN type of BioLCCC model.
-    The data was obtained in the joint research of Harvard University and
-    Institute for Energy Problems for Chemical Physics, Russian Academy of
-    Science. The set includes phosphorylated aminoacids. */
+    //! Reversed phase, ACN, trifluoracetic acid, COIL_BOLTZMANN model.
+    /*! A ChemicalBasis calibrated for reversed phase, ACN as a second solvent,
+        0.1% TFA and COIL_BOLTZMANN type of BioLCCC model. The data was 
+        obtained in Guo et al, Journal of Chromatography, 359 (1986) 449-517. */
+    RP_ACN_TFA_COIL_BOLTZMANN, 
+    //! Reversed phase, ACN, formic acid, ROD_BOLTZMANN model.
+    /*! A ChemicalBasis calibrated for reversed phase, ACN as a second solvent,
+        0.1% FA and ROD_BOLTZMANN type of BioLCCC model. The data was obtained
+        in the joint research of Harvard University and Institute for Energy 
+        Problems for Chemical Physics, Russian Academy of Science. */
+    RP_ACN_FA_ROD_BOLTZMANN 
 };
 
 //! An instance of ChemicalBasis contains a set of BioLCCC constants.
