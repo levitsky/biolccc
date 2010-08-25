@@ -1,8 +1,31 @@
-Building libBioLCCC/pyBioLCCC on Linux.
-*****************************************
+Installing pyBioLCCC from PyPi
+******************************
+
+GNU/Linux
+=========
+
+The preferred way to obtain pyBioLCCC is via pip Python package manager.
+Install pip and execute in the command line:
+
+.. code-block:: bash
+
+    sudo pip install pyBioLCCC
+
+Windows
+=======
+
+The previous recipe works on Windows. But there is another option -- 
+a precompiled .exe package is available for download from the pyBioLCCC page on
+PyPi: http://pypi.python.org/pypi/pyBioLCCC/
+
+Building libBioLCCC/pyBioLCCC from sources
+******************************************
+
+GNU/Linux
+=========
 
 libBioLCCC
-===========
+----------
 
 In order to compile libBioLCCC you need the following tools to be installed:
 
@@ -27,7 +50,7 @@ directory (!) and execute in it:
 The build scripts will do all the remaining work.
 
 pyBioLCCC
-==========
+---------
 
 In order to compile and install the Python package:
 
@@ -49,14 +72,13 @@ In order to compile and install the Python package:
 
       python setup.py install
 
+Windows
+=======
 
-Building libBioLCCC/pyBioLCCC on Windows.
-******************************************
-
-As we mentioned, the main platform of libBioLCCC/pyBioLCCC development is Linux.
-However, we clearly understand the importance of Windows and try to write 
+The main platform of libBioLCCC/pyBioLCCC development is Linux.
+However, we clearly understand importance of Windows and try to write 
 only platform-independent code and to use only cross-platform tools.
-Theoretically it means that it will make no difficulty to compile libBioLCCC
+In theory that means that it will make no difficulty to compile libBioLCCC
 under Windows.
 
 So far only the pyBioLCCC package was compiled for Windows using Wine+MinGW32.

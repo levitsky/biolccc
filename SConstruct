@@ -70,6 +70,7 @@ if platform.name in ['win32', 'windows']:
 env = Environment(
     PLATFORM=platform.name,
     CPPPATH=[Dir('include').abspath, distutils.sysconfig.get_python_inc()],
+    #CPPPATH=[Dir('include').abspath, "/usr/include/python3.1"],
     CCFLAGS=ccflags,
     tools=[tools],
     BUILDTYPE=buildtype,

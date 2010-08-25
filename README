@@ -1,7 +1,7 @@
 What is BioLCCC?
------------------
+----------------
 
-BioLCCC (Liquid Chromatography of Biomolecules at Critical Conditions) is a
+BioLCCC (Liquid Chromatography of Biomacromolecules at Critical Conditions) is a
 model which describes the adsorption of protein molecules on porous media. Its
 main application is retention time prediction in liquid chromatography, however
 the list of potential applications can be easily extended. Contrary to the other
@@ -51,9 +51,30 @@ Alexander R. Ivanov and Mikhail V. Gorshkov, Accepted to Proteomics.
 `Link <http://dx.doi.org/10.1002/pmic.200900837>`_.
 
 What is libBioLCCC?
----------------------
+-------------------
 
-libBioLCCC is a free implementation
+libBioLCCC is an open source library, which implements the BioLCCC model in 
+C++ programming language. It performs basic BioLCCC-related tasks, such as:
+
+* predicts the retention time of peptides and proteins in given 
+  chromatographic conditions;
+* predicts the adsorption properties of protein molecules, namely coefficient of
+  distribution between mobile and solid phase;
+* manages elution conditions and physicochemical constants;
+* calculates masses of peptides and proteins.
+
+libBioLCCC has a simple and well-documented API.
 
 What is pyBioLCCC?
--------------------
+------------------
+
+pyBioLCCC is a set of Python wrappings around libBioLCCC. It allows to invoke
+libBioLCCC functions from Python programming language.
+
+The main purpose of pyBioLCCC project is to make libBioLCCC available in a
+programming language not so demanding as C++. The choice of Python is dictated
+by several points. Among them are simplicity, the great variety of libraries and
+the extreme speed of development which could be very well appreciated in the
+modern scientific world.
+
+
