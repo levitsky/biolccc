@@ -16,6 +16,9 @@
 %include "std_string.i"
 %include "std_map.i"
 %include "std_vector.i"
+%include "pyabc.i"
+
+%pythonabc(ChemicalGroup, collections.MutableMapping);
 %template(GradientPointVector) std::vector<BioLCCC::GradientPoint>;
 %template(StringChemicalGroupMap) std::map<std::string,BioLCCC::ChemicalGroup>;
 

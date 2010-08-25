@@ -25,12 +25,12 @@ public:
     chromatographic equipment. It contains:
         - The geometry of the column.
         - The properties of the adsorbent: average size of the pores, porosity
-          (i.e. percentage of volume not filled with the solid phase) and 
-          (volume of pores)/(total volume of column) ratio.
-        - Elution parameters: the shape of a gradient, the composition of
+          (i.e. percentage of volume not filled with the solid phase),
+          (volume of pores)/(total volume of column) ratio, relative strength of
+          adsorption.
+        - Elution parameters: the shape of the gradient, the composition of
           components, flow rate, delay time.
         - Temperature of a column (EXPERIMENTAL).
-        - The aging parameter.
         - The step of integration.
 
  */
