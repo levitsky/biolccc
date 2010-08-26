@@ -88,8 +88,20 @@ public:
     //! Shows whether the group is an amino acid.
     bool isAminoAcid() const;
 
+    //! Sets the full name of the chemical group.
+    void setName(std::string newName);
+
+    //! Sets the brief code of the group used in peptide sequence notation.
+    void setLabel(std::string newLabel);
+
     //! Sets the binding energy value.
     void setBindEnergy(double newBindEnergy);
+
+    //! Sets the average mass of the chemical group.
+    void setAverageMass(double newAverageMass);
+
+    //! Sets the monoisotopic mass of the chemical group.
+    void setMonoisotopicMass(double newMonoisotopicMass);
 
 private:
     std::string mName;
