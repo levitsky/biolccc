@@ -42,6 +42,32 @@ double ChemicalGroup::monoisotopicMass() const
     return mMonoisotopicMass;
 }
 
+void ChemicalGroup::setBindEnergy(double newBindEnergy)
+{
+    mBindEnergy = newBindEnergy;
+}
+
+
+void ChemicalGroup::setName(std::string newName)
+{
+    mName = newName;
+}
+
+void ChemicalGroup::setLabel(std::string newLabel)
+{
+    mLabel = newLabel;
+}
+
+void ChemicalGroup::setAverageMass(double newAverageMass)
+{
+    mAverageMass = newAverageMass;
+}
+
+void ChemicalGroup::setMonoisotopicMass(double newMonoisotopicMass)
+{
+    mMonoisotopicMass = newMonoisotopicMass;
+}
+
 bool ChemicalGroup::isNTerminal() const
 {
     return (mLabel.find("-") == (size_t)(mLabel.size()-1));
@@ -56,10 +82,4 @@ bool ChemicalGroup::isAminoAcid() const
 {
     return (!(isCTerminal() || isNTerminal()));
 }
-
-void ChemicalGroup::setBindEnergy(double newBindEnergy)
-{
-    mBindEnergy = newBindEnergy;
 }
-}
-

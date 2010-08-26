@@ -9,25 +9,9 @@ GradientPoint::GradientPoint(double time,
                              double concentrationB
                             )
 {
-    if (time < 0.0)
-    {
-        throw GradientPointException("Time is negative.");
-    }
 
-    if (concentrationB < 0.0)
-    {
-        throw GradientPointException(
-            "The concentration of B component is negative.");
-    }
-
-    if (concentrationB > 100.0)
-    {
-        throw GradientPointException(
-            "The concentration of B component is greater than 100%.");
-    }
-
-    mTime = time;
-    mConcentrationB = concentrationB;
+    setTime(time);
+    setConcentrationB(concentrationB);
 }
 
 double GradientPoint::time() const
@@ -40,5 +24,31 @@ double GradientPoint::concentrationB() const
     return mConcentrationB;
 }
 
+void GradientPoint::setTime(double newTime) 
+{
+    if (newTime < 0.0)
+    {
+        throw GradientPointException("Time is negative.");
+    }
+
+    mTime = newTime;
+}
+
+void GradientPoint::setConcentrationB(double newConcentrationB) 
+{
+    if (newConcentrationB < 0.0)
+    {
+        throw GradientPointException(
+            "The concentration of B component is negative.");
+    }
+
+    if (newConcentrationB > 100.0)
+    {
+        throw GradientPointException(
+            "The concentration of B component is greater than 100%.");
+    }
+
+    mConcentrationB = newConcentrationB;
+}
 }
 

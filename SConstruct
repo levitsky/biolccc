@@ -22,7 +22,8 @@ Targets:
                              Compiled by default.
     libBioLCCC_static        Static BioLCCC library. 
     libgtest_static          Static Google Test library. 
-    test                     A test suite.
+    test                     A test suite for libBioLCCC.
+    test_pyBioLCCC           A test suite for pyBioLCCC.
     doc_doxygen              API documentation for libBioLCCC.
     doc_sphinx               A general documentation for libBioLCCC and 
                              pyBioLCCC.
@@ -74,7 +75,8 @@ env = Environment(
     CCFLAGS=ccflags,
     tools=[tools],
     BUILDTYPE=buildtype,
-    LIBPATH=os.path.join('#lib', 'static', platform.name, buildtype),
+    LIBPATH=[os.path.join('#lib', 'static', platform.name, buildtype),
+             os.path.join('#lib', 'shared', platform.name, buildtype)],
     ROOTBUILDDIR=Dir('.').abspath,
     )
 
@@ -129,7 +131,7 @@ Requires(tests, libgtest_static)
 Alias('tests', tests)
 
 # pyBioLCCC package.
-#---------------------
+#-------------------
 pyBioLCCC = SConscript(
     os.path.join('src', 'bindings', 'SConscript'),
     exports = {'env':env},
@@ -139,6 +141,13 @@ pyBioLCCC = SConscript(
     )
 
 # Copying source files required for the python source package.
+env.AddPostAction(pyBioLCCC, Copy(
+    os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
+        'post_swig.py'),
+    os.path.join(Dir('#.').abspath, 'src', 'bindings', 'post_swig.py')))
+env.AddPostAction(pyBioLCCC, 'python ' +
+    os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
+        'post_swig.py'))
 env.AddPostAction(pyBioLCCC, Copy(
     os.path.join(Dir('#.').abspath, 'src', 'bindings', 'pyBioLCCC.py'),
     os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
@@ -151,6 +160,7 @@ env.AddPostAction(pyBioLCCC, Touch(
     os.path.join(Dir('#.').abspath, 'src', 'bindings', '__init__.py')))
 
 # Copying the remaining files for pyBioLCCC.
+Depends(pyBioLCCC, 'src/bindings/post_swig.py')
 Depends(pyBioLCCC, 'setup.py')
 Depends(pyBioLCCC, 'MANIFEST.in')
 # Copying the documentation to the build dir.
@@ -158,8 +168,17 @@ Depends(pyBioLCCC, 'VERSION')
 Depends(pyBioLCCC, 'README')
 Alias('pyBioLCCC', pyBioLCCC)
 
+# A test suite for pyBioLCCC.
+#----------------------------
+test_pyBioLCCC = env.Install(
+    os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings'),
+    os.path.join(Dir('#.').abspath, 'src', 'bindings', 'test_pyBioLCCC.py'))
+Depends(test_pyBioLCCC, 
+    os.path.join(Dir('#.').abspath, 'src', 'bindings', 'test_pyBioLCCC.py'))
+Alias('test_pyBioLCCC', test_pyBioLCCC)
+
 # Doxygen documentation.
-#------------------------
+#-----------------------
 doc_doxygen = env.Command('doc_doxygen', 'Doxyfile', 
     [Mkdir('doc'), 'doxygen $SOURCE'])
 Depends(doc_doxygen, 'Doxyfile')

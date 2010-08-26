@@ -10,7 +10,9 @@ namespace BioLCCC
 {
 
 ParsingException::ParsingException(std::string message):
-        BioLCCCException(message) {};
+        BioLCCCException(message) 
+{
+};
 
 // Auxiliary functions that shouldn't be exposed to user at this
 // point.

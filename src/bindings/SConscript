@@ -9,6 +9,6 @@ local_env['SHLIBPREFIX'] = ''
 
 pyBioLCCC_so = local_env.SharedLibrary(
     target = '_pyBioLCCC',
-    source = ['pyBioLCCC.i'] + Glob('../core/*.cpp'))
+    source = ['pyBioLCCC.i'] + Glob('../core/shared/*.os'))
 
 Return('pyBioLCCC_so')

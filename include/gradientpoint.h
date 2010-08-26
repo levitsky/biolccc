@@ -42,6 +42,12 @@ public:
     //! Returns the concentration of component B at the point in percents.
     double concentrationB() const;
 
+    //! Sets the time of the point in minutes.
+    void setTime(double newTime);
+
+    //! Sets the concentration of component B at the point in percents.
+    void setConcentrationB(double newConcentrationB);
+
 private:
     double mTime;
     double mConcentrationB;

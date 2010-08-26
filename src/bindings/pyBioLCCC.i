@@ -17,151 +17,318 @@
 %include "std_map.i"
 %include "std_vector.i"
 %include "pyabc.i"
+%include "exception.i"
+
+%exception {
+    try {
+        $action
+    }
+    catch (BioLCCC::BioLCCCException & e) {
+        PyErr_SetString(PyExc_RuntimeError, e.what()); 
+        return NULL;
+    }
+}
 
 %pythonabc(ChemicalGroup, collections.MutableMapping);
+%pythonabc(ChemicalBasis, collections.MutableMapping);
+%pythonabc(ChromoConditions, collections.MutableMapping);
+%pythonabc(GradientPoint, collections.MutableMapping);
 %template(GradientPointVector) std::vector<BioLCCC::GradientPoint>;
 %template(StringChemicalGroupMap) std::map<std::string,BioLCCC::ChemicalGroup>;
 
+%extend std::map<std::string,BioLCCC::ChemicalGroup>{
+    %insert("python") %{
+        def __str__(self):
+            return str(dict(self))
+
+        def __repr__(self):
+            return str(dict(self))
+
+        def __eq__(self, other):
+            return dict(self) == dict(other)
+    %}
+}
+
+%extend BioLCCC::Gradient {
+    %insert("python") %{
+        def __str__(self):
+            return str(list(self))
+
+        def __repr__(self):
+            return str(list(self))
+
+        def __eq__(self, other):
+            return list(self) == list(other)
+    %}
+}
+
 %extend BioLCCC::ChemicalGroup{
     %insert("python") %{
-        def __getstate__(self):
-            output_dict = {}
-            output_dict['name'] = self.name()
-            output_dict['label'] = self.label()
-            output_dict['bindEnergy'] = self.bindEnergy()
-            output_dict['averageMass'] = self.averageMass()
-            output_dict['monoisotopicMass'] = self.monoisotopicMass()
-            return output_dict
+        def __eq__(self, other):
+            return dict(self) == dict(other)
+
+        def __str__(self):
+            return str(dict(self))
+
+        def __repr__(self):
+            return str(dict(self))
+
+        def __len__(self):
+            return len(self._keys);
+
+        def __iter__(self):
+            return iter(self._keys)
+
+        def __contains__(self, key):
+            return key in self._keys 
+
+        def __getitem__(self, key):
+            return {
+                'name' : self.name,
+                'label': self.label,
+                'bindEnergy': self.bindEnergy,
+                'averageMass': self.averageMass,
+                'monoisotopicMass': self.monoisotopicMass,
+            }[key]()
+
+        def __setitem__(self, key, value):
+            {
+                'name' : self.setName,
+                'label': self.setLabel,
+                'bindEnergy': self.setBindEnergy,
+                'averageMass': self.setAverageMass,
+                'monoisotopicMass': self.setMonoisotopicMass,
+            }[key](value)
+
+        def __delitem__(self, key):
+            pass
+
+        _keys = ['name', 'label', 'bindEnergy', 'averageMass',
+                'monoisotopicMass']
+
+        def keys(self):
+            return self._keys
     %}
 }
 
 %extend BioLCCC::ChemicalBasis {
     %insert("python") %{
+        def __eq__(self, other):
+            return dict(self) == dict(other)
+
+        def __repr__(self):
+            return str(dict(self))
+
         def __str__(self):
-            return str(self.min_inf()).replace(',', ',\n')
+            return str(dict(self))
+
+        def __len__(self):
+            return len(self._keys);
+
+        def __iter__(self):
+            return iter(self._keys)
+
+        def __contains__(self, key):
+            return key in self._keys 
+
+        def __getitem__(self, key):
+            return {
+                'chemicalGroups': self.chemicalGroups,
+                'adsorbtionLayerWidth': self.adsorbtionLayerWidth,
+                'kuhnLength': self.kuhnLength,
+                'model': self.model,
+                'secondSolventBindEnergy': self.secondSolventBindEnergy,
+                'segmentLength': self.segmentLength,
+            }[key]()
+
+        def __setitem__(self, key, value):
+            {
+                'chemicalGroups' : self.setChemicalGroups,
+                'adsorbtionLayerWidth': self.setAdsorbtionLayerWidth,
+                'kuhnLength': self.setKuhnLength,
+                'model': self.setModel,
+                'secondSolventBindEnergy': self.setSecondSolventBindEnergy,
+                'segmentLength': self.setSegmentLength,
+            }[key](value)
+
+        def __delitem__(self, key):
+            pass
+
+        _keys = ['chemicalGroups', 'adsorbtionLayerWidth', 'kuhnLength',
+            'model', 'secondSolventBindEnergy', 'segmentLength']
+
+        def keys(self):
+            return self._keys
 
         def __getstate__(self):
-            output_dict = {}
-            output_dict['model'] = self.model()
-            output_dict['segmentLength'] = self.segmentLength()
-            output_dict['kuhnLength'] = self.kuhnLength()
-            output_dict['adsorbtionLayerWidth'] = self.adsorbtionLayerWidth()
-            output_dict['secondSolventBindEnergy'] = \
-                self.secondSolventBindEnergy()
+            state_dict = {}
+            for key in self:
+                if key != 'chemicalGroups':
+                    state_dict[key] = self[key]
+            state_dict['chemicalGroups'] = {}
+            for key in self['chemicalGroups']:
+                state_dict['chemicalGroups'][key] = (
+                    dict(self['chemicalGroups'][key]))
+            return state_dict
 
-            output_dict['chemicalGroups'] = {}
-            for label, chemical_group in self.chemicalGroups().items():
-                output_dict['chemicalGroups'][label] = (
-                    chemical_group.__getstate__())
+        def __setstate__(self, state_dict):
+            for key in state_dict:
+                self[key] = state_dict[key]
 
-            return output_dict
-
-        def __setstate__(self, chembasis_dict):
-            self.setModel(chembasis_dict['model'])
-            self.setSegmentLength(chembasis_dict['segmentLength'])
-            self.setKuhnLength(chembasis_dict['kuhnLength'])
-            self.setAdsorbtionLayerWidth(chembasis_dict['adsorbtionLayerWidth'])
-            self.setSecondSolventBindEnergy(
-                chembasis_dict['secondSolventBindEnergy'])
+        def setChemicalGroups(self, chemicalGroupsDict):
             self.clearChemicalGroups()
-            for chemical_group_dict in chembasis_dict['chemicalGroups'].values():
-                chemical_group = ChemicalGroup(
-                    chemical_group_dict['name'],
-                    chemical_group_dict['label'],
-                    chemical_group_dict['bindEnergy'],
-                    chemical_group_dict['averageMass'],
-                    chemical_group_dict['monoisotopicMass'])
-                self.addChemicalGroup(chemical_group)
-
-        def min_inf(self):
-            output_dict = {}
-            output_dict['model'] = self.model()
-            output_dict['segmentLength'] = self.segmentLength()
-            output_dict['kuhnLength'] = self.kuhnLength()
-            output_dict['adsorbtionLayerWidth'] = self.adsorbtionLayerWidth()
-            output_dict['secondSolventBindEnergy'] = \
-                self.secondSolventBindEnergy()
-
-            for label, chemical_group in self.chemicalGroups().items():
-                output_dict[label] = chemical_group.bindEnergy()
-            return output_dict
-
-        def set_min_inf_element(self, key, value):
-            if key == 'model':
-                self.setModel(value)
-            elif key == 'segmentLength':
-                self.setSegmentLength(value)
-            elif key == 'kuhnLength':
-                self.setKuhnLength(value)
-            elif key == 'adsorbtionLayerWidth':
-                self.setAdsorbtionLayerWidth(value)
-            elif key == 'secondSolventBindEnergy':
-                self.setSecondSolventBindEnergy(value)
-            else:
-                if key in self.chemicalGroups():
-                    self.setChemicalGroupBindEnergy(key, value) 
+            for key, value in chemicalGroupsDict.items():
+                if type(value).__name__ == 'dict':
+                    self.addChemicalGroup(
+                        ChemicalGroup(
+                            value['name'],
+                            value['label'],
+                            value['bindEnergy'],
+                            value['averageMass'],
+                            value['monoisotopicMass']))
+                elif type(value).__name__ == 'pyBioLCCC.ChemicalBasis':
+                    self.addChemicalGroup(value)
                 else:
-                    self.addChemicalGroup(ChemicalGroup("", key, value))
-
-        def set_min_inf(self, min_inf_dict):
-            for key, value in min_inf_dict.items():
-                self.set_min_inf_element(key, value)
+                    raise Exception('pyBioLCCC', 'wrong type for ChemicalGroup')
     %}
 };
 
 %extend BioLCCC::GradientPoint{
     %insert("python") %{
+        def __eq__(self, other):
+            return dict(self) == dict(other)
+
         def __str__(self):
-            return '(%f,%f)' % (self.time(), self.concentrationB())
+            return str(dict(self))
+
+        def __repr__(self):
+            return str(dict(self))
+
+        def __len__(self):
+            return len(self._keys);
+
+        def __iter__(self):
+            return iter(self._keys)
+
+        def __contains__(self, key):
+            return key in self._keys 
+
+        def __getitem__(self, key):
+            return {
+                'time' : self.time,
+                'concentrationB': self.concentrationB,
+            }[key]()
+
+        def __setitem__(self, key, value):
+            {
+                'time' : self.setName,
+                'concentrationB': self.setConcentrationB,
+            }[key](value)
+
+        def __delitem__(self, key):
+            pass
+
+        _keys = ['time', 'concentrationB']
+
+        def keys(self):
+            return self._keys
     %}
 };
 
 %extend BioLCCC::ChromoConditions{
     %insert("python") %{
+        def __eq__(self, other):
+            return dict(self) == dict(other)
+
         def __str__(self):
-            return str(self.__getstate__())
+            return str(dict(self))
+
+        def __repr__(self):
+            return str(dict(self))
+
+        def __len__(self):
+            return len(self._keys);
+
+        def __iter__(self):
+            return iter(self._keys)
+
+        def __contains__(self, key):
+            return key in self._keys 
+
+        def __getitem__(self, key):
+            return {
+                'columnLength': self.columnLength,
+                'columnDiameter': self.columnDiameter,
+                'columnPoreSize': self.columnPoreSize,
+                'columnRelativeStrength': self.columnRelativeStrength,
+                'columnVpToVtot': self.columnVpToVtot,
+                'columnPorosity': self.columnPorosity,
+                'delayTime': self.delayTime,
+                'dV': self.dV,
+                'flowRate': self.flowRate,
+                'gradient': self.gradient,
+                'secondSolventConcentrationA':
+                    self.secondSolventConcentrationA,
+                'secondSolventConcentrationB':
+                    self.secondSolventConcentrationB,
+                'temperature': self.temperature,
+            }[key]()
+
+        def __setitem__(self, key, value):
+            return {
+                'columnLength': self.setColumnLength,
+                'columnDiameter': self.setColumnDiameter,
+                'columnPoreSize': self.setColumnPoreSize,
+                'columnRelativeStrength': self.setColumnRelativeStrength,
+                'columnVpToVtot': self.setColumnVpToVtot,
+                'columnPorosity': self.setColumnPorosity,
+                'delayTime': self.setDelayTime,
+                'dV': self.setDV,
+                'flowRate': self.setFlowRate,
+                'gradient': self.setGradient,
+                'secondSolventConcentrationA':
+                    self.setSecondSolventConcentrationA,
+                'secondSolventConcentrationB':
+                    self.setSecondSolventConcentrationB,
+                'temperature': self.setTemperature,
+            }[key](value)
+
+        def __delitem__(self, key):
+            pass
+
+        _keys = ['columnLength', 'columnDiameter', 'columnPoreSize', 
+                 'gradient', 'secondSolventConcentrationA',
+                 'secondSolventConcentrationB', 'delayTime', 'flowRate',
+                 'dV', 'columnRelativeStrength', 'columnVpToVtot',
+                 'columnPorosity', 'temperature']
+
+        def keys(self):
+            return self._keys
 
         def __getstate__(self):
-            output_dict = {}
-            output_dict['columnLength'] = self.columnLength()
-            output_dict['columnDiameter'] = self.columnDiameter()
-            output_dict['columnPoreSize'] = self.columnPoreSize()
-            output_dict['gradient'] = [eval(str(i)) for i in self.gradient()]
-            output_dict['secondSolventConcentrationA'] = (
-                self.secondSolventConcentrationA())
-            output_dict['secondSolventConcentrationB'] = (
-                self.secondSolventConcentrationB())
-            output_dict['delayTime'] = self.delayTime()
-            output_dict['flowRate'] = self.flowRate()
-            output_dict['dV'] = self.dV()
-            output_dict['columnRelativeStrength'] = (
-                self.columnRelativeStrength())
-            output_dict['columnVpToVtot'] = self.columnVpToVtot()
-            output_dict['columnPorosity'] = self.columnPorosity()
-            output_dict['temperature'] = self.temperature()
-            return output_dict
+            state_dict = {}
+            for key in self:
+                if key != 'gradient':
+                    state_dict[key] = self[key]
+            state_dict['gradient'] = []
+            for point in self['gradient']:
+                state_dict['gradient'].append(dict(point))
+            return state_dict
 
-        def __setstate__(self, input_dict):
-            self.setColumnLength(input_dict['columnLength'])
-            self.setColumnDiameter(input_dict['columnDiameter'])
-            self.setColumnPoreSize(input_dict['columnPoreSize'])
-
-            input_gradient = self.gradient();
-            input_gradient.clear();
-            for (time, concentrationB) in input_dict['gradient']:
-                input_gradient.addPoint(time, concentrationB)
-            self.setGradient(input_gradient)
-            self.setSecondSolventConcentrationA(
-                input_dict['secondSolventConcentrationA'])
-            self.setSecondSolventConcentrationB(
-                input_dict['secondSolventConcentrationB'])
-            self.setDelayTime(input_dict['delayTime'])
-            self.setFlowRate(input_dict['flowRate'])
-            self.setDV(input_dict['dV'])
-            self.setColumnRelativeStrength(input_dict['columnRelativeStrength'])
-            self.setColumnVpToVtot(input_dict['columnVpToVtot'])
-            self.setColumnPorosity(input_dict['columnPorosity'])
-            self.setTemperature(input_dict['temperature'])
+        def __setstate__(self, state_dict):
+            for key in state_dict:
+                if key != 'gradient':
+                    self[key] = state_dict[key]
+            gradient = Gradient()
+            for point in state_dict['gradient']:
+                if type(point).__name__ == 'dict':
+                    gradient.addPoint(
+                        point['time'], point['concentrationB'])
+                elif type(point).__name__ == 'pyBioLCCC.GradientPoint':
+                    gradient.addPoint(point)
+                else:
+                    raise Exception('pyBioLCCC', 'wrong type for GradientPoint')
+            self['gradient'] = gradient
     %}
 };
 
