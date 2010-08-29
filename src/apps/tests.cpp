@@ -107,14 +107,14 @@ TEST_F(BioLCCCTest, parsesStandardTerminalGroups)
                            &parsedPeptideStructure,
                            &NTerminus, &CTerminus, &peptideEnergyProfile);
     ASSERT_EQ(NTerminus.label(), "H-");
-    ASSERT_EQ(CTerminus.label(), "-COOH");
+    ASSERT_EQ(CTerminus.label(), "-OH");
 
-    BioLCCC::parseSequence("H-GGGG-COOH",
+    BioLCCC::parseSequence("H-GGGG-OH",
                            BioLCCC::rpAcnTfaCoilBoltzmann, 
                            &parsedPeptideStructure,
                            &NTerminus, &CTerminus, &peptideEnergyProfile);
     ASSERT_EQ(NTerminus.label(), "H-");
-    ASSERT_EQ(CTerminus.label(), "-COOH");
+    ASSERT_EQ(CTerminus.label(), "-OH");
 
     BioLCCC::parseSequence("Ac-GGGG-NH2",
                            BioLCCC::rpAcnTfaCoilBoltzmann,
@@ -128,14 +128,14 @@ TEST_F(BioLCCCTest, parsesStandardTerminalGroups)
                            &parsedPeptideStructure,
                            &NTerminus, &CTerminus, &peptideEnergyProfile);
     ASSERT_EQ(NTerminus.label(), "H-");
-    ASSERT_EQ(CTerminus.label(), "-COOH");
+    ASSERT_EQ(CTerminus.label(), "-OH");
 
-    BioLCCC::parseSequence("H-GGGG-COOH",
+    BioLCCC::parseSequence("H-GGGG-OH",
                            BioLCCC::rpAcnFaRodBoltzmann, 
                            &parsedPeptideStructure,
                            &NTerminus, &CTerminus, &peptideEnergyProfile);
     ASSERT_EQ(NTerminus.label(), "H-");
-    ASSERT_EQ(CTerminus.label(), "-COOH");
+    ASSERT_EQ(CTerminus.label(), "-OH");
 
     BioLCCC::parseSequence("Ac-GGGG-NH2",
                            BioLCCC::rpAcnFaRodBoltzmann,
@@ -192,6 +192,36 @@ TEST_F(BioLCCCTest, calculatesRT)
         BioLCCC::rpAcnTfaCoilBoltzmann), 0.0);
     ASSERT_GT(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM",
         BioLCCC::rpAcnFaRodBoltzmann), 0.0);
+}
+
+TEST_F(BioLCCCTest, assignesChemicalGroupProperties) 
+{
+    BioLCCC::ChemicalBasis
+      myChemicalBasis(BioLCCC::RP_ACN_FA_ROD_BOLTZMANN);
+
+    myChemicalBasis.chemicalGroups()["A"].setName("Test");
+    ASSERT_EQ(myChemicalBasis.chemicalGroups()["A"].name(), "Test");
+
+    myChemicalBasis.chemicalGroups()["A"].setBindEnergy(1.0);
+    ASSERT_EQ(myChemicalBasis.chemicalGroups()["A"].bindEnergy(), 1.0);
+
+    myChemicalBasis.chemicalGroups()["A"].setAverageMass(1.0);
+    ASSERT_EQ(myChemicalBasis.chemicalGroups()["A"].averageMass(), 1.0);
+
+    myChemicalBasis.chemicalGroups()["A"].setMonoisotopicMass(1.0);
+    ASSERT_EQ(myChemicalBasis.chemicalGroups()["A"].monoisotopicMass(), 1.0);
+
+    myChemicalBasis.chemicalGroups()["-NH2"].setName("Test");
+    ASSERT_EQ(myChemicalBasis.chemicalGroups()["-NH2"].name(), "Test");
+
+    myChemicalBasis.chemicalGroups()["-NH2"].setBindEnergy(1.0);
+    ASSERT_EQ(myChemicalBasis.chemicalGroups()["-NH2"].bindEnergy(), 1.0);
+
+    myChemicalBasis.chemicalGroups()["-NH2"].setAverageMass(1.0);
+    ASSERT_EQ(myChemicalBasis.chemicalGroups()["-NH2"].averageMass(), 1.0);
+
+    myChemicalBasis.chemicalGroups()["-NH2"].setMonoisotopicMass(1.0);
+    ASSERT_EQ(myChemicalBasis.chemicalGroups()["-NH2"].monoisotopicMass(), 1.0);
 }
 
 int main(int argc, char **argv)

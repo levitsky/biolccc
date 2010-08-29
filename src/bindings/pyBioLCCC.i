@@ -35,6 +35,8 @@
 %pythonabc(GradientPoint, collections.MutableMapping);
 %template(GradientPointVector) std::vector<BioLCCC::GradientPoint>;
 %template(StringChemicalGroupMap) std::map<std::string,BioLCCC::ChemicalGroup>;
+%ignore StringChemicalGroupMap::operator[] const;
+%ignore BioLCCC::ChemicalBasis::chemicalGroups() const;
 
 %extend std::map<std::string,BioLCCC::ChemicalGroup>{
     %insert("python") %{
