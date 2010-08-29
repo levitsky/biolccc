@@ -29,6 +29,7 @@ Documentation
    ./introduction
    ./build
    ./tutorial
+   ./advanced
 
 Mailing list
 ============

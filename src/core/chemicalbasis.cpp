@@ -19,11 +19,18 @@ ChemicalBasis::ChemicalBasis(PredefinedChemicalBasis predefinedChemicalBasisId)
     setPredefinedChemicalBasis(predefinedChemicalBasisId);
 }
 
+std::map<std::string,ChemicalGroup> & 
+    ChemicalBasis::chemicalGroups()
+{
+    return mChemicalGroups;
+}
+
 const std::map<std::string,ChemicalGroup> & 
     ChemicalBasis::chemicalGroups() const
 {
     return mChemicalGroups;
 }
+
 
 const ChemicalGroup & ChemicalBasis::defaultNTerminus() const
 {
@@ -39,10 +46,10 @@ const ChemicalGroup & ChemicalBasis::defaultNTerminus() const
 const ChemicalGroup & ChemicalBasis::defaultCTerminus() const
 {
     std::map<std::string, ChemicalGroup>::const_iterator CTerminusIterator =
-        mChemicalGroups.find("-COOH");
+        mChemicalGroups.find("-OH");
     if (CTerminusIterator == mChemicalGroups.end())
     {
-        throw ChemicalBasisException("The default -COOH C-terminus not found.");
+        throw ChemicalBasisException("The default -OH C-terminus not found.");
     }
     return CTerminusIterator->second;
 }
@@ -289,8 +296,8 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
                                            0.0,
                                            43.0452,
                                            43.01839));
-            addChemicalGroup(ChemicalGroup("C-terminal carboxyl",
-                                           "-COOH",
+            addChemicalGroup(ChemicalGroup("C-terminal carboxyl group",
+                                           "-OH",
                                            -0.03,
                                            17.0073,
                                            17.00274));
@@ -446,8 +453,8 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
                                            -0.05,
                                            43.0452,
                                            43.01839));
-            addChemicalGroup(ChemicalGroup("C-terminal carboxyl",
-                                           "-COOH",
+            addChemicalGroup(ChemicalGroup("C-terminal carboxyl group",
+                                           "-OH",
                                            1.02,
                                            17.0073,
                                            17.00274));

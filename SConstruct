@@ -179,9 +179,9 @@ Alias('test_pyBioLCCC', test_pyBioLCCC)
 
 # Doxygen documentation.
 #-----------------------
-doc_doxygen = env.Command('doc_doxygen', 'Doxyfile', 
+doc_doxygen = env.Command('doc_doxygen', 'doc/Doxyfile', 
     [Mkdir('doc'), 'doxygen $SOURCE'])
-Depends(doc_doxygen, 'Doxyfile')
+Depends(doc_doxygen, 'doc/Doxyfile')
 # Source code needs to be copied.
 Depends(doc_doxygen, libBioLCCC_shared)
 

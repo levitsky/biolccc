@@ -83,7 +83,13 @@ public:
     //! Constructs a ChemicalBasis instance with a predefined set of constants.
     ChemicalBasis(PredefinedChemicalBasis predefinedChemicalBasisId);
 
-    //! Returns the map of all chemical groups.
+    //! Returns the map of all chemical groups. Non-constant version.
+    /*!
+        A chemical group can be retrieved from the map by its label.
+     */
+    std::map<std::string, ChemicalGroup> & chemicalGroups();
+
+    //! Returns the map of all chemical groups. Constant version.
     /*!
         A chemical group can be retrieved from the map by its label.
      */
