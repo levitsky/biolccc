@@ -91,8 +91,8 @@ public:
     //! Sets the full name of the chemical group.
     void setName(std::string newName);
 
-    //! Sets the brief code of the group used in peptide sequence notation.
-    void setLabel(std::string newLabel);
+    ////! Sets the brief code of the group used in peptide sequence notation.
+    //void setLabel(std::string newLabel);
 
     //! Sets the binding energy value.
     void setBindEnergy(double newBindEnergy);
