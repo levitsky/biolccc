@@ -19,6 +19,26 @@
 %include "pyabc.i"
 %include "exception.i"
 
+%pythonabc(ChemicalGroup, collections.MutableMapping);
+%pythonabc(ChemicalBasis, collections.MutableMapping);
+%pythonabc(ChromoConditions, collections.MutableMapping);
+%pythonabc(GradientPoint, collections.MutableMapping);
+%template(GradientPointVector) std::vector<BioLCCC::GradientPoint>;
+%template(StringChemicalGroupMap) std::map<std::string,BioLCCC::ChemicalGroup>;
+%template(StringChemicalGroupPtrMap) std::map<std::string,BioLCCC::ChemicalGroup *> ;
+%rename(__chemicalGroups__) chemicalGroups();
+%ignore StringChemicalGroupMap::operator[] const;
+%ignore BioLCCC::ChemicalBasis::chemicalGroups() const;
+
+// Parse the original header file
+%include "biolcccexception.h"
+%include "chemicalgroup.h"
+%include "chemicalbasis.h"
+%include "gradientpoint.h"
+%include "gradient.h"
+%include "chromoconditions.h"
+%include "biolccc.h"
+
 %exception {
     try {
         $action
@@ -28,15 +48,6 @@
         return NULL;
     }
 }
-
-%pythonabc(ChemicalGroup, collections.MutableMapping);
-%pythonabc(ChemicalBasis, collections.MutableMapping);
-%pythonabc(ChromoConditions, collections.MutableMapping);
-%pythonabc(GradientPoint, collections.MutableMapping);
-%template(GradientPointVector) std::vector<BioLCCC::GradientPoint>;
-%template(StringChemicalGroupMap) std::map<std::string,BioLCCC::ChemicalGroup>;
-%ignore StringChemicalGroupMap::operator[] const;
-%ignore BioLCCC::ChemicalBasis::chemicalGroups() const;
 
 %extend std::map<std::string,BioLCCC::ChemicalGroup>{
     %insert("python") %{
@@ -93,10 +104,13 @@
                 'monoisotopicMass': self.monoisotopicMass,
             }[key]()
 
+        def __raiseLabelException__(self, value):
+            raise RuntimeError('Label cannot be set')
+
         def __setitem__(self, key, value):
             {
                 'name' : self.setName,
-                'label': self.setLabel,
+                'label': self.__raiseLabelException__,
                 'bindEnergy': self.setBindEnergy,
                 'averageMass': self.setAverageMass,
                 'monoisotopicMass': self.setMonoisotopicMass,
@@ -111,6 +125,24 @@
         def keys(self):
             return self._keys
     %}
+}
+
+%extend BioLCCC::ChemicalBasis {
+    std::map<std::string, BioLCCC::ChemicalGroup *> 
+        __ptrChemicalGroups__()
+    {
+        std::map<std::string, BioLCCC::ChemicalGroup * > 
+            ptrChemicalGroupsMap;
+        for (
+            std::map<std::string, BioLCCC::ChemicalGroup>::iterator it = 
+                $self->BioLCCC::ChemicalBasis::chemicalGroups().begin();
+            it != $self->BioLCCC::ChemicalBasis::chemicalGroups().end();
+            it++)
+        {
+            ptrChemicalGroupsMap[it->first] = &(it->second);
+        }
+        return ptrChemicalGroupsMap;
+    }
 }
 
 %extend BioLCCC::ChemicalBasis {
@@ -133,9 +165,12 @@
         def __contains__(self, key):
             return key in self._keys 
 
+        def chemicalGroups(self):
+            return self.__ptrChemicalGroups__()
+
         def __getitem__(self, key):
             return {
-                'chemicalGroups': self.chemicalGroups,
+                'chemicalGroups': self.__ptrChemicalGroups__,
                 'adsorbtionLayerWidth': self.adsorbtionLayerWidth,
                 'kuhnLength': self.kuhnLength,
                 'model': self.model,
@@ -334,14 +369,6 @@
     %}
 };
 
-// Parse the original header file
-%include "biolcccexception.h"
-%include "chemicalgroup.h"
-%include "chemicalbasis.h"
-%include "gradientpoint.h"
-%include "gradient.h"
-%include "chromoconditions.h"
-%include "biolccc.h"
 
 // Instantiate some templates
 

@@ -53,11 +53,6 @@ void ChemicalGroup::setName(std::string newName)
     mName = newName;
 }
 
-void ChemicalGroup::setLabel(std::string newLabel)
-{
-    mLabel = newLabel;
-}
-
 void ChemicalGroup::setAverageMass(double newAverageMass)
 {
     mAverageMass = newAverageMass;
