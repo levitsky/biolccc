@@ -16,6 +16,7 @@
 %include "std_string.i"
 %include "std_map.i"
 %include "std_vector.i"
+%include "std_list.i"
 %include "pyabc.i"
 %include "exception.i"
 
@@ -24,6 +25,8 @@
 %pythonabc(ChromoConditions, collections.MutableMapping);
 %pythonabc(GradientPoint, collections.MutableMapping);
 %template(GradientPointVector) std::vector<BioLCCC::GradientPoint>;
+%template(ChemicalGroupVector) std::vector<BioLCCC::ChemicalGroup>;
+%template(DoubleVector) std::vector<double>;
 %template(StringChemicalGroupMap) std::map<std::string,BioLCCC::ChemicalGroup>;
 %template(StringChemicalGroupPtrMap) std::map<std::string,BioLCCC::ChemicalGroup *> ;
 %rename(__chemicalGroups__) chemicalGroups();
@@ -50,6 +53,19 @@
 }
 
 %extend std::map<std::string,BioLCCC::ChemicalGroup>{
+    %insert("python") %{
+        def __str__(self):
+            return str(dict(self))
+
+        def __repr__(self):
+            return str(dict(self))
+
+        def __eq__(self, other):
+            return dict(self) == dict(other)
+    %}
+}
+
+%extend std::map<std::string,BioLCCC::ChemicalGroup *>{
     %insert("python") %{
         def __str__(self):
             return str(dict(self))
@@ -171,28 +187,44 @@
         def __getitem__(self, key):
             return {
                 'chemicalGroups': self.__ptrChemicalGroups__,
-                'adsorbtionLayerWidth': self.adsorbtionLayerWidth,
-                'kuhnLength': self.kuhnLength,
-                'model': self.model,
+                'firstSolventDensity': self.firstSolventDensity,
+                'firstSolventAverageMass': self.firstSolventAverageMass,
+                'secondSolventDensity': self.secondSolventDensity,
+                'secondSolventAverageMass': self.secondSolventAverageMass,
                 'secondSolventBindEnergy': self.secondSolventBindEnergy,
-                'segmentLength': self.segmentLength,
+                'adsorptionLayerWidth': self.adsorptionLayerWidth,
+                'adsorptionLayerFactors': self.adsorptionLayerFactors,
+                'kuhnLength': self.kuhnLength,
+                'monomerLength': self.monomerLength,
+                'model': self.model,
+                'snyderApproximation': self.snyderApproximation,
             }[key]()
 
         def __setitem__(self, key, value):
             {
                 'chemicalGroups' : self.setChemicalGroups,
-                'adsorbtionLayerWidth': self.setAdsorbtionLayerWidth,
-                'kuhnLength': self.setKuhnLength,
-                'model': self.setModel,
+                'firstSolventDensity': self.setFirstSolventDensity,
+                'firstSolventAverageMass': self.setFirstSolventAverageMass,
+                'secondSolventDensity': self.setSecondSolventDensity,
+                'secondSolventAverageMass': self.setSecondSolventAverageMass,
                 'secondSolventBindEnergy': self.setSecondSolventBindEnergy,
-                'segmentLength': self.setSegmentLength,
+                'adsorptionLayerWidth': self.setAdsorptionLayerWidth,
+                'adsorptionLayerFactors': self.setAdsorptionLayerFactors,
+                'kuhnLength': self.setKuhnLength,
+                'monomerLength': self.setMonomerLength,
+                'model': self.setModel,
+                'snyderApproximation': self.setSnyderApproximation,
             }[key](value)
 
         def __delitem__(self, key):
             pass
 
-        _keys = ['chemicalGroups', 'adsorbtionLayerWidth', 'kuhnLength',
-            'model', 'secondSolventBindEnergy', 'segmentLength']
+        _keys = ['chemicalGroups', 'firstSolventDensity', 
+                 'firstSolventAverageMass',
+                 'secondSolventDensity', 'secondSolventAverageMass',
+                 'secondSolventBindEnergy', 'adsorptionLayerWidth', 
+                 'adsorptionLayerFactors', 'kuhnLength', 'monomerLength', 
+                 'model', 'snyderApproximation']
 
         def keys(self):
             return self._keys
@@ -211,6 +243,9 @@
         def __setstate__(self, state_dict):
             for key in state_dict:
                 self[key] = state_dict[key]
+
+        def __reduce__(self):
+            return (ChemicalBasis, (), self.__getstate__(),)
 
         def setChemicalGroups(self, chemicalGroupsDict):
             self.clearChemicalGroups()
@@ -366,6 +401,9 @@
                 else:
                     raise Exception('pyBioLCCC', 'wrong type for GradientPoint')
             self['gradient'] = gradient
+
+        def __reduce__(self):
+            return (ChromoConditions, (), self.__getstate__(),)
     %}
 };
 

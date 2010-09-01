@@ -2,6 +2,7 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
+#include <cmath>
 #include "biolccc.h"
 
 #define PI 3.14159265
@@ -14,25 +15,168 @@ ParsingException::ParsingException(std::string message):
 {
 };
 
-// Auxiliary functions that shouldn't be exposed to user at this
-// point.
+// Auxiliary functions that shouldn't be exposed to a user.
 namespace
 {
 
-std::vector<double> calculateRT(std::vector<std::string> mixture,
-                                ChemicalBasis chemicalBasis,
-                                ChromoConditions chromatograph)
+/*!
+    This function calculates the effective energy profile of a polymer chain.
+    Each element in this profile contains the adsorption energy of a single
+    monomer.
+
+    E_{effective} = alpha * ( E_{residue} - E_{ab} ) * 293.0 / temperature,
+    and Eab is the effective energy of binary solvent binding to the
+    stationary phase.
+    Eab = Ea + 1 / alpha * ln( 1 + Nb + Nb * exp( alpha * ( Ea - Eb ) ) )
+*/
+std::vector<double> calculateMonomerEnergyProfile(
+    const std::vector<ChemicalGroup> &parsedSequence,
+    const ChemicalBasis & chemBasis,
+    const double secondSolventConcentration,
+    const double columnRelativeStrength, 
+    const double temperature)
 {
-    std::vector<double> times;
-    for (unsigned int i = 0; i < mixture.size(); i++)
+    if (parsedSequence.size() < 3)
     {
-        times.push_back(calculateRT(mixture[i], chemicalBasis, chromatograph));
+        throw BioLCCCException(
+            "The parsed sequence contains too little chemical groups.");
     }
-    return times;
+
+    if (columnRelativeStrength == 0.0)
+    {
+        return std::vector<double> (parsedSequence.size()-2, 0.0);
+    }
+
+    // Due to the preliminary scaling the binding energy of water equals zero.
+    double Q = exp(columnRelativeStrength * 
+                   (chemBasis.secondSolventBindEnergy() - 0.0) *
+                   293.0 / temperature);
+    // Nb = (DensityB * %B / MB) / 
+    //      (DensityB * %B / MB + DensityA * %A / MA)
+    // where DensityA and DensityB are the corresponding densities and
+    // MA and MB are the corresponding molecular weights.
+    double Nb =
+        secondSolventConcentration * chemBasis.secondSolventDensity()
+        / chemBasis.secondSolventAverageMass() 
+        / ( secondSolventConcentration * chemBasis.secondSolventDensity() 
+                / chemBasis.secondSolventAverageMass()
+            + (100.0 - secondSolventConcentration) * chemBasis.firstSolventDensity()
+                   / chemBasis.firstSolventAverageMass());
+
+    double Eab = 0.0;
+    if (chemBasis.snyderApproximation()) 
+    {
+        Eab = Nb * chemBasis.secondSolventBindEnergy();
+    }
+    else
+    {
+        Eab = 0.0 + 1.0 / columnRelativeStrength * log( 1.0 - Nb + Nb * Q );
+    }
+
+    std::vector<double> monomerEnergyProfile;
+    for (std::vector<BioLCCC::ChemicalGroup>::const_iterator residue =
+                ++(parsedSequence.begin());
+            residue != --(parsedSequence.end());
+            ++residue)
+    {
+        double residueEnergy = residue->bindEnergy();
+
+        // Adding the energy of the N-terminal group to the first residue.
+        if (residue == ++(parsedSequence.begin()))
+        {
+            residueEnergy += parsedSequence.begin()->bindEnergy();
+        }
+
+        // Adding the energy of the C-terminal group to the last residue.
+        else if (residue == --(--(parsedSequence.end())))
+        {
+            residueEnergy += (--(parsedSequence.end()))->bindEnergy();
+        }
+
+        monomerEnergyProfile.push_back(
+            columnRelativeStrength*(residueEnergy - Eab) * 293.0 / temperature);
+    }
+    return monomerEnergyProfile;
 }
 
-double calculateKdCoilBoltzmann(
-    const std::vector<double> &peptideEnergyProfile,
+/*!
+    This function calculates the effective energy profile of a polymer chain.
+    Each element in this profile contains the adsorption energy of a single
+    segment.
+
+    The energy of a single segment equals to sum of the energies of the whole
+    monomers containing in the segment PLUS the proportional parts of the
+    energies of monomers which cross the borders of the segment. 
+*/
+std::vector<double> calculateSegmentEnergyProfile(
+    const std::vector<double> &monomerEnergyProfile,
+    const double monomerLength,
+    const double kuhnLength)
+{
+    std::vector<double> segmentEnergyProfile; 
+    std::vector<double>::const_iterator monomerEnergyIt =
+        monomerEnergyProfile.begin();
+    double kuhnLeftBorder  = 0;
+    double monomerLeftBorder  = 0;
+    double sumEnergy = 0.0;
+    bool kuhnSegmentOpen = true;
+
+    while (monomerEnergyIt != monomerEnergyProfile.end()) 
+    {
+        if ((kuhnLeftBorder + kuhnLength) >= 
+                (monomerLeftBorder + monomerLength))
+        {
+            sumEnergy += *(monomerEnergyIt) * 
+                (monomerLeftBorder + monomerLength - 
+                    std::max(monomerLeftBorder, kuhnLeftBorder)) / 
+                monomerLength;
+            kuhnSegmentOpen = true;
+            monomerLeftBorder += monomerLength;
+            ++monomerEnergyIt;
+        }
+        else 
+        {
+            sumEnergy += *(monomerEnergyIt) * 
+                (kuhnLeftBorder + kuhnLength - 
+                    std::max(monomerLeftBorder, kuhnLeftBorder)) / 
+                monomerLength;
+            segmentEnergyProfile.push_back(sumEnergy);
+            sumEnergy = 0.0;
+            kuhnSegmentOpen = false;
+            kuhnLeftBorder += kuhnLength;
+        }
+    }
+
+    if (kuhnSegmentOpen)
+    {
+        segmentEnergyProfile.push_back(sumEnergy);
+    }
+
+    return segmentEnergyProfile;
+}
+
+/*!
+    This function converts the energy profile of a peptide/protein to 
+    a profile of distribution probabilities. Probability = exp(E_effective).
+*/
+std::vector<double> calculateBoltzmannFactorProfile(
+    const std::vector<double> &effectiveEnergyProfile)
+{
+    std::vector<double> boltzmannFactorProfile; 
+
+    for (std::vector<double>::const_iterator energy =
+                effectiveEnergyProfile.begin();
+            energy != effectiveEnergyProfile.end();
+            ++energy)
+    {
+        boltzmannFactorProfile.push_back(exp(*energy));
+    }
+
+    return boltzmannFactorProfile;
+}
+
+double calculateKdCoil(
+    const std::vector<ChemicalGroup> &parsedSequence,
     const double secondSolventConcentration,
     const ChemicalBasis &chemBasis,
     const double columnPoreSize,
@@ -40,192 +184,192 @@ double calculateKdCoilBoltzmann(
     const double temperature
 )
 {
-    // At first, we need to convert energy profile to a profile of distribution
-    // probabilities. Probability = exp(E_effective),
+    // At first, we need to convert the energy profile to a profile of 
+    // distribution probabilities. Probability = exp(E_effective),
     // where E_effective = E_of_residue - Eab,
     // and Eab is an energy of binding for a binary solvent
     // and Eab = Ea + ln ( 1 + Nb + Nb*exp (Ea - Eb) )
     // also corrections of energies due to temperature (energies in exponents
-    // are scaled to the new temperature) and column aging (calibration
-    // parameter) are introduced.
-
-    if (peptideEnergyProfile.size() == 0)
+    // are scaled to the new temperature) and the relative strength 
+    // are introduced.
+    std::vector<std::vector<double> > boltzmannFactorProfiles;
+    for (std::vector<double>::const_iterator adsorptionLayerFactor = 
+            chemBasis.adsorptionLayerFactors().begin();
+         adsorptionLayerFactor != chemBasis.adsorptionLayerFactors().end();
+         ++adsorptionLayerFactor) 
     {
-        return 0.0;
+        boltzmannFactorProfiles.push_back(
+            calculateBoltzmannFactorProfile(
+                calculateSegmentEnergyProfile(
+                    calculateMonomerEnergyProfile(
+                        parsedSequence,
+                        chemBasis,
+                        secondSolventConcentration,
+                        columnRelativeStrength * (*adsorptionLayerFactor),
+                        temperature),
+                    chemBasis.monomerLength(),
+                    chemBasis.kuhnLength())));
     }
 
-    // Due to the preliminary scaling the binding energy of water equals zero.
-    double Q = exp((0 + chemBasis.secondSolventBindEnergy()) *
-                   293.0 / temperature);
-    double Nb = 0;
-    double Eab = 0;
-    Nb = secondSolventConcentration * 1.91 /
-         (secondSolventConcentration * 1.91 +
-          (100.0 - secondSolventConcentration) * 5.56);
-    Eab = 0.0 + 1.0 / columnRelativeStrength * log( 1.0 - Nb + Nb * Q );
+    // The size of the lattice must be greater than 
+    // (number of adsorbing layers) * 2.
+    // double round (double x) {return floor(x+0.5);}
+    const unsigned int latticeSize = 
+        floor(columnPoreSize / chemBasis.kuhnLength() + 0.5);
 
-    // A Boltzmann factor is an exponent of an energy of interaction between
-    // an amino acid residue and a solid phase divided by a temperature *
-    // Boltzmann's constant. An energy unit is a Boltzmann's constant *
-    // 293.0 Kelvins. This probability is used later in the transition matrix.
-    std::vector<double> boltzmannFactorProfile;
-    int residueNumber = 0;
-    double energySum = 0.0;
-    for (std::vector<double>::const_iterator residueEnergy =
-                peptideEnergyProfile.begin();
-            residueEnergy != peptideEnergyProfile.end();
-            residueEnergy ++
-        )
+    if (latticeSize < chemBasis.adsorptionLayerFactors().size() * 2)
     {
-        // More detailed formula for the Nb is:
-        // Nb= (DensityB * %B / MB) / (DensityB * %B / MB + DensityA * %A / MA)
-        // Where DensityA and DensityB are the corresponding densities and
-        // MA and MB are the corresponding molecular weights.
-        residueNumber++;
-        energySum += columnRelativeStrength * (*residueEnergy - Eab) *
-                     293.0 / temperature;
-        if ((residueNumber % chemBasis.kuhnLength()) == 0)
-        {
-            boltzmannFactorProfile.push_back(exp(energySum));
-            energySum = 0.0;
-        }
-    }
-
-    // If the last persistent block is incomplete, we should add it manually.
-    if ((residueNumber % chemBasis.kuhnLength()) != 0)
-    {
-        boltzmannFactorProfile.push_back(exp(energySum));
+        throw BioLCCCException(
+            "The pore size is too small for the given number of adsorbing "
+            "layers.");
     }
 
     // The density vector correspond to a probability of n-th residue to be in
     // a certain layer between pore walls.
+    double *density;
+
     // The transition matrix used to calculate a density vector of n-th
     // particle from a density vector of (n-1)-th particle.
-    // The density buffer vector is used during matrix calculations.
-    double *density;
     double *transitionMatrix;
-    double *densityBuffer;
 
-    // PoreSteps is a number of nodes in a lattice between two walls. 
-    // Because of the calculation features it have to be greater than 2.
-    const int poreSteps = (int) (columnPoreSize /
-                                 chemBasis.segmentLength() / 
-                                 (double)(chemBasis.kuhnLength())) ;
-    if (poreSteps <2)
-    {
-        throw BioLCCCException(
-            "The pore size is too small for Kd calculation.");
-    }
+    // The density buffer vector is used during matrix calculations.
+    double *densityBuffer;
 
     // Memory managment.
     try
     {
-        density = new double[poreSteps];
-        densityBuffer = new double[poreSteps];
-        transitionMatrix = new double[poreSteps*poreSteps];
+        density = new double[latticeSize];
+        densityBuffer = new double[latticeSize];
+        transitionMatrix = new double[latticeSize*latticeSize];
     }
     catch (...)
     {
         throw BioLCCCException("Cannot allocate memory for calculations");
     }
 
-    // Now we need to construct a density vector for the first amino acid
-    // residue.
-    // A density is distributed uniformely over all layers of the lattice,
-    // except for the wall layers. There a density is multiplied by Boltzmann
-    // factor due to interaction of a residue with a solid phase.
-    density[0] = boltzmannFactorProfile[0];
+    // Constructing a density vector for the first amino acid residue.
+    // A density is distributed uniformly over all non-adsorbing layers of 
+    // the lattice.
+    // The density in adsorbing layers is multiplied by a Boltzmann factor of
+    // the first segment.
 
-    for (int i = 1; i < poreSteps - 1 ; i++)
+    for (unsigned int i = 0; i < latticeSize; i++)
     {
         density[i] = 1.0;
     }
 
-    density[poreSteps - 1] =
-        boltzmannFactorProfile[0];
+    for (unsigned int i = 0; i < boltzmannFactorProfiles.size(); ++i) 
+    {
+        density[i] = boltzmannFactorProfiles[i][0];
+        density[latticeSize - i - 1] = boltzmannFactorProfiles[i][0];
+    }
+
+    // Debugging facilities.
+    //for (unsigned int i = 0; i < latticeSize; i++)
+    //{
+    //    std::cout << density[i] << " ";
+    //}
+    //std::cout << std::endl;
+    //std::cout << std::endl;
 
     // Than we construct a basis for the transition matrix. The basis is
     // a diagonal matrix with 4.0/6.0 on the main diagonal and 1.0/6.0 on
     // the side diagonals.
 
     // Filling the matrix.
-    for (int i = 0; i < poreSteps; i++)
+    for (unsigned int i = 0; i < latticeSize; i++)
     {
-        for (int j = 0; j < poreSteps; j++)
+        for (unsigned int j = 0; j < latticeSize; j++)
         {
-            switch ( j - i + 1 )
+            switch (abs( j - i ))
             {
             case 0:
             {
-                transitionMatrix[j + poreSteps * i] = 1.0/6.0;
+                transitionMatrix[j + latticeSize * i] = 4.0/6.0;
                 break;
             }
             case 1:
             {
-                transitionMatrix[j + poreSteps * i] = 4.0/6.0;
-                break;
-            }
-            case 2:
-            {
-                transitionMatrix[j + poreSteps * i] = 1.0/6.0;
+                transitionMatrix[j + latticeSize * i] = 1.0/6.0;
                 break;
             }
             default:
-                transitionMatrix[j + poreSteps * i] = 0.0;
+                transitionMatrix[j + latticeSize * i] = 0.0;
             }
         }
     }
 
-    // On the each step we calculate a density vector for the n-th amino acid
-    // residue by multiplication of the transition matrix and the density 
-    // vector for the (n-1)th residue.
-    for (std::vector<double>::const_iterator residueBoltzmannFactor =
-                ++boltzmannFactorProfile.begin();
-            residueBoltzmannFactor != boltzmannFactorProfile.end();
-            residueBoltzmannFactor++
-        )
+    // On each step we obtain the density vector for the n-th segment
+    // multiplying the transition matrix and the density vector of the 
+    // (n-1)th residue.
+    // The multiplication starts from the second segment.
+    for (unsigned int segmentIndex = 1; 
+         segmentIndex < boltzmannFactorProfiles[0].size();
+         ++segmentIndex) 
     {
-        // Elements of the first and the last rows of the transition matrix are
-        // modified by Boltzmann factor.
-        transitionMatrix[0] = 4.0 / 6.0 * (*residueBoltzmannFactor);
-        transitionMatrix[1] = 1.0 / 6.0 * (*residueBoltzmannFactor);
-        transitionMatrix[poreSteps*poreSteps - 1] = 4.0 / 6.0 *
-                (*residueBoltzmannFactor);
-        transitionMatrix[poreSteps*poreSteps - 2] = 1.0 / 6.0 *
-                (*residueBoltzmannFactor);
+        // Filling the matrix elements that describe the adsorption.
+        for (unsigned int layerIndex = 0;
+             layerIndex < boltzmannFactorProfiles.size();
+             ++layerIndex) 
+        {
+            int indexShift = layerIndex * ( latticeSize + 1 );
+            double boltzmannFactor = 
+                boltzmannFactorProfiles[layerIndex][segmentIndex];
+
+            transitionMatrix[indexShift + 0] = 4.0/6.0 * boltzmannFactor;
+            transitionMatrix[indexShift + 1] = 1.0/6.0 * boltzmannFactor;
+            transitionMatrix[latticeSize*latticeSize - 1 - indexShift - 0] =
+                    4.0 / 6.0 * boltzmannFactor;
+            transitionMatrix[latticeSize*latticeSize - 1 - indexShift - 1] =
+                    1.0 / 6.0 * boltzmannFactor;
+
+            // A segment may enter the second and further adsorption layers from
+            // the inner layer (i.e. the layer lying closer to the walls).
+            if (layerIndex > 0) 
+            {
+                transitionMatrix[indexShift - 1] = 1.0/6.0 * boltzmannFactor;
+                transitionMatrix[latticeSize*latticeSize - 1 - indexShift + 1] =
+                        1.0 / 6.0 * boltzmannFactor;
+            }
+        }
 
         // Zeroing the calculation buffer.
-        for (int i = 0; i < poreSteps; i++)
+        for (unsigned int i = 0; i < latticeSize; i++)
         {
             densityBuffer[i] = 0.0;
         }
 
         // Multiplying the transition matrix by the density vector. The result
         // is stored in the buffer vector.
-        for (int i = 0; i < poreSteps; i++)
+        for (unsigned int i = 0; i < latticeSize; i++)
         {
-            for (int j = 0; j < poreSteps; j++)
+            for (unsigned int j = 0; j < latticeSize; j++)
             {
+                //std::cout << transitionMatrix[j + i * latticeSize] << " ";
                 densityBuffer[i] = densityBuffer[i] + density[j] *
-                                   transitionMatrix[j + i * poreSteps];
+                                   transitionMatrix[j + i * latticeSize];
             }
+            //std::cout << std::endl;
         }
 
         // Transferring the results from the density vector.
-        for (int i = 0; i < poreSteps; i++)
+        for (unsigned int i = 0; i < latticeSize; i++)
         {
             density[i] = densityBuffer[i];
+            //std::cout << density[i] << " ";
         }
+        //std::cout << std::endl;
+        //std::cout << std::endl;
     }
 
-    // Finally, Kd is calculated as a sum of elements of the density vector.
-    // It is normalized to the size of the lattice.
+    // Kd is a sum of elements of the density vector, normalized to the size 
+    // of the lattice.
     double Kd=0;
-    for (int i=0; i < poreSteps; i++)
+    for (unsigned int i=0; i < latticeSize; i++)
     {
         Kd += density[i];
     }
-    Kd = Kd / (double)(poreSteps);
+    Kd = Kd / (double)(latticeSize);
 
     // Cleaning memory.
     try
@@ -242,446 +386,11 @@ double calculateKdCoilBoltzmann(
     return Kd;
 }
 
-double calculateKdCoilBoltzmannDoubleLayer(
-    const std::vector<double> &peptideEnergyProfile,
-    const double secondSolventConcentration,
-    const ChemicalBasis &chemBasis,
-    const double columnPoreSize,
-    const double columnRelativeStrength,
-    const double temperature
-)
-{
-    // At first, we need to convert energy profile to a profile of distribution
-    // probabilities. Probability = exp(E_effective),
-    // where E_effective = E_of_residue - Eab,
-    // and Eab is an energy of binding for a binary solvent
-    // and Eab = Ea + ln ( 1 + Nb + Nb*exp (Ea - Eb) )
-    // also corrections of energies due to temperature (energies in exponents
-    // are scaled to the new temperature) and column aging (calibration
-    // parameter) are introduced.
-
-    if (peptideEnergyProfile.size() == 0)
-    {
-        return 0.0;
-    }
-
-    // Due to the preliminary scaling the binding energy of water equals zero.
-    double Q = exp((0 + chemBasis.secondSolventBindEnergy()) *
-                   293.0 / temperature);
-    double Nb = 0;
-    double Eab = 0;
-
-    // A Boltzmann factor is an exponent of an energy of interaction between
-    // an amino acid residue and a solid phase divided by a temperature *
-    // Boltzmann's constant. An energy unit is a Boltzmann's constant *
-    // 293.0 Kelvins. This probability is used later in the transition matrix.
-    std::vector<double> boltzmannFactorProfile;
-    for (std::vector<double>::const_iterator residueEnergy =
-                peptideEnergyProfile.begin();
-            residueEnergy != peptideEnergyProfile.end();
-            residueEnergy ++
-        )
-    {
-        //std::cout << *residueEnergy << " ";
-        Nb = secondSolventConcentration * 1.91 /
-             (secondSolventConcentration * 1.91 +
-              (100.0 - secondSolventConcentration) * 5.56);
-        Eab = 0.0 + 1.0 / columnRelativeStrength * log( 1.0 - Nb + Nb * Q );
-        boltzmannFactorProfile.push_back(exp(columnRelativeStrength *
-                                             (*residueEnergy - Eab) * 293.0 / 
-                                             temperature));
-    }
-
-    // The density vector correspond to a probability of n-th residue to be in
-    // a certain layer between pore walls.
-    // The transition matrix used to calculate a density vector of n-th
-    // particle from a density vector of (n-1)-th particle.
-    // The density buffer vector is used during matrix calculations.
-    double *density;
-    double *transitionMatrix;
-    double *densityBuffer;
-
-    // PoreSteps is a number of nodes in a lattice between two walls. 
-    // Because of the calculation features it have to be greater than 4.
-    const int poreSteps = (int) (columnPoreSize /
-                                 chemBasis.segmentLength() / 
-                                 (double)(chemBasis.kuhnLength())) ;
-    if (poreSteps <4)
-    {
-        throw BioLCCCException(
-            "The pore size is too small for Kd calculation.");
-    }
-
-    // Memory managment.
-    try
-    {
-        density = new double[poreSteps];
-        densityBuffer = new double[poreSteps];
-        transitionMatrix = new double[poreSteps*poreSteps];
-    }
-    catch (...)
-    {
-        throw BioLCCCException("Cannot allocate memory for calculations");
-    }
-
-    // Now we need to construct a density vector for the first amino acid
-    // residue.
-    // A density is distributed uniformely over all layers of the lattice,
-    // except for the wall layers. There a density is multiplied by Boltzmann
-    // factor due to interaction of a residue with a solid phase.
-    density[0] = boltzmannFactorProfile[0];
-    density[1] = boltzmannFactorProfile[0];
-
-    for (int i = 2; i < poreSteps - 2 ; i++)
-    {
-        density[i] = 1;
-    }
-
-    density[poreSteps - 2] =
-        boltzmannFactorProfile[0];
-    density[poreSteps - 1] =
-        boltzmannFactorProfile[0];
-
-    // Than we construct a basis for the transition matrix. The basis is
-    // a diagonal matrix with 4.0/6.0 on the main diagonal and 1.0/6.0 on
-    // the side diagonals.
-
-    // Filling the first row.
-    transitionMatrix[0] = 4.0/6.0;
-    transitionMatrix[1] = 1.0/6.0;
-    for (int i = 2; i < poreSteps; i++)
-    {
-        transitionMatrix[i] = 0.0;
-    }
-
-    // Filling from 2nd to (n-1)th rows.
-    for (int i = 1; i < poreSteps - 1; i++)
-    {
-        for (int j = 0; j < poreSteps; j++)
-        {
-            switch ( j - i + 1 )
-            {
-            case 0:
-            {
-                transitionMatrix[j + poreSteps * i] = 1.0/6.0;
-                break;
-            }
-            case 1:
-            {
-                transitionMatrix[j + poreSteps * i] = 4.0/6.0;
-                break;
-            }
-            case 2:
-            {
-                transitionMatrix[j + poreSteps * i] = 1.0/6.0;
-                break;
-            }
-            default:
-                transitionMatrix[j + poreSteps * i] = 0.0;
-            }
-        }
-    }
-
-    // Filling the n-th row.
-    for (int i = poreSteps * (poreSteps - 1);
-            i < (poreSteps * poreSteps - 2);
-            i++)
-    {
-        transitionMatrix[i] = 0.0;
-    }
-    transitionMatrix[poreSteps * poreSteps - 2] = 1.0/6.0;
-    transitionMatrix[poreSteps * poreSteps - 1] = 4.0/6.0;
-
-    // On the each step we calculate a density vector for the n-th amino acid
-    // residue by multiplication of the transition matrix and the density
-    // vector for the (n-1)th residue.
-    for (std::vector<double>::const_iterator residueBoltzmannFactor =
-                ++boltzmannFactorProfile.begin();
-            residueBoltzmannFactor != boltzmannFactorProfile.end();
-            residueBoltzmannFactor++
-        )
-    {
-        // Elements of the first and the last rows of the transition matrix are
-        // modified by Boltzmann factor.
-        transitionMatrix[0] = 4.0 / 6.0 * (*residueBoltzmannFactor);
-        transitionMatrix[1] = 1.0 / 6.0 * (*residueBoltzmannFactor);
-        transitionMatrix[poreSteps] = 1.0 / 6.0 * (*residueBoltzmannFactor);
-        transitionMatrix[poreSteps + 1] = 4.0 / 6.0 *(*residueBoltzmannFactor);
-        transitionMatrix[poreSteps + 2] = 1.0 / 6.0 *(*residueBoltzmannFactor);
-
-        transitionMatrix[poreSteps*(poreSteps - 1) - 1] = 1.0 / 6.0 *
-                (*residueBoltzmannFactor);
-        transitionMatrix[poreSteps*(poreSteps - 1) - 2] = 4.0 / 6.0 *
-                (*residueBoltzmannFactor);
-        transitionMatrix[poreSteps*(poreSteps - 1) - 3] = 1.0 / 6.0 *
-                (*residueBoltzmannFactor);
-        transitionMatrix[poreSteps*poreSteps - 1] = 4.0 / 6.0 *
-                (*residueBoltzmannFactor);
-        transitionMatrix[poreSteps*poreSteps - 2] = 1.0 / 6.0 *
-                (*residueBoltzmannFactor);
-
-        // Zeroing the calculation buffer.
-        for (int i = 0; i < poreSteps; i++)
-        {
-            densityBuffer[i] = 0.0;
-        }
-
-        // Multiplying the transition matrix by the density vector. The result
-        // is stored in the buffer vector.
-        for (int i = 0; i < poreSteps; i++)
-        {
-            for (int j = 0; j < poreSteps; j++)
-            {
-                densityBuffer[i] = densityBuffer[i] + density[j] *
-                                   transitionMatrix[j + i * poreSteps];
-            }
-        }
-
-        // Transferring results from the density vector.
-        for (int i = 0; i < poreSteps; i++)
-        {
-            density[i] = densityBuffer[i];
-        }
-    }
-
-    // Finally, Kd is calculated as a sum of elements of the density vector.
-    // It is normalized to the size of the lattice.
-    double Kd=0;
-    for (int k=0; k < poreSteps; k++)
-    {
-        Kd += density[k];
-    }
-    Kd = Kd / poreSteps;
-
-    // Cleaning memory.
-    try
-    {
-        delete[] density;
-        delete[] densityBuffer;
-        delete[] transitionMatrix;
-    }
-    catch (...)
-    {
-        throw BioLCCCException("Cannot allocate memory for calculations");
-    }
-
-    return Kd;
-}
-
-double calculateKdCoilSnyder(
-    const std::vector<double> &peptideEnergyProfile,
-    const double secondSolventConcentration,
-    const ChemicalBasis &chemBasis,
-    const double columnPoreSize,
-    const double columnRelativeStrength,
-    const double temperature
-)
-{
-    // At first, we need to convert energy profile to a profile of distribution
-    // probabilities. Probability = exp(E_effective),
-    // where E_effective = E_of_residue - Eab,
-    // and Eab is an energy of binding for a binary solvent
-    // and Eab = Ea + ln ( 1 + Nb + Nb*exp (Ea - Eb) )
-    // also corrections of energies due to temperature (energies in exponents
-    // are scaled to the new temperature) and column aging (calibration
-    // parameter) are introduced.
-
-    if (peptideEnergyProfile.size() == 0)
-    {
-        return 0.0;
-    }
-
-    // Due to the preliminary scaling the binding energy of water equals zero.
-    double Nb = 0;
-
-    // A Boltzmann factor is an exponent of an energy of interaction between
-    // an amino acid residue and a solid phase divided by a temperature *
-    // Boltzmann's constant. An energy unit is a Boltzmann's constant *
-    // 293.0 Kelvins. This probability is used later in the transition matrix.
-    std::vector<double> boltzmannFactorProfile;
-    for (std::vector<double>::const_iterator residueEnergy =
-                peptideEnergyProfile.begin();
-            residueEnergy != peptideEnergyProfile.end();
-            residueEnergy ++
-        )
-    {
-        //std::cout << *residueEnergy << " ";
-        Nb = secondSolventConcentration * 1.91 /
-             (secondSolventConcentration * 1.91 +
-              (100.0 - secondSolventConcentration) * 5.56);
-        boltzmannFactorProfile.push_back(
-            exp(columnRelativeStrength *
-                (*residueEnergy - chemBasis.secondSolventBindEnergy() * Nb) *
-                293.0 / temperature));
-    }
-
-    // The density vector correspond to a probability of n-th residue to be in
-    // a certain layer between pore walls.
-    // The transition matrix used to calculate a density vector of n-th
-    // particle from a density vector of (n-1)-th particle.
-    // The density buffer vector is used during matrix calculations.
-    double *density;
-    double *transitionMatrix;
-    double *densityBuffer;
-
-    // PoreSteps is a number of nodes in a lattice between two walls. 
-    // Because of the calculation features it have to be greater than 4.
-    const int poreSteps = (int) (columnPoreSize /
-                                 chemBasis.segmentLength() / 
-                                 (double)(chemBasis.kuhnLength())) ;
-    if (poreSteps <2)
-    {
-        throw BioLCCCException(
-            "The pore size is too small for Kd calculation.");
-    }
-  
-    // Memory managment.
-    try
-    {
-        density = new double[poreSteps];
-        densityBuffer = new double[poreSteps];
-        transitionMatrix = new double[poreSteps*poreSteps];
-    }
-    catch (...)
-    {
-        throw BioLCCCException("Cannot allocate memory for calculations");
-    }
-
-    // Now we need to construct a density vector for the first amino acid
-    // residue.
-    // A density is distributed uniformely over all layers of the lattice,
-    // except for the wall layers. There a density is multiplied by Boltzmann
-    // factor due to interaction of a residue with a solid phase.
-    density[0] = boltzmannFactorProfile[0];
-    for (int i = 1; i < poreSteps - 1 ; i++)
-    {
-        density[i] = 1;
-    }
-    density[poreSteps - 1] =
-        boltzmannFactorProfile[0];
-
-    // Than we construct a basis for the transition matrix. The basis is
-    // a diagonal matrix with 4.0/6.0 on the main diagonal and 1.0/6.0 on
-    // the side diagonals.
-
-    // Filling the first row.
-    transitionMatrix[0] = 4.0/6.0;
-    transitionMatrix[1] = 1.0/6.0;
-    for (int i = 2; i < poreSteps; i++)
-    {
-        transitionMatrix[i] = 0.0;
-    }
-
-    // Filling from 2nd to (n-1)th rows.
-    for (int i = 1; i < poreSteps - 1; i++)
-    {
-        for (int j = 0; j < poreSteps; j++)
-        {
-            switch ( j - i + 1 )
-            {
-            case 0:
-            {
-                transitionMatrix[j + poreSteps * i] = 1.0/6.0;
-                break;
-            }
-            case 1:
-            {
-                transitionMatrix[j + poreSteps * i] = 4.0/6.0;
-                break;
-            }
-            case 2:
-            {
-                transitionMatrix[j + poreSteps * i] = 1.0/6.0;
-                break;
-            }
-            default:
-                transitionMatrix[j + poreSteps * i] = 0.0;
-            }
-        }
-    }
-
-    // Filling the n-th row.
-    for (int i = poreSteps * (poreSteps - 1);
-            i < (poreSteps * poreSteps - 2);
-            i++)
-    {
-        transitionMatrix[i] = 0.0;
-    }
-    transitionMatrix[poreSteps * poreSteps - 2] = 1.0/6.0;
-    transitionMatrix[poreSteps * poreSteps - 1] = 4.0/6.0;
-
-    // On the each step we calculate a density vector for the n-th amino acid
-    // residue by multiplication of the transition matrix and the density
-    // vector for the (n-1)th residue.
-    for (std::vector<double>::const_iterator residueBoltzmannFactor =
-                ++boltzmannFactorProfile.begin();
-            residueBoltzmannFactor != boltzmannFactorProfile.end();
-            residueBoltzmannFactor++
-        )
-    {
-        // Elements of the first and the last rows of the transition matrix are
-        // modified by Boltzmann factor.
-        transitionMatrix[0] = 4.0 / 6.0 * (*residueBoltzmannFactor);
-        transitionMatrix[1] = 1.0 / 6.0 * (*residueBoltzmannFactor);
-        transitionMatrix[poreSteps*poreSteps - 1] = 4.0 / 6.0 *
-                (*residueBoltzmannFactor);
-        transitionMatrix[poreSteps*poreSteps - 2] = 1.0 / 6.0 *
-                (*residueBoltzmannFactor);
-
-        // Zeroing the calculation buffer.
-        for (int i = 0; i < poreSteps; i++)
-        {
-            densityBuffer[i] = 0.0;
-        }
-
-        // Multiplying the transition matrix by the density vector. The result
-        // is stored in the buffer vector.
-        for (int i = 0; i < poreSteps; i++)
-        {
-            for (int j = 0; j < poreSteps; j++)
-            {
-                densityBuffer[i] = densityBuffer[i] + density[j] *
-                                   transitionMatrix[j + i * poreSteps];
-            }
-        }
-
-        // Transferring results from the density vector.
-        for (int i = 0; i < poreSteps; i++)
-        {
-            density[i] = densityBuffer[i];
-        }
-    }
-
-    // Finally, Kd is calculated as a sum of elements of the density vector.
-    // It is normalized to the size of the lattice.
-    double Kd=0;
-    for (int k=0; k<poreSteps; k++)
-    {
-        Kd += density[k];
-    }
-    Kd = Kd / poreSteps;
-
-    // Cleaning memory.
-    try
-    {
-        delete[] density;
-        delete[] densityBuffer;
-        delete[] transitionMatrix;
-    }
-    catch (...)
-    {
-        throw BioLCCCException("Cannot allocate memory for calculations");
-    }
-
-    return Kd;
-}
-
-double rodAdsorbtionEnergy(const std::vector<double> & peptideEnergyProfile,
+double rodAdsorptionEnergy(const std::vector<double> & rodEnergyProfile,
                            unsigned int n,
-                           bool reversed = false
-                          )
+                           bool reversed = false)
 {
-    if ((n < 0) || (n > peptideEnergyProfile.size()))
+    if ((n < 0) || (n > rodEnergyProfile.size()))
     {
         throw BioLCCCException("Index is out of range.");
     }
@@ -689,21 +398,20 @@ double rodAdsorbtionEnergy(const std::vector<double> & peptideEnergyProfile,
     double init = 0;
     if (reversed)
     {
-        return std::accumulate(peptideEnergyProfile.end()-n,
-                               peptideEnergyProfile.end(),
+        return std::accumulate(rodEnergyProfile.end()-n,
+                               rodEnergyProfile.end(),
                                init);
     }
     else
     {
-        return std::accumulate(peptideEnergyProfile.begin(),
-                               peptideEnergyProfile.begin()+n,
+        return std::accumulate(rodEnergyProfile.begin(),
+                               rodEnergyProfile.begin()+n,
                                init);
     }
 }
 
 double partitionFunctionRodFreeSlit(double rodLength,
-                                    double slitWidth
-                                   )
+                                    double slitWidth)
 {
     // the equation works only if the slit is wider than the rod
     if (rodLength <= slitWidth)
@@ -721,21 +429,6 @@ double partitionFunctionRodFreeSlit(double rodLength,
 
 }
 
-double partitionFunctionRodFreeSlitA(double rodLength,
-                                     double slitWidth
-                                    )
-{
-    return (4 * PI * slitWidth * rodLength * rodLength -
-            2 * PI * rodLength * rodLength * rodLength);
-}
-
-double partitionFunctionRodFreeSlitC(double rodLength,
-                                     double slitWidth
-                                    )
-{
-    return (2 * PI * slitWidth * slitWidth * rodLength);
-}
-
 double partitionFunctionRodSubmergedIntoLayer(
     double segmentLength,
     double slitWidth,
@@ -751,7 +444,7 @@ double partitionFunctionRodSubmergedIntoLayer(
         if (layerWidth >= segmentLength * double(n))
         {
             partitionFunction += 2.0 * PI * rodLength * rodLength *
-                                 exp(rodAdsorbtionEnergy(
+                                 exp(rodAdsorptionEnergy(
                                     rodEnergyProfile, n, reversed)) *
                                  segmentLength / 2.0;
         }
@@ -759,7 +452,7 @@ double partitionFunctionRodSubmergedIntoLayer(
                  (layerWidth < segmentLength * double(n)))
         {
             partitionFunction += 2.0 * PI * rodLength * rodLength *
-                                 exp(rodAdsorbtionEnergy(
+                                 exp(rodAdsorptionEnergy(
                                     rodEnergyProfile, n, reversed)) *
                                  (layerWidth
                                   - segmentLength * (double)(n-1) / 2.0
@@ -769,7 +462,7 @@ double partitionFunctionRodSubmergedIntoLayer(
         else
         {
             partitionFunction += 2.0 * PI * rodLength * rodLength *
-                                 exp(rodAdsorbtionEnergy(
+                                 exp(rodAdsorptionEnergy(
                                     rodEnergyProfile, n, reversed)) *
                                  layerWidth * layerWidth / 2.0 / double(n)
                                  / double(n-1) / segmentLength;
@@ -779,14 +472,13 @@ double partitionFunctionRodSubmergedIntoLayer(
 }
 
 double partitionFunctionRodFreeVolume(double rodLength,
-                                      double slitWidth
-                                     )
+                                      double slitWidth)
 {
     return (4 * PI * slitWidth * rodLength * rodLength);
 }
 
 double calculateKdRod(
-    const std::vector<double> &peptideEnergyProfile,
+    const std::vector<ChemicalGroup> &parsedSequence,
     const double secondSolventConcentration,
     const ChemicalBasis &chemBasis,
     const double columnPoreSize,
@@ -794,136 +486,113 @@ double calculateKdRod(
     const double temperature
 )
 {
-    // At first, we need to convert energy profile to a profile of distribution
-    // probabilities. Probability = exp(E_effective),
-    // where E_effective = E_of_residue - Eab,
-    // and Eab is an energy of binding for a binary solvent
-    // and Eab = Ea + ln ( 1 + Nb + Nb*exp (Ea - Eb) )
-    // also corrections of energies due to temperature (energies in exponents
-    // are scaled to the new temperature) and column aging (calibration
-    // parameter) are introduced.
-
-    if (peptideEnergyProfile.size() == 0)
+    if (parsedSequence.size() == 0)
     {
         return 0.0;
     }
 
-    // Due to the preliminary scaling the binding energy of water equals zero.
-    double Q = exp((0 + chemBasis.secondSolventBindEnergy()) *
-                   293.0 / temperature);
-    double Nb = 0;
-    double Eab = 0;
+    std::vector<double> segmentEnergyProfile = 
+        calculateSegmentEnergyProfile(
+            calculateMonomerEnergyProfile(
+                parsedSequence,
+                chemBasis,
+                secondSolventConcentration,
+                columnRelativeStrength,
+                temperature),
+            chemBasis.monomerLength(),
+            chemBasis.kuhnLength());
 
-    // A Boltzmann factor is an exponent of an energy of interaction between
-    // an amino acid residue and a solid phase divided by a temperature *
-    // Boltzmann's constant. An energy unit is a Boltzmann's constant *
-    // 293.0 Kelvins. This probability is used later in the transition matrix.
-    std::vector<double> effectiveEnergyProfile;
-
-    for (std::vector<double>::const_iterator residueEnergy=
-                peptideEnergyProfile.begin();
-            residueEnergy != peptideEnergyProfile.end();
-            residueEnergy++)
-    {
-        Nb = secondSolventConcentration * 1.91 /
-             (secondSolventConcentration * 1.91 +
-              (100.0 - secondSolventConcentration) * 5.56);
-        Eab = 0.0 + 1.0 / columnRelativeStrength * log( 1.0 - Nb + Nb * Q );
-        effectiveEnergyProfile.push_back(columnRelativeStrength *
-                                         (*residueEnergy - Eab) * 293.0 / 
-                                         temperature);
-    }
+    double rodLength = chemBasis.kuhnLength() *
+        (segmentEnergyProfile.size() - 1);
 
     double Kd =
-        (partitionFunctionRodFreeSlit(
-             chemBasis.segmentLength() * (effectiveEnergyProfile.size() - 1),
-             columnPoreSize - 2.0 * chemBasis.adsorbtionLayerWidth())
-         + 2.0 * partitionFunctionRodFreeSlit(
-             chemBasis.segmentLength() * (effectiveEnergyProfile.size() - 1),
-             chemBasis.adsorbtionLayerWidth())
-         * exp(rodAdsorbtionEnergy(
-                   effectiveEnergyProfile,
-                   effectiveEnergyProfile.size()))
+        (
+            partitionFunctionRodFreeSlit(
+                rodLength,
+                columnPoreSize - 2.0 * chemBasis.adsorptionLayerWidth())
 
-         + 2.0 * partitionFunctionRodSubmergedIntoLayer(
-             chemBasis.segmentLength(),
-             columnPoreSize,
-             chemBasis.adsorbtionLayerWidth(),
-             effectiveEnergyProfile,
-             false)
-         + 2.0 * partitionFunctionRodSubmergedIntoLayer(
-             chemBasis.segmentLength(),
-             columnPoreSize,
-             chemBasis.adsorbtionLayerWidth(),
-             effectiveEnergyProfile,
-             true)) /
-        partitionFunctionRodFreeVolume(
-            (effectiveEnergyProfile.size() - 1) * chemBasis.segmentLength(),
+            + 2.0 * partitionFunctionRodFreeSlit(
+                rodLength,
+                chemBasis.adsorptionLayerWidth())
+            * exp(rodAdsorptionEnergy(
+                segmentEnergyProfile,
+                segmentEnergyProfile.size()))
+
+            + 2.0 * partitionFunctionRodSubmergedIntoLayer(
+                chemBasis.kuhnLength(),
+                columnPoreSize,
+                chemBasis.adsorptionLayerWidth(),
+                segmentEnergyProfile,
+                false)
+
+            + 2.0 * partitionFunctionRodSubmergedIntoLayer(
+                chemBasis.kuhnLength(),
+                columnPoreSize,
+                chemBasis.adsorptionLayerWidth(),
+                segmentEnergyProfile,
+                true)
+        ) / partitionFunctionRodFreeVolume(
+            rodLength,
             columnPoreSize);
 
     return Kd;
 }
 
-double calculateKd(const std::vector<double> &peptideEnergyProfile,
+double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
                    const double secondSolventConcentration,
                    const ChemicalBasis &chemBasis,
                    const double columnPoreSize,
                    const double columnRelativeStrength,
-                   const double temperature
-                  )
+                   const double temperature)
 {
+    // assymetricCalculations shows whether the Kd for the reversed molecule 
+    // will differ. It happens when a molecule cannot be divided into an integer
+    // number of Kuhn segments.
+    bool assymetricCalculations = 
+        (fmod(chemBasis.monomerLength() * parsedSequence.size(), 
+              chemBasis.kuhnLength()) != 0);
     // Choosing the appropriate model.
-    if (chemBasis.model()==COIL_BOLTZMANN)
+    if (chemBasis.model()==COIL)
     {
-        if (peptideEnergyProfile.size() % chemBasis.kuhnLength() == 0)
+        double Kd = calculateKdCoil(parsedSequence,
+                                    secondSolventConcentration, 
+                                    chemBasis, columnPoreSize,
+                                    columnRelativeStrength, temperature);
+        if (assymetricCalculations) 
         {
-            return calculateKdCoilBoltzmann(peptideEnergyProfile,
-                                            secondSolventConcentration, 
-                                            chemBasis, columnPoreSize,
-                                            columnRelativeStrength, temperature);
+            std::vector<ChemicalGroup> revParsedSequence = 
+                parsedSequence;
+            std::reverse(revParsedSequence.begin(),
+                         revParsedSequence.end());
+            Kd = (Kd + calculateKdCoil(revParsedSequence,
+                                       secondSolventConcentration,
+                                       chemBasis,
+                                       columnPoreSize,
+                                       columnRelativeStrength, 
+                                       temperature)) / 2.0 ;
         }
-        else
+        return Kd;
+    }
+    else if (chemBasis.model() == ROD)
+    {
+        double Kd = calculateKdRod(parsedSequence,
+                                   secondSolventConcentration, 
+                                   chemBasis, columnPoreSize,
+                                   columnRelativeStrength, temperature);
+        if (assymetricCalculations) 
         {
-            std::vector<double> revPeptideEnergyProfile = peptideEnergyProfile;
-            std::reverse(revPeptideEnergyProfile.begin(),
-                         revPeptideEnergyProfile.end());
-            return (calculateKdCoilBoltzmann(peptideEnergyProfile,
-                                             secondSolventConcentration, 
-                                             chemBasis, columnPoreSize,
-                                             columnRelativeStrength, temperature)
-                    + calculateKdCoilBoltzmann(revPeptideEnergyProfile,
-                                               secondSolventConcentration,
-                                               chemBasis, columnPoreSize,
-                                               columnRelativeStrength, 
-                                               temperature)) / 2.0 ;
+            std::vector<ChemicalGroup> revParsedSequence = 
+                parsedSequence;
+            std::reverse(revParsedSequence.begin(),
+                         revParsedSequence.end());
+            Kd = (Kd + calculateKdRod(revParsedSequence,
+                                      secondSolventConcentration,
+                                      chemBasis,
+                                      columnPoreSize,
+                                      columnRelativeStrength, 
+                                      temperature)) / 2.0 ;
         }
-    }
-    else if (chemBasis.model()==COIL_BOLTZMANN_DOUBLE_LAYER)
-    {
-        return calculateKdCoilBoltzmannDoubleLayer(peptideEnergyProfile,
-                secondSolventConcentration,
-                chemBasis,
-                columnPoreSize,
-                columnRelativeStrength,
-                temperature);
-    }
-    else if (chemBasis.model() == COIL_SNYDER)
-    {
-        return calculateKdCoilSnyder(peptideEnergyProfile,
-                                     secondSolventConcentration,
-                                     chemBasis,
-                                     columnPoreSize,
-                                     columnRelativeStrength,
-                                     temperature);
-    }
-    else if (chemBasis.model() == ROD_BOLTZMANN)
-    {
-        return calculateKdRod(peptideEnergyProfile,
-                              secondSolventConcentration,
-                              chemBasis,
-                              columnPoreSize,
-                              columnRelativeStrength,
-                              temperature);
+        return Kd;
     }
     else
     {
@@ -931,11 +600,10 @@ double calculateKd(const std::vector<double> &peptideEnergyProfile,
     }
 }
 
-double calculateRT(const std::vector<double> &peptideEnergyProfile,
+double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                    const ChemicalBasis &chemBasis,
                    const ChromoConditions &conditions,
-                   const bool continueGradient
-                  )
+                   const bool continueGradient)
 {
     // Calculating column volumes.
     double volumeLiquidPhase = conditions.columnDiameter() *
@@ -1018,19 +686,23 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                     // the section is the last.
                     bool peptideElutes = 
                         ((1.0 - S) / dV * calculateKd(
-                            peptideEnergyProfile, currentGradientPoint->second,
-                            chemBasis, conditions.columnPoreSize(),
+                            parsedSequence,
+                            currentGradientPoint->second,
+                            chemBasis, 
+                            conditions.columnPoreSize(),
                             conditions.columnRelativeStrength(),
                             conditions.temperature()) * volumePore < 
                         (currentGradientPoint->first - j + 1));
+
                     if (peptideElutes ||
                         (currentGradientPoint == --convertedGradient.end()))
                     {
                         j += (int)ceil((1.0 - S) / dV *
                             calculateKd(
-                               peptideEnergyProfile,
+                               parsedSequence,
                                currentGradientPoint->second,
-                               chemBasis, conditions.columnPoreSize(),
+                               chemBasis,
+                               conditions.columnPoreSize(),
                                conditions.columnRelativeStrength(),
                                conditions.temperature()) *
                             volumePore);
@@ -1041,7 +713,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                     else
                     {
                         S += dV / calculateKd(
-                                 peptideEnergyProfile,
+                                 parsedSequence,
                                  currentGradientPoint->second,
                                  chemBasis,
                                  conditions.columnPoreSize(),
@@ -1063,7 +735,7 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
             (currentGradientPoint->first - previousGradientPoint->first) *
             (currentGradientPoint->first - (double) j);
         S += dV / calculateKd(
-                 peptideEnergyProfile, secondSolventConcentration,
+                 parsedSequence, secondSolventConcentration,
                  chemBasis, conditions.columnPoreSize(),
                  conditions.columnRelativeStrength(),
                  conditions.temperature()) / volumePore;
@@ -1073,19 +745,15 @@ double calculateRT(const std::vector<double> &peptideEnergyProfile,
                 volumeLiquidPhase / conditions.flowRate();
     return RT;
 }
-
 }
 
-void parseSequence(
+std::vector<ChemicalGroup> parseSequence(
     const std::string &source,
-    const ChemicalBasis &chemBasis,
-    std::vector<ChemicalGroup> *parsedPeptideStructure,
-    ChemicalGroup *NTerminus,
-    ChemicalGroup *CTerminus,
-    std::vector<double> *peptideEnergyProfile
-)
+    const ChemicalBasis &chemBasis)
 {
-    parsedPeptideStructure->clear();
+    std::vector<ChemicalGroup> parsedSequence;
+    ChemicalGroup NTerminus;
+    ChemicalGroup CTerminus;
 
     // At first we need to strip the sequence from adjacent amino acids.
     // If a source sequence contains them, it should contain two dots, so we
@@ -1130,7 +798,7 @@ void parseSequence(
 
     // First we need to check the stripped source sequence for
     // the N-Terminal group.
-    *NTerminus = chemBasis.defaultNTerminus();
+    NTerminus = chemBasis.defaultNTerminus();
     for (std::map<std::string,ChemicalGroup>::const_iterator
             NTerminusIterator = chemBasis.chemicalGroups().begin();
             NTerminusIterator != chemBasis.chemicalGroups().end();
@@ -1141,14 +809,14 @@ void parseSequence(
             if (strippedSource.find(NTerminusIterator->second.label()) ==
                     (size_t)0)
             {
-                *NTerminus = NTerminusIterator->second;
+                NTerminus = NTerminusIterator->second;
                 NTerminusPosition = NTerminusIterator->second.label().size();
             }
         }
     }
 
     // Then we need to found the location of the C-Terminus.
-    *CTerminus = chemBasis.defaultCTerminus();
+    CTerminus = chemBasis.defaultCTerminus();
     std::size_t CTerminusPosition;
     CTerminusPosition = strippedSource.find("-", NTerminusPosition);
     if (CTerminusPosition != std::string::npos)
@@ -1172,7 +840,7 @@ void parseSequence(
                 if (strippedSource.find(CTerminusIterator->second.label(),
                     CTerminusPosition) != std::string::npos)
                 {
-                    *CTerminus = CTerminusIterator->second;
+                    CTerminus = CTerminusIterator->second;
                 }
             }
         }
@@ -1217,7 +885,7 @@ void parseSequence(
                 aminoAcidIterator->second.label()) == 0)
             {
                 curPos += aminoAcidIterator->second.label().size();
-                parsedPeptideStructure -> push_back(aminoAcidIterator->second);
+                parsedSequence.push_back(aminoAcidIterator->second);
                 aminoAcidFound = true;
                 break;
             }
@@ -1230,14 +898,18 @@ void parseSequence(
                 source.substr(curPos, 1) + ".");
         }
     }
+    parsedSequence.insert(parsedSequence.begin(), NTerminus);
+    parsedSequence.push_back(CTerminus);
+    return parsedSequence;
 
+    /*
     // Finally, we build an energy profile if it was defined.
     if (peptideEnergyProfile != NULL)
     {
         peptideEnergyProfile->clear();
         for (std::vector<ChemicalGroup>::const_iterator currentAminoAcid =
-                    parsedPeptideStructure->begin();
-                currentAminoAcid != parsedPeptideStructure->end();
+                    parsedSequence.begin();
+                currentAminoAcid != parsedSequence.end();
                 currentAminoAcid++)
         {
             peptideEnergyProfile->push_back(currentAminoAcid->bindEnergy());
@@ -1249,26 +921,15 @@ void parseSequence(
         *(--peptideEnergyProfile->end()) = *(--peptideEnergyProfile->end()) +
                                            CTerminus->bindEnergy();
     }
+    */
 }
 
 double calculateRT(const std::string &sequence,
                    const ChemicalBasis &chemBasis,
                    const ChromoConditions &conditions,
-                   const bool continueGradient
-                  )
+                   const bool continueGradient)
 {
-    std::vector<ChemicalGroup> parsedPeptideStructure;
-    ChemicalGroup NTerminus;
-    ChemicalGroup CTerminus;
-    std::vector<double> peptideEnergyProfile;
-
-    parseSequence(sequence,
-                  chemBasis,
-                  &parsedPeptideStructure,
-                  &NTerminus,
-                  &CTerminus,
-                  &peptideEnergyProfile);
-    return calculateRT(peptideEnergyProfile,
+    return calculateRT(parseSequence(sequence, chemBasis),
                        chemBasis,
                        conditions,
                        continueGradient);
@@ -1279,21 +940,9 @@ double calculateKd(const std::string &sequence,
                    const ChemicalBasis & chemBasis,
                    const double columnPoreSize,
                    const double columnRelativeStrength,
-                   const double temperature
-                  )
+                   const double temperature)
 {
-    std::vector<ChemicalGroup> parsedPeptideStructure;
-    ChemicalGroup NTerminus;
-    ChemicalGroup CTerminus;
-    std::vector<double> peptideEnergyProfile;
-
-    parseSequence(sequence,
-                  chemBasis,
-                  &parsedPeptideStructure,
-                  &NTerminus,
-                  &CTerminus,
-                  &peptideEnergyProfile);
-    return calculateKd(peptideEnergyProfile,
+    return calculateKd(parseSequence(sequence, chemBasis),
                        secondSolventConcentration,
                        chemBasis,
                        columnPoreSize,
@@ -1302,211 +951,37 @@ double calculateKd(const std::string &sequence,
 }
 
 double calculateAverageMass(const std::string &sequence,
-                            const ChemicalBasis &chemBasis
-                           )
+                            const ChemicalBasis &chemBasis)
 {
-    std::vector<ChemicalGroup> parsedPeptideStructure;
-    ChemicalGroup NTerminus;
-    ChemicalGroup CTerminus;
+    std::vector<ChemicalGroup> parsedSequence =
+        parseSequence(sequence, chemBasis);
     double peptideAverageMass = 0;
-
-    parseSequence(sequence, chemBasis, &parsedPeptideStructure,
-                  &NTerminus, &CTerminus, NULL);
     for (std::vector<ChemicalGroup>::const_iterator i =
-                parsedPeptideStructure.begin();
-            i < parsedPeptideStructure.end();
+                parsedSequence.begin();
+            i < parsedSequence.end();
             i++)
     {
         peptideAverageMass += i -> averageMass();
     }
-    peptideAverageMass += NTerminus.averageMass();
-    peptideAverageMass += CTerminus.averageMass();
 
     return peptideAverageMass;
 }
 
 double calculateMonoisotopicMass(const std::string &sequence,
-                                 const ChemicalBasis &chemBasis
-                                )
+                                 const ChemicalBasis &chemBasis)
 {
-    std::vector<ChemicalGroup> parsedPeptideStructure;
-    ChemicalGroup NTerminus;
-    ChemicalGroup CTerminus;
-    double monoisotopicMass = 0;
-
-    parseSequence(sequence, chemBasis, &parsedPeptideStructure,
-                  &NTerminus, &CTerminus, NULL);
+    std::vector<ChemicalGroup> parsedSequence =
+        parseSequence(sequence, chemBasis);
+    double peptideMonoisotopicMass = 0;
     for (std::vector<ChemicalGroup>::const_iterator i =
-                parsedPeptideStructure.begin();
-            i < parsedPeptideStructure.end();
+                parsedSequence.begin();
+            i < parsedSequence.end();
             i++)
     {
-        monoisotopicMass += i -> monoisotopicMass();
+        peptideMonoisotopicMass += i -> monoisotopicMass();
     }
-    monoisotopicMass += NTerminus.monoisotopicMass();
-    monoisotopicMass += CTerminus.monoisotopicMass();
 
-    return monoisotopicMass;
+    return peptideMonoisotopicMass;
 }
-
-//void calculatePeptideProperties(const std::string &sequence,
-//                                const ChromoConditions &conditions,
-//                                const ChemicalBasis &chemBasis,
-//                                double *RTBioLCCC,
-//                                double *averageMass,
-//                                double *monoisotopicMass
-//                               )
-//{
-//    std::vector<ChemicalGroup> parsedPeptideStructure;
-//    ChemicalGroup NTerminus;
-//    ChemicalGroup CTerminus;
-//    std::vector<double> peptideEnergyProfile;
-//
-//    parseSequence(sequence,
-//                  chemBasis,
-//                  &parsedPeptideStructure,
-//                  &NTerminus,
-//                  &CTerminus,
-//                  &peptideEnergyProfile);
-//
-//    *RTBioLCCC = calculateRT(peptideEnergyProfile, conditions, chemBasis,
-//                             true);
-//
-//    *averageMass = 0;
-//    for (std::vector<ChemicalGroup>::const_iterator i =
-//                parsedPeptideStructure.begin();
-//            i < parsedPeptideStructure.end();
-//            i++)
-//    {
-//        *averageMass += i -> averageMass();
-//    }
-//    *averageMass += NTerminus.averageMass();
-//    *averageMass += CTerminus.averageMass();
-//
-//    *monoisotopicMass = 0;
-//    for (std::vector<ChemicalGroup>::const_iterator i =
-//                parsedPeptideStructure.begin();
-//            i < parsedPeptideStructure.end();
-//            i++)
-//    {
-//        *monoisotopicMass += i -> monoisotopicMass();
-//    }
-//    *monoisotopicMass += NTerminus.monoisotopicMass();
-//    *monoisotopicMass += CTerminus.monoisotopicMass();
-//}
-//
-//ChemicalBasis calibrateBioLCCC(std::vector<std::string> calibrationMixture,
-//                               std::vector<double> retentionTimes,
-//                               ChromoConditions chromatograph,
-//                               ChemicalBasis initialChemicalBasis,
-//                               std::vector<std::string> energiesToCalibrate
-//) {
-//
-//    // Generate the list of setter functions out of 'energiesToCalibrate'
-//    ChemicalBasis newChemicalBasis = initialChemicalBasis;
-//    std::vector< boost::function<void(double)> > setters;
-//    for(unsigned int i = 0; i < energiesToCalibrate.size(); i++) {
-//        if (initialChemicalBasis.aminoacids().find(energiesToCalibrate[i]) !=
-//        initialChemicalBasis.aminoacids().end()) {
-//            setters.push_back(boost::bind(
-//                &ChemicalBasis::setAminoacidBindEnergy,
-//                &newChemicalBasis,
-//                energiesToCalibrate[i],
-//                _1));
-////            std::cout << "AA found\n";
-//        }
-//        else if (initialChemicalBasis.NTermini().find(energiesToCalibrate[i]) !=
-//                 initialChemicalBasis.NTermini().end()) {
-//                     setters.push_back(boost::bind(
-//                         &ChemicalBasis::setNTerminusBindEnergy,
-//                         &newChemicalBasis,
-//                         energiesToCalibrate[i],
-//                         _1));
-////                     std::cout << "NT found\n";
-//                 }
-//        else if (initialChemicalBasis.CTermini().find(energiesToCalibrate[i]) !=
-//                 initialChemicalBasis.CTermini().end()) {
-//                     setters.push_back(boost::bind(
-//                         &ChemicalBasis::setCTerminusBindEnergy,
-//                         &newChemicalBasis,
-//                         energiesToCalibrate[i],
-//                         _1));
-////                     std::cout << "CT found\n";
-//                 }
-//        else if (energiesToCalibrate[i] == "ACN") {
-//            // This is a walkaround for the strange type-punning GCC warning.
-//            boost::function<void (ChemicalBasis*, double)> secondSolventSetter;
-//            secondSolventSetter = &ChemicalBasis::setSecondSolventBindEnergy;
-//            setters.push_back(boost::bind(secondSolventSetter,
-//                                          &newChemicalBasis,
-//                                          _1));
-////            std::cout << "ACN found\n";
-//        }
-//
-//    }
-//
-//    std::vector<double> (*calculateRTforList)
-//        (std::vector<std::string>,ChromoConditions,ChemicalBasis) =
-//            &calculateRT;
-//    boost::function<double(void)> penaltyFunction = boost::bind(
-//        boost::bind(vectorNorm<double>,
-//                    boost::bind(VectorDiff<double>, _1, _2)),
-//        boost::bind(calculateRTforList, calibrationMixture,
-//                    chromatograph, boost::ref(newChemicalBasis)),
-//        retentionTimes);
-//
-//    std::vector<double> lowerBounds, upperBounds, steps, gradientSteps;
-//    for(unsigned int i = 0; i < setters.size(); i++) {
-//        lowerBounds.push_back(0.0);
-//        upperBounds.push_back(3.0);
-//        steps.push_back(0.25);
-//        gradientSteps.push_back(0.001);
-//    }
-//    //std::vector<double> lowerBounds, upperBounds, steps, gradientSteps;
-//    //lowerBounds.push_back(0.575-0.01);
-//    //lowerBounds.push_back(0.83-0.01);
-//    //lowerBounds.push_back(2.20-0.01);
-//    //upperBounds.push_back(0.575+0.01);
-//    //upperBounds.push_back(0.83+0.01);
-//    //upperBounds.push_back(2.20+0.01);
-//    //steps.push_back(0.0025);
-//    //steps.push_back(0.0025);
-//    //steps.push_back(0.0025);
-//    //gradientSteps.push_back(0.001);
-//    //gradientSteps.push_back(0.001);
-//    //gradientSteps.push_back(0.001);
-//
-//    std::cout << "Initial penalty function value: "
-//        << penaltyFunction() << "\n";
-//    std::vector<double> calibratedEnergiesBruteForce =
-//        findMinimumBruteForce(penaltyFunction, setters, lowerBounds,
-//                              upperBounds, steps);
-//    std::cout << "BruteForce approximation:\n";
-//    for(unsigned int i = 0; i < setters.size(); i++) {
-//        std::cout << energiesToCalibrate[i] << ": "
-//            << calibratedEnergiesBruteForce[i] << "\n";
-//    }
-//
-//    for(unsigned int i = 0; i < setters.size(); i++) {
-//        setters[i](calibratedEnergiesBruteForce[i]);
-//    }
-//    std::cout << "Penalty function value after calibration: "
-//        << penaltyFunction() << "\n";
-//
-//    std::vector<double> calibratedEnergiesGradientDescent =
-//        findMinimumGradientDescent(penaltyFunction, setters,
-//            calibratedEnergiesBruteForce, gradientSteps, 0.00001);
-//
-//    std::cout << "GradientDescent approximation:\n";
-//    for(unsigned int i = 0; i < setters.size(); i++) {
-//        std::cout << energiesToCalibrate[i] << ": "
-//            << calibratedEnergiesGradientDescent[i] << "\n";
-//    }
-//
-//    for(unsigned int i = 0; i < setters.size(); i++) {
-//        setters[i](calibratedEnergiesGradientDescent[i]);
-//    }
-//    return newChemicalBasis;
-//}
 
 }
