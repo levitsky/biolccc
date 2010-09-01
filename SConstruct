@@ -22,7 +22,7 @@ Targets:
                              Compiled by default.
     libBioLCCC_static        Static BioLCCC library. 
     libgtest_static          Static Google Test library. 
-    test                     A test suite for libBioLCCC.
+    tests                    A test suite for libBioLCCC.
     test_pyBioLCCC           A test suite for pyBioLCCC.
     doc_doxygen              API documentation for libBioLCCC.
     doc_sphinx               A general documentation for libBioLCCC and 

@@ -2,6 +2,7 @@
 #define CHEMICALBASIS_H
 
 #include <map>
+#include <vector>
 #include "biolcccexception.h"
 #include "chemicalgroup.h"
 
@@ -25,16 +26,10 @@ enum ModelType
 {
     /*! The standard BioLCCC model with the assumption of absolute 
         flexibility of a protein molecule. */
-    COIL_BOLTZMANN,
+    COIL,
     /*! The BioLCCC model with the assumption of absolute rigidity of 
         a protein molecule. It works better for short molecules. */
-    ROD_BOLTZMANN,
-    /*! EXPERIMENTAL. Modification of the standard model in which adsorption 
-        occurs in a volume, i.e. in two near-wall layers. */
-    COIL_BOLTZMANN_DOUBLE_LAYER, 
-    /*! EXPERIMENTAL. Modification of the standard model in which adsorption 
-        is described by the linear Snyder's theory. */
-    COIL_SNYDER 
+    ROD
 };
 
 //! This enum describes the predefined sets of physicochemical constants.
@@ -49,13 +44,13 @@ enum PredefinedChemicalBasis
     /*! A ChemicalBasis calibrated for reversed phase, ACN as a second solvent,
         0.1% TFA and COIL_BOLTZMANN type of BioLCCC model. The data was 
         obtained in Guo et al, Journal of Chromatography, 359 (1986) 449-517. */
-    RP_ACN_TFA_COIL_BOLTZMANN, 
+    RP_ACN_TFA_COIL, 
     //! Reversed phase, ACN, formic acid, ROD_BOLTZMANN model.
     /*! A ChemicalBasis calibrated for reversed phase, ACN as a second solvent,
         0.1% FA and ROD_BOLTZMANN type of BioLCCC model. The data was obtained
         in the joint research of Harvard University and Institute for Energy 
         Problems for Chemical Physics, Russian Academy of Science. */
-    RP_ACN_FA_ROD_BOLTZMANN 
+    RP_ACN_FA_ROD 
 };
 
 //! An instance of ChemicalBasis contains a set of BioLCCC constants.
@@ -118,13 +113,13 @@ public:
     //! Removes all chemical groups in a ChemicalBasis.
     void clearChemicalGroups();
 
-    //! Sets \a newBindEnergy as the binding energy of chemical group \a label.
-    /*!
-        Throws ChemicalBasisException if the chemical group is not found.
-        \param label The label of the chemical group to be modified.
-        \param newBindEnergy The new value of the bind energy.
-    */
-    void setChemicalGroupBindEnergy(std::string label, double newBindEnergy);
+    ////!Sets \a newBindEnergy as the binding energy of chemical group \a label.
+    ///*!
+    //    Throws ChemicalBasisException if the chemical group is not found.
+    //    \param label The label of the chemical group to be modified.
+    //    \param newBindEnergy The new value of the bind energy.
+    //*/
+    //void setChemicalGroupBindEnergy(std::string label, double newBindEnergy);
 
     //! Returns the bind energy of the second solvent. 
     /*! 
@@ -144,67 +139,154 @@ public:
     //! Returns the type of BioLCCC model (e.g. CoilBoltzmann, CoilSnydel).
     const ModelType model() const;
 
-    //! Returns the length of a single amino acid residue in angstroms.
+    //! Returns the length of a single monomer in a polymer chain in angstroms.
     /*!
         Due to the complex geometry of peptide molecule, this length is defined
         only approximately. The definition is the average length of an amino
         acid residue along backbone. In other terms, it is the length of 
         a backbone divided by the number of amino acid residues.
      */
-    double segmentLength() const;
+    double monomerLength() const;
 
-    //! Sets the length between two peptide bonds in angstroms.
+    //! Sets the length of a single monomer in a polymer chain in angstroms.
     /*!
         Due to the complex geometry of peptide molecule, this length is defined
         only approximately. The definition is the average length of an amino
         acid residue along backbone. In other terms, it is the length of 
         a backbone divided by the number of amino acid residues.
      */
-    void setSegmentLength(double newSegmentLength);
+    void setMonomerLength(double newMonomerLength);
 
-    //! Returns the Kuhn length of a molecule in amino acid residues.
+    //! Returns the Kuhn length of a polymer molecule in angstroms.
     /*!
         A polymer molecule can be modelled as a chain of equal-sized rigid rods,
         freely joined with each other. In this case, the rods would be called 
-        Kuhn segments and the length of a segment would be the Kuhn length.
-        In BioLCCC model the Kuhn length is measured as a number of amino acid 
-        residues comprising one rigid segment.
+        Kuhn segments, and the length of a segment would be the Kuhn length.
+        The effective adsorption energy of a Kuhn segment equals to the total
+        adsorption energy of all monomers that contains in this segment. If only
+        a part of monomer contains in a segment than its energy is taken
+        proportionally.
 
-        This value is used only for COIL_* types of model.
+        There are no joints in the ROD model, the whole molecule is assumed to
+        be shorter than a single Kuhn segment. However, in ROD model kuhnLength
+        is still used to calculate the energy profile of a rod. The whole rod is
+        divided into segments of kuhnLength and each segment transforms into an
+        adsorbing bead. The effective energy of adsorption equals to the total
+        effective energy of a segment, with the same expression as in the COIL
+        model.
     */
-    int kuhnLength() const;
+    double kuhnLength() const;
 
-    //! Sets the Kuhn length of a molecule in amino acid residues.
+    //! Sets the Kuhn length of a molecule in angstroms.
     /*!
         A polymer molecule can be modelled as a chain of equal-sized rigid rods,
         freely joined with each other. In this case, the rods would be called 
-        Kuhn segments and the length of a segment would be the Kuhn length.
-        In BioLCCC model the Kuhn length is measured as a number of amino acid 
-        residues comprising one rigid segment.
+        Kuhn segments, and the length of a segment would be the Kuhn length.
+        The effective adsorption energy of a Kuhn segment equals to the total
+        adsorption energy of all monomers that contains in this segment. If only
+        a part of monomer contains in a segment than its energy is taken
+        proportionally.
 
-        This value is used only for COIL_* types of model.
+        There are no joints in the ROD model, the whole molecule is assumed to
+        be shorter than a single Kuhn segment. However, in ROD model kuhnLength
+        is still used to calculate the energy profile of a rod. The whole rod is
+        divided into segments of kuhnLength and each segment transforms into an
+        adsorbing bead. The effective energy of adsorption equals to the total
+        effective energy of a segment, with the same expression as in the COIL
+        model.
     */
-    void setKuhnLength(int newKuhnLength);
+    void setKuhnLength(double newKuhnLength);
 
-    //! Returns the width of a solid phase adsorption layer.
+    //! Returns the width of a solid phase adsorption layer in ROD model.
     /*!
         The width of a solid phase adsorption layer can be defined as a
         characteristic distance of interaction between an amino acid residue and
         the surface of a solid phase. 
 
-        This value is used only for ROD_* types of model.
+        This value is used only in the ROD model.
     */
-    double adsorbtionLayerWidth() const;
+    double adsorptionLayerWidth() const;
 
-    //! Sets the width of a solid phase adsorption layer.
+    //! Sets the width of a solid phase adsorption layer in ROD model.
     /*!
         The width of a solid phase adsorption layer can be defined as a
         characteristic distance of interaction between an amino acid residue and
         the surface of a solid phase. 
 
-        This value is used only for ROD_* types of model.
+        This value is used only in the ROD model.
     */
-    void setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth);
+    void setAdsorptionLayerWidth(double newAdsorptionLayerWidth);
+
+    //! Returns the absorption factors of the near-wall layers in COIL model.
+    /*! 
+        The standard COIL BioLCCC model assumes that adsorption occurs only in
+        one layer located close to the wall. However, this assumption can be
+        generalized to the case when several near-wall layers adsorb segments 
+        of a polymer chain. This vector contains the relative adsorbtion
+        strengths of near-wall layers. This adsorbtion strength have the same
+        meaning as the relative adsorbtion strength of a column and multiplyed
+        by it. The first element of the vector corresponds to the
+        layer closest to the wall, second to the next and so on.
+
+        This value is used only in the COIL model.
+     */
+    const std::vector<double> & adsorptionLayerFactors() const;
+
+    //! Sets the absorption factors of the near-wall layers in COIL model.
+    /*! 
+        The standard COIL BioLCCC model assumes that adsorption occurs only in
+        one layer located close to the wall. However, this assumption can be
+        generalized to the case when several near-wall layers adsorb segments 
+        of a polymer chain. This vector contains the relative adsorption
+        strengths of near-wall layers. This adsorption strength have the same
+        meaning as the relative adsorption strength of a column and multiplyed
+        by it. The first element of the vector corresponds to the
+        layer closest to the wall, second to the next and so on.
+
+        This value is used only in the COIL model.
+     */
+    void setAdsorptionLayerFactors(
+        std::vector<double> newAdsorptionLayerFactors);
+
+    //! Returns true if the energy of binary solvent is linearly fitted.
+    /*!
+        If the value of snyderApproximation is true then the energy of binary
+        solvent is expressed by:
+        E_{ab} = secondSolventBindEnergy * Nb
+     */
+    bool snyderApproximation() const;
+
+    //! Enables the linear approximation of the energy of binary solvent.
+    /*!
+        If the value of snyderApproximation is true then the energy of binary
+        solvent is expressed by:
+        E_{ab} = secondSolventBindEnergy * Nb
+     */
+    void setSnyderApproximation(bool flag);
+
+    //! Returns the density of the first solvent in kg/m^3.
+    double firstSolventDensity() const;
+
+    //! Sets the density of the first solvent in kg/m^3.
+    void setFirstSolventDensity(double newFirstSolventDensity);
+
+    //! Returns the density of the second solvent in kg/m^3.
+    double secondSolventDensity() const;
+
+    //! Sets the density of the second solvent in kg/m^3.
+    void setSecondSolventDensity(double newSecondSolventDensity);
+
+    //! Returns the molecular mass of the first solvent in g/mol.
+    double firstSolventAverageMass() const;
+
+    //! Sets the molecular mass of the first solvent in g/mol.
+    void setFirstSolventAverageMass(double newFirstSolventAverageMass);
+
+    //! Returns the molecular mass of the second solvent in g/mol.
+    double secondSolventAverageMass() const;
+
+    //! Sets the molecular mass of the second solvent in g/mol.
+    void setSecondSolventAverageMass(double newSecondSolventAverageMass);
 
     //! Sets one of predefined chemical basis.
     ChemicalBasis setPredefinedChemicalBasis(
@@ -213,10 +295,16 @@ public:
 private:
     std::map<std::string,ChemicalGroup> mChemicalGroups;
     double mSecondSolventBindEnergy;
-    double mSegmentLength;
-    int mKuhnLength;
-    double mAdsorbtionLayerWidth;
+    double mMonomerLength;
+    double mKuhnLength;
+    double mAdsorptionLayerWidth;
+    std::vector<double> mAdsorptionLayerFactors;
     ModelType mModel;
+    double mFirstSolventDensity;
+    double mSecondSolventDensity;
+    double mFirstSolventAverageMass;
+    double mSecondSolventAverageMass;
+    bool mSnyderApproximation;
 };
 
 }

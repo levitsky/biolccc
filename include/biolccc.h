@@ -21,13 +21,13 @@ public:
 //! A ChromoConditions instance with the standard chromatographic conditions.
 const ChromoConditions standardChromoConditions = ChromoConditions();
 
-//! A ChemicalBasis instance of predefined RP_ACN_TFA_COIL_BOLTZMANN.
-const ChemicalBasis rpAcnTfaCoilBoltzmann =
-    ChemicalBasis(RP_ACN_TFA_COIL_BOLTZMANN);
+//! A ChemicalBasis instance of predefined RP_ACN_TFA_COIL.
+const ChemicalBasis rpAcnTfaCoil=
+    ChemicalBasis(RP_ACN_TFA_COIL);
 
-//! A ChemicalBasis instance of predefined RP_ACN_FA_ROD_BOLTZMANN.
-const ChemicalBasis rpAcnFaRodBoltzmann =
-    ChemicalBasis(RP_ACN_FA_ROD_BOLTZMANN);
+//! A ChemicalBasis instance of predefined RP_ACN_FA_ROD.
+const ChemicalBasis rpAcnFaRod=
+    ChemicalBasis(RP_ACN_FA_ROD);
 
 //! Parses the given peptide sequence.
 /*!
@@ -38,13 +38,9 @@ const ChemicalBasis rpAcnFaRodBoltzmann =
 
     Throws ParsingException if the peptide is not parseable.
 */
-void parseSequence(
+std::vector<ChemicalGroup> parseSequence(
     const std::string &source,
-    const ChemicalBasis &chemBasis,
-    std::vector<ChemicalGroup> *parsedPeptideStructure,
-    ChemicalGroup *NTerminus,
-    ChemicalGroup *CTerminus,
-    std::vector<double> *peptideEnergyProfile);
+    const ChemicalBasis &chemBasis);
 
 //! Calculates the retention time of a peptide.
 /*!
@@ -96,17 +92,5 @@ double calculateKd(const std::string &sequence,
                    const double columnPoreSize = 100.0,
                    const double columnRelativeStrength = 1.0,
                    const double temperature = 293.0);
-
-///*!
-//    Created as a transient solution for the fast calculation of RTBioLCCC
-//    and masses.
-//*/
-//void calculatePeptideProperties(const std::string &sequence,
-//                                const ChromoConditions &conditions,
-//                                const ChemicalBasis &chemBasis,
-//                                double *RTBioLCCC,
-//                                double *averageMass,
-//                                double *monoisotopicMass);
-//
 }
 #endif

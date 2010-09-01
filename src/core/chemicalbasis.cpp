@@ -7,11 +7,17 @@ ChemicalBasisException::ChemicalBasisException(std::string message):
 
 ChemicalBasis::ChemicalBasis()
 {
-    setModel(COIL_BOLTZMANN);
+    setModel(COIL);
+    setFirstSolventDensity(1e-10);
+    setFirstSolventAverageMass(1e-10);
+    setSecondSolventDensity(1e-19);
+    setSecondSolventAverageMass(1e-10);
     setSecondSolventBindEnergy(1.0e-10);
-    setSegmentLength(1.0e-10);
-    setAdsorbtionLayerWidth(1.0e-10);
-    setKuhnLength(1);
+    setMonomerLength(1.0e-10);
+    setKuhnLength(1.0e-10);
+    setAdsorptionLayerWidth(1.0e-10);
+    setAdsorptionLayerFactors(std::vector<double>(1, 1.0));
+    setSnyderApproximation(false);
 }
 
 ChemicalBasis::ChemicalBasis(PredefinedChemicalBasis predefinedChemicalBasisId)
@@ -30,7 +36,6 @@ const std::map<std::string,ChemicalGroup> &
 {
     return mChemicalGroups;
 }
-
 
 const ChemicalGroup & ChemicalBasis::defaultNTerminus() const
 {
@@ -64,28 +69,28 @@ void ChemicalBasis::setSecondSolventBindEnergy(double newEnergy)
     mSecondSolventBindEnergy = newEnergy;
 }
 
-double ChemicalBasis::segmentLength() const
+double ChemicalBasis::monomerLength() const
 {
-    return mSegmentLength;
+    return mMonomerLength;
 }
 
-void ChemicalBasis::setSegmentLength(double newSegmentLength)
+void ChemicalBasis::setMonomerLength(double newMonomerLength)
 {
-    if (newSegmentLength <= 0.0)
+    if (newMonomerLength <= 0.0)
     {
         throw ChemicalBasisException(
-            "The new length of a segment is not positive.");
+            "The new length of a monomer is not positive.");
     }
 
-    mSegmentLength = newSegmentLength;
+    mMonomerLength = newMonomerLength;
 }
 
-int ChemicalBasis::kuhnLength() const
+double ChemicalBasis::kuhnLength() const
 {
     return mKuhnLength;
 }
 
-void ChemicalBasis::setKuhnLength(int newKuhnLength)
+void ChemicalBasis::setKuhnLength(double newKuhnLength)
 {
     if (newKuhnLength <= 0)
     {
@@ -95,19 +100,30 @@ void ChemicalBasis::setKuhnLength(int newKuhnLength)
     mKuhnLength = newKuhnLength;
 }
 
-double ChemicalBasis::adsorbtionLayerWidth() const
+double ChemicalBasis::adsorptionLayerWidth() const
 {
-    return mAdsorbtionLayerWidth;
+    return mAdsorptionLayerWidth;
 }
 
-void ChemicalBasis::setAdsorbtionLayerWidth(double newAdsorbtionLayerWidth)
+void ChemicalBasis::setAdsorptionLayerWidth(double newAdsorptionLayerWidth)
 {
-    if (newAdsorbtionLayerWidth < 0.0)
+    if (newAdsorptionLayerWidth < 0.0)
     {
         throw ChemicalBasisException(
-            "The new adsorbtion layer width is negative.");
+            "The new adsorption layer width is negative.");
     }
-    mAdsorbtionLayerWidth = newAdsorbtionLayerWidth;
+    mAdsorptionLayerWidth = newAdsorptionLayerWidth;
+}
+
+const std::vector<double> & ChemicalBasis::adsorptionLayerFactors() const
+{
+    return mAdsorptionLayerFactors;
+}
+
+void ChemicalBasis::setAdsorptionLayerFactors(
+    std::vector<double> newAdsorptionLayerFactors)
+{
+    mAdsorptionLayerFactors = newAdsorptionLayerFactors;
 }
 
 void ChemicalBasis::addChemicalGroup(ChemicalGroup newChemicalGroup)
@@ -129,18 +145,18 @@ void ChemicalBasis::clearChemicalGroups()
     mChemicalGroups.clear();
 }
 
-void ChemicalBasis::setChemicalGroupBindEnergy(std::string label,
-        double newBindEnergy)
-{
-    std::map<std::string,ChemicalGroup>::iterator it =
-        mChemicalGroups.find(label);
-    if (it == mChemicalGroups.end())
-    {
-        throw ChemicalBasisException(
-            "The chemical group " + label + " is not found.");
-    }
-    it->second.setBindEnergy(newBindEnergy);
-}
+//void ChemicalBasis::setChemicalGroupBindEnergy(std::string label,
+//        double newBindEnergy)
+//{
+//    std::map<std::string,ChemicalGroup>::iterator it =
+//        mChemicalGroups.find(label);
+//    if (it == mChemicalGroups.end())
+//    {
+//        throw ChemicalBasisException(
+//            "The chemical group " + label + " is not found.");
+//    }
+//    it->second.setBindEnergy(newBindEnergy);
+//}
 
 const ModelType ChemicalBasis::model() const
 {
@@ -152,14 +168,103 @@ void ChemicalBasis::setModel(ModelType newModel)
     mModel = newModel;
 }
 
+bool ChemicalBasis::snyderApproximation() const 
+{
+    return mSnyderApproximation;
+}
+
+void ChemicalBasis::setSnyderApproximation(bool flag) 
+{
+    mSnyderApproximation = flag;
+}
+
+double ChemicalBasis::firstSolventDensity() const
+{
+    return mFirstSolventDensity;
+}
+
+void ChemicalBasis::setFirstSolventDensity(double newFirstSolventDensity)
+{
+    if (newFirstSolventDensity < 0.0)
+    {
+        throw ChemicalBasisException(
+            "The density must have a not-negative value.");
+    }
+    mFirstSolventDensity = newFirstSolventDensity;
+}
+
+double ChemicalBasis::secondSolventDensity() const
+{
+    return mSecondSolventDensity;
+}
+
+void ChemicalBasis::setSecondSolventDensity(double newSecondSolventDensity)
+{
+    if (newSecondSolventDensity < 0.0)
+    {
+        throw ChemicalBasisException(
+            "The density must have a not-negative value.");
+    }
+    mSecondSolventDensity = newSecondSolventDensity;
+}
+
+double ChemicalBasis::firstSolventAverageMass() const
+{
+    return mFirstSolventAverageMass;
+}
+
+void ChemicalBasis::setFirstSolventAverageMass(
+    double newFirstSolventAverageMass)
+{
+    if (newFirstSolventAverageMass < 0.0)
+    {
+        throw ChemicalBasisException(
+            "The average mass must have a not-negative value.");
+    }
+    mFirstSolventAverageMass = newFirstSolventAverageMass;
+}
+
+double ChemicalBasis::secondSolventAverageMass() const
+{
+    return mSecondSolventAverageMass;
+}
+
+void ChemicalBasis::setSecondSolventAverageMass(
+    double newSecondSolventAverageMass)
+{
+    if (newSecondSolventAverageMass < 0.0)
+    {
+        throw ChemicalBasisException(
+            "The average mass must have a not-negative value.");
+    }
+    mSecondSolventAverageMass = newSecondSolventAverageMass;
+}
+
 ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
     PredefinedChemicalBasis predefinedChemicalBasisId)
 {
     switch ( predefinedChemicalBasisId ) 
     {
-        case RP_ACN_TFA_COIL_BOLTZMANN:
+        case RP_ACN_TFA_COIL:
         {
-            setModel(COIL_BOLTZMANN);
+            setModel(COIL);
+            // Water as the first solvent.
+            setFirstSolventDensity(1000.0);
+            setFirstSolventAverageMass(18.02);
+            //setFirstSolventDensity(5.56);
+            //setFirstSolventAverageMass(1.0);
+            // Acetonitrile as the second solvent.
+            setSecondSolventDensity(786.0);
+            setSecondSolventAverageMass(41.05);
+            //setSecondSolventDensity(1.91);
+            //setSecondSolventAverageMass(1.0);
+            setSecondSolventBindEnergy(2.4);
+            setAdsorptionLayerWidth(15.0);
+            setAdsorptionLayerFactors(std::vector<double>(1, 1.0));
+            setMonomerLength(10.0);
+            setKuhnLength(10.0);
+            setSnyderApproximation(false);
+
             clearChemicalGroups();
             addChemicalGroup(ChemicalGroup ("Alanine",
                                             "A",
@@ -306,17 +411,25 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
                                            0.0,
                                            16.0226,
                                            16.01872));
-
-            setSecondSolventBindEnergy(2.3979);
-            setSegmentLength(10.0);
-            setAdsorbtionLayerWidth(15.0);
-            setKuhnLength(1);
             break;
         }
 
-        case RP_ACN_FA_ROD_BOLTZMANN:
+        case RP_ACN_FA_ROD:
         {
-            setModel(ROD_BOLTZMANN);
+            setModel(ROD);
+            setAdsorptionLayerWidth(16.0);
+            setAdsorptionLayerFactors(std::vector<double>(1, 1.0));
+            setMonomerLength(4.0);
+            setKuhnLength(4.0);
+            // Water as the first solvent.
+            setFirstSolventDensity(1000.0);
+            setFirstSolventAverageMass(18.02);
+            // Acetonitrile as the second solvent.
+            setSecondSolventDensity(786.0);
+            setSecondSolventAverageMass(41.05);
+            setSecondSolventBindEnergy(2.4);
+            setSnyderApproximation(false);
+
             clearChemicalGroups();
             addChemicalGroup(ChemicalGroup ("Alanine",
                                             "A",
@@ -463,11 +576,6 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
                                            0.55,
                                            16.0226,
                                            16.01872));
-
-            setSecondSolventBindEnergy(2.4);
-            setSegmentLength(4.0);
-            setAdsorbtionLayerWidth(16.0);
-            setKuhnLength(1);
             break;
         }
     }
