@@ -195,72 +195,72 @@ TEST_F(BioLCCCTest, calculatesRT)
 
 TEST_F(BioLCCCTest, matrixTest)
 {
-    //for (float i = 3.0; i < 11.0; ++i)
-    //{
-    //    ASSERT_EQ(
-    //        BioLCCC::calculateKd("H-B-OH", 0.0,
-    //            testChemBasis, i * 10.0),
-    //        1.0);
-    //    ASSERT_LT(
-    //        abs(BioLCCC::calculateKd("H-BB-OH", 0.0, testChemBasis, i * 10.0) - 
-    //           (1.0 - 2.0/6.0/i)),
-    //        1e-5);
-    //}
+    for (float i = 3.0; i < 11.0; ++i)
+    {
+        ASSERT_EQ(
+            BioLCCC::calculateKd("H-B-OH", 0.0,
+                testChemBasis, i * 10.0),
+            1.0);
+        ASSERT_LT(
+            abs(BioLCCC::calculateKd("H-BB-OH", 0.0, testChemBasis, i * 10.0) - 
+               (1.0 - 2.0/6.0/i)),
+            1e-5);
+    }
 
-    //for (float i = 3.0; i < 11.0; ++i)
-    //{
-    //    ASSERT_LT(
-    //        abs(BioLCCC::calculateKd("H-O-OH", 0.0, testChemBasis, i * 10.0) 
-    //            - (1.0 + (2.0 * (exp(1.0) - 1.0) / i))),
-    //        1e-5);
-    //    ASSERT_LT(
-    //        abs(BioLCCC::calculateKd("H-OO-OH", 0.0, testChemBasis, i * 10.0) 
-    //            - (1.0 + (4.0 * exp(1.0) * exp(1.0) + 2.0 * exp(1.0)  - 7.0) 
-    //                     / 3.0 / i)),
-    //        1e-5);
-    //}
+    for (float i = 3.0; i < 11.0; ++i)
+    {
+        ASSERT_LT(
+            abs(BioLCCC::calculateKd("H-O-OH", 0.0, testChemBasis, i * 10.0) 
+                - (1.0 + (2.0 * (exp(1.0) - 1.0) / i))),
+            1e-5);
+        ASSERT_LT(
+            abs(BioLCCC::calculateKd("H-OO-OH", 0.0, testChemBasis, i * 10.0) 
+                - (1.0 + (4.0 * exp(1.0) * exp(1.0) + 2.0 * exp(1.0)  - 7.0) 
+                         / 3.0 / i)),
+            1e-5);
+    }
 
-    //std::vector<double> adsorptionLayerFactors;
-    //adsorptionLayerFactors.push_back(0.0);
-    //adsorptionLayerFactors.push_back(1.0);
-    //testChemBasis.setAdsorptionLayerFactors(adsorptionLayerFactors);
+    std::vector<double> adsorptionLayerFactors;
+    adsorptionLayerFactors.push_back(0.0);
+    adsorptionLayerFactors.push_back(1.0);
+    testChemBasis.setAdsorptionLayerFactors(adsorptionLayerFactors);
 
-    //for (float i = 6.0; i < 11.0; ++i)
-    //{
-    //    ASSERT_LT(
-    //        abs(BioLCCC::calculateKd("H-O-OH", 0.0, testChemBasis, i * 10.0) 
-    //            - (1.0 + (2.0 * (exp(1.0) - 1.0) / i))),
-    //        1e-5);
+    for (float i = 6.0; i < 11.0; ++i)
+    {
+        ASSERT_LT(
+            abs(BioLCCC::calculateKd("H-O-OH", 0.0, testChemBasis, i * 10.0) 
+                - (1.0 + (2.0 * (exp(1.0) - 1.0) / i))),
+            1e-5);
 
-    //    ASSERT_LT(
-    //        abs(BioLCCC::calculateKd("H-OO-OH", 0.0, testChemBasis, i * 10.0) 
-    //            - (1.0 + (4.0 * exp(1.0) * exp(1.0) + 4.0 * exp(1.0) - 9.0) 
-    //                     / 3.0 / i)),
-    //        1e-5);
-    //}
+        ASSERT_LT(
+            abs(BioLCCC::calculateKd("H-OO-OH", 0.0, testChemBasis, i * 10.0) 
+                - (1.0 + (4.0 * exp(1.0) * exp(1.0) + 4.0 * exp(1.0) - 9.0) 
+                         / 3.0 / i)),
+            1e-5);
+    }
 }
 
 TEST_F(BioLCCCTest, adsorptionStrengthTest)
 {
-    //testChemBasis.setSecondSolventBindEnergy(1.0);
-    //double kd1 = BioLCCC::calculateKd("H-OBO-OH", 100.0, testChemBasis, 100.0);
+    testChemBasis.setSecondSolventBindEnergy(1.0);
+    double kd1 = BioLCCC::calculateKd("H-OBO-OH", 100.0, testChemBasis, 100.0);
 
-    //testChemBasis.setSecondSolventBindEnergy(2.0);
-    //testChemBasis.chemicalGroups()["O"].setBindEnergy(2.0);
-    //double kd2 = 
-    //    BioLCCC::calculateKd("H-OBO-OH", 100.0, testChemBasis, 100.0, 0.5);
-    //ASSERT_EQ(kd1, kd2);
+    testChemBasis.setSecondSolventBindEnergy(2.0);
+    testChemBasis.chemicalGroups()["O"].setBindEnergy(2.0);
+    double kd2 = 
+        BioLCCC::calculateKd("H-OBO-OH", 100.0, testChemBasis, 100.0, 0.5);
+    ASSERT_EQ(kd1, kd2);
 
-    //double kd3 = 
-    //    BioLCCC::calculateKd("H-OBO-OH", 100.0, testChemBasis, 100.0, 0.6);
-    //ASSERT_NE(kd1, kd3);
+    double kd3 = 
+        BioLCCC::calculateKd("H-OBO-OH", 100.0, testChemBasis, 100.0, 0.6);
+    ASSERT_NE(kd1, kd3);
 
-    //testChemBasis.setSecondSolventBindEnergy(1.0);
-    //testChemBasis.chemicalGroups()["O"].setBindEnergy(1.0);
-    //testChemBasis.setAdsorptionLayerFactors(std::vector<double>(1, 0.5));
-    //double kd4 = 
-    //    BioLCCC::calculateKd("H-OBO-OH", 100.0, testChemBasis, 100.0, 2.0);
-    //ASSERT_EQ(kd1, kd4);
+    testChemBasis.setSecondSolventBindEnergy(1.0);
+    testChemBasis.chemicalGroups()["O"].setBindEnergy(1.0);
+    testChemBasis.setAdsorptionLayerFactors(std::vector<double>(1, 0.5));
+    double kd4 = 
+        BioLCCC::calculateKd("H-OBO-OH", 100.0, testChemBasis, 100.0, 2.0);
+    ASSERT_EQ(kd1, kd4);
 }
 
 TEST_F(BioLCCCTest, monomerEnergyProfileTest)
@@ -291,7 +291,8 @@ TEST_F(BioLCCCTest, monomerEnergyProfileTest)
         0.0));
 
     testChemBasis.setSecondSolventBindEnergy(1.0);
-    double kd3 = BioLCCC::calculateKd("H-nOOcO-OH", 100.0, testChemBasis, 100.0);
+    double kd3 = BioLCCC::calculateKd("H-nOOcO-OH", 100.0, testChemBasis, 
+        100.0);
     ASSERT_EQ(kd1, kd3);
 }
 
@@ -316,7 +317,8 @@ TEST_F(BioLCCCTest, segmentEnergyProfileTest)
     testChemBasis.setKuhnLength(20.0);
     testChemBasis.setSecondSolventBindEnergy(0.5);
     double kd2 = 
-        BioLCCC::calculateKd("H-hOhOhOhOhOhOhOhO-OH", 100.0, testChemBasis, 200.0);
+        BioLCCC::calculateKd("H-hOhOhOhOhOhOhOhO-OH", 100.0, 
+            testChemBasis, 200.0);
     ASSERT_EQ(kd1, kd2);
 
     testChemBasis.setKuhnLength(5.0);
@@ -376,7 +378,8 @@ TEST_F(BioLCCCTest, assignsChemicalBasis)
     ASSERT_EQ(myChemicalBasis.chemicalGroups()["tT"].label(), "tT");
     ASSERT_EQ(myChemicalBasis.chemicalGroups()["tT"].bindEnergy(), 1234.0);
     ASSERT_EQ(myChemicalBasis.chemicalGroups()["tT"].averageMass(), 1235.0);
-    ASSERT_EQ(myChemicalBasis.chemicalGroups()["tT"].monoisotopicMass(), 1236.0);
+    ASSERT_EQ(myChemicalBasis.chemicalGroups()["tT"].monoisotopicMass(), 
+        1236.0);
 
     myChemicalBasis.chemicalGroups()["tT"].setName("Test");
     ASSERT_EQ(myChemicalBasis.chemicalGroups()["tT"].name(), "Test");
