@@ -25,10 +25,12 @@ public:
 enum ModelType
 {
     /*! The standard BioLCCC model with the assumption of absolute 
-        flexibility of a protein molecule. */
+        flexibility of a protein molecule. It use actively matrix calculations.
+        */
     COIL,
     /*! The BioLCCC model with the assumption of absolute rigidity of 
-        a protein molecule. It works better for short molecules. */
+        a protein molecule. It works better for short molecules. It use explicit
+        expressions for Kd. */
     ROD
 };
 
@@ -40,14 +42,14 @@ enum ModelType
  */
 enum PredefinedChemicalBasis
 {
-    //! Reversed phase, ACN, trifluoracetic acid, COIL_BOLTZMANN model.
+    //! Reversed phase, ACN, trifluoracetic acid, COIL model.
     /*! A ChemicalBasis calibrated for reversed phase, ACN as a second solvent,
-        0.1% TFA and COIL_BOLTZMANN type of BioLCCC model. The data was 
+        0.1% TFA and COIL type of BioLCCC model. The data was 
         obtained in Guo et al, Journal of Chromatography, 359 (1986) 449-517. */
     RP_ACN_TFA_COIL, 
-    //! Reversed phase, ACN, formic acid, ROD_BOLTZMANN model.
+    //! Reversed phase, ACN, formic acid, ROD model.
     /*! A ChemicalBasis calibrated for reversed phase, ACN as a second solvent,
-        0.1% FA and ROD_BOLTZMANN type of BioLCCC model. The data was obtained
+        0.1% FA and ROD type of BioLCCC model. The data was obtained
         in the joint research of Harvard University and Institute for Energy 
         Problems for Chemical Physics, Russian Academy of Science. */
     RP_ACN_FA_ROD 
@@ -57,13 +59,15 @@ enum PredefinedChemicalBasis
 /*!
     An instance of ChemicalBasis manages all the physicochemical constants,
     which are used in the calculations. Currently it contains:
-        - The list of amino acids and peptide terminal groups.
-        - The terminal groups which are set by default (cannon be changed).
-        - The Energy of binding between a solvent and the surface of a solid 
-          phase.
-        - The type of BioLCCC model being used in calculations. 
-        - Peptide geometry: the length of amino acid and the Kuhn length.
-        - The width of the adsorbing layer.
+        - the list of amino acids and peptide terminal groups;
+        - the terminal groups which are set by default (cannon be changed);
+        - the energy of binding between a solvent and the surface of a solid 
+          phase;
+        - the type of BioLCCC model being used in calculations and
+          approximations
+          used in
+        - peptide geometry: the length of amino acid and the Kuhn length;
+        - the width of the adsorbing layer.
        
     Note that the set of constants is highly interconnected. Usually the change
     in one constant, like the width of adsorbing layer or type of BioLCCC model,
