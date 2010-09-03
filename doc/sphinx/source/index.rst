@@ -30,6 +30,7 @@ Documentation
    ./build
    ./tutorial
    ./advanced
+   ./changelog
 
 - `API documentation <./API/namespaceBioLCCC.html>`_
 
