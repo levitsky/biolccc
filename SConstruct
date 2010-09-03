@@ -24,10 +24,8 @@ Targets:
     libgtest_static          Static Google Test library. 
     tests                    A test suite for libBioLCCC.
     test_pyBioLCCC           A test suite for pyBioLCCC.
-    doc_doxygen              API documentation for libBioLCCC.
-    doc_sphinx               A general documentation for libBioLCCC and 
-                             pyBioLCCC.
-    doc                      Both types of documentation.
+    examples                 Examples for libBioLCCC.
+    doc                      The documentation.
 """)
 
 # Get the mode flag from the command line.
@@ -177,6 +175,19 @@ Depends(test_pyBioLCCC,
     os.path.join(Dir('#.').abspath, 'src', 'bindings', 'test_pyBioLCCC.py'))
 Alias('test_pyBioLCCC', test_pyBioLCCC)
 
+# Examples.
+#----------
+examples = SConscript(
+    os.path.join('src', 'examples', 'SConscript'),
+    exports={'env':env},
+    variant_dir=os.path.join(
+        'build', platform.name, env['BUILDTYPE'], 'examples'), 
+    duplicate=True,
+    )
+
+Requires(examples, libBioLCCC_static)
+Alias('examples', examples)
+
 # Doxygen documentation.
 #-----------------------
 doc_doxygen = env.Command('doc_doxygen', 'doc/Doxyfile', 
@@ -186,7 +197,7 @@ Depends(doc_doxygen, 'doc/Doxyfile')
 Depends(doc_doxygen, libBioLCCC_shared)
 
 # Sphinx documentation.
-#-----------------------
+#----------------------
 doc_sphinx = env.Command('doc_sphinx', '', 'cd ./doc/sphinx; make html; cd ../')
 Depends(doc_sphinx, Glob('doc/sphinx/*'))
 Depends(doc_sphinx, Glob('doc/sphinx/build/*'))
@@ -196,15 +207,26 @@ Depends(doc_sphinx, Glob('doc/sphinx/source/_templates/*'))
 Depends(doc_sphinx, 'VERSION')
 Depends(doc_sphinx, 'README')
 Depends(doc_sphinx, 'INSTALL')
+Depends(doc_sphinx, Glob('src/examples/*.py'))
+Depends(doc_sphinx, Glob('src/examples/*.cpp'))
 
-# Both types of documentation.
-#------------------------------
-Alias('doc', [doc_doxygen, doc_sphinx])
+# Complete documentation.
+#------------------------
+docs = env.Command('docs', '',
+    ['mv doc/sphinx/build/html/* doc/',
+     'mkdir doc/API',
+     'mv doc/doxygen/html/* doc/API',
+     'rm -r doc/doxygen',
+     'rm -r doc/sphinx'])
+Requires('docs', doc_doxygen)
+Requires('docs', doc_sphinx)
+# For some funny reason name 'doc' doesn't work, so we need to use an alias.
+Alias('doc', docs)
 
 # Final configuration of the build.
 #===================================
 env.Default([libBioLCCC_shared, pyBioLCCC])
 Alias('all', 
     [libBioLCCC_shared, libBioLCCC_shared, libgtest_static,
-     tests, pyBioLCCC, doc_doxygen, doc_sphinx])
+     tests, pyBioLCCC, docs])
 
