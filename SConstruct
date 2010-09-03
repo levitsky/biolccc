@@ -207,6 +207,7 @@ Depends(doc_sphinx, Glob('doc/sphinx/source/_templates/*'))
 Depends(doc_sphinx, 'VERSION')
 Depends(doc_sphinx, 'README')
 Depends(doc_sphinx, 'INSTALL')
+Depends(doc_sphinx, 'CHANGELOG')
 Depends(doc_sphinx, Glob('src/examples/*.py'))
 Depends(doc_sphinx, Glob('src/examples/*.cpp'))
 
