@@ -281,12 +281,12 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
                                             0.77,
                                             160.1901,
                                             160.03065));
-            addChemicalGroup(ChemicalGroup ("Aspartic_acid",
+            addChemicalGroup(ChemicalGroup ("Aspartic acid",
                                             "D",
                                             0.7805,
                                             115.0886,
                                             115.02694));
-            addChemicalGroup(ChemicalGroup ("Glutamic_acid",
+            addChemicalGroup(ChemicalGroup ("Glutamic acid",
                                             "E",
                                             0.9835,
                                             129.1155,
@@ -446,12 +446,12 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
                                             0.24,
                                             160.1901,
                                             160.03065));
-            addChemicalGroup(ChemicalGroup ("Aspartic_acid",
+            addChemicalGroup(ChemicalGroup ("Aspartic acid",
                                             "D",
                                             0.60,
                                             115.0886,
                                             115.02694));
-            addChemicalGroup(ChemicalGroup ("Glutamic_acid",
+            addChemicalGroup(ChemicalGroup ("Glutamic acid",
                                             "E",
                                             0.62,
                                             129.1155,

@@ -60,18 +60,18 @@ enum PredefinedChemicalBasis
     An instance of ChemicalBasis manages all the physicochemical constants,
     which are used in the calculations. Currently it contains:
         - the list of amino acids and peptide terminal groups;
-        - the terminal groups which are set by default (cannon be changed);
-        - the energy of binding between a solvent and the surface of a solid 
-          phase;
+        - which terminal groups are set by default (cannon be changed);
+        - the chemical properties of solvents: densities, molar mass and
+          adsorption energies (adsorption energy of the first solvent always
+          equals zero);
         - the type of BioLCCC model being used in calculations and
-          approximations
-          used in
+          approximations used in the equations;
         - peptide geometry: the length of amino acid and the Kuhn length;
-        - the width of the adsorbing layer.
+        - the width of the adsorbing layer on the walls.
        
-    Note that the set of constants is highly interconnected. Usually the change
-    in one constant, like the width of adsorbing layer or type of BioLCCC model,
-    would only deteriorate the quality of RT prediction.
+    Note that the constants are highly interconnected. That leads to the fact,
+    that a change in a single constant, like the width of adsorbing layer or 
+    type of BioLCCC model, deteriorates the accuracy of RT prediction. 
  */
 class ChemicalBasis
 {
@@ -224,12 +224,14 @@ public:
     //! Returns the absorption factors of the near-wall layers in COIL model.
     /*! 
         The standard COIL BioLCCC model assumes that adsorption occurs only in
-        one layer located close to the wall. However, this assumption can be
+        one layer, which is closest to the wall. This assumption can be
         generalized to the case when several near-wall layers adsorb segments 
-        of a polymer chain. This vector contains the relative adsorbtion
-        strengths of near-wall layers. This adsorbtion strength have the same
-        meaning as the relative adsorbtion strength of a column and multiplyed
-        by it. The first element of the vector corresponds to the
+        of a polymer chain. adsorptionLayerFactors() vector contains the 
+        relative adsorption
+        strengths of the near-wall layers. This adsorption strength have the 
+        same
+        meaning as the relative adsorption strength of a column and is
+        multiplied by it. The first element of the vector corresponds to the
         layer closest to the wall, second to the next and so on.
 
         This value is used only in the COIL model.
@@ -239,12 +241,14 @@ public:
     //! Sets the absorption factors of the near-wall layers in COIL model.
     /*! 
         The standard COIL BioLCCC model assumes that adsorption occurs only in
-        one layer located close to the wall. However, this assumption can be
+        one layer, which is closest to the wall. This assumption can be
         generalized to the case when several near-wall layers adsorb segments 
-        of a polymer chain. This vector contains the relative adsorption
-        strengths of near-wall layers. This adsorption strength have the same
-        meaning as the relative adsorption strength of a column and multiplyed
-        by it. The first element of the vector corresponds to the
+        of a polymer chain. adsorptionLayerFactors() vector contains the 
+        relative adsorption
+        strengths of the near-wall layers. This adsorption strength have the 
+        same
+        meaning as the relative adsorption strength of a column and is
+        multiplied by it. The first element of the vector corresponds to the
         layer closest to the wall, second to the next and so on.
 
         This value is used only in the COIL model.

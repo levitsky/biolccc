@@ -17,27 +17,14 @@ why we supply code snippets both for C++ and Python. Here is an example:
      - Python
    * - 
 
-       .. code-block:: cpp
-
-          #include <iostream>
-
-          int main() {
-              int a = 1;
-              int b = 2;
-
-              std::cout << a+b << std::endl;
-
-              return 0;
-          }
+       .. literalinclude:: ../../../src/examples/snippet_example.cpp
+          :language: cpp
 
      - 
 
-       .. code-block:: python
+       .. literalinclude:: ../../../src/examples/snippet_example.py
+          :language: python
 
-          a = 1
-          b = 2
-
-          print a+b
 
 The Python examples are specific to Python 2.x, since our project doesn't
 support Python 3.x.
@@ -53,22 +40,20 @@ molecules. Strictly speaking, BioLCCC is a family of models, each based on the
 different assumptions. This version of the BioLCCC model contains two types of
 model:
 
-    **ROD_BOLTZMANN** - in this type of model a peptide is represented as an
+    **ROD** - in this type of model a peptide is represented as an
     absolutely rigid rod. Amino acids are modelled as regularly spaced beads
     threaded on this rod. This assumption works better for peptides rather
-    than protein molecules. The adsorption is described by the Boltzmann
-    equation.
+    than protein molecules.
 
-    The equations for ROD_BOLZMANN are going to be published in the upcoming
+    The equations for the ROD model are to be published in the upcoming
     paper.
     
-    **COIL_BOLTZMANN** - in this model a protein molecule is described as
+    **COIL** - in this model a protein molecule is described as
     a flexible polymer. The conformations of this molecule in a pore can be
     modelled as a random walk in the field of adsorbing walls. This assumption
-    should work better for long protein molecules. The adsorption itself is
-    described by the Boltzmann equation.
+    should work better for long protein molecules.
 
-    COIL_BOLTZMANN model was described in ''Liquid Chromatography at Critical 
+    The COIL model was described in ''Liquid Chromatography at Critical 
     Conditions: Comprehensive Approach to Sequence-Dependent Retention Time 
     Prediction'', Alexander V. Gorshkov et al, Analytical Chemistry, 2006, 78
     (22), 7770-7777. `Link <http://dx.doi.org/10.1021/ac060913x>`_.
@@ -81,17 +66,21 @@ properties of a chemical group are stored in the ChemicalGroup class.
 **Chemical basis** - a set of all physicochemical constants involved into the
 BioLCCC equations. This set contains:
 
-    - The list of all chemical groups, i.e. amino acids and terminal groups. 
+    - the list of all chemical groups, i.e. amino acids and terminal groups.
       Any peptide can be represented as a series of these, that is why it is
-      a *basis* similar to the mathematical basis. 
-    - Which terminal groups are set by default.
-    - The energy of binding between a solvent and the surface of a solid phase.
-    - The type of BioLCCC model being used in calculations.
-    - Peptide geometry: the length of an amino acid and the Kuhn length.
-    - The range of an interaction between an amino acid and the surface of the
-      solid phase (a.k.a. the width of the adsorbing layer).
-
-The properties of a chemical basis are stored in the ChemicalBasis class.
+      a *basis* similar to the mathematical basis;
+    - which terminal groups are set by default (cannon be changed);
+    - the chemical properties of solvents: densities, molar mass and
+      adsorption energies (adsorption energy of the first solvent always
+      equals zero);
+    - the type of BioLCCC model being used in calculations and
+      approximations used in the equations;
+    - peptide geometry: the length of amino acid and the Kuhn length;
+    - the range of an interaction between an amino acid and the surface of 
+      the solid phase (a.k.a. the width of the adsorbing layer).
+       
+The properties of a chemical basis are stored in the 
+`ChemicalBasis class <./API/classBioLCCC_1_1ChemicalBasis.html>`_.
 
 A chemical basis is specific to a type of retention chemistry, solvents
 and ion paring agent being used in the experiment. In addition, it must be used
@@ -103,31 +92,29 @@ precisely, calibrated) for the specific retention chemistry and type of
 BioLCCC model. The current version of libBioLCCC contains two predefined
 chemical bases:
 
-    **rpAcnFaRodBoltzmann** - a ChemicalBasis calibrated for a reversed phase,
-    ACN as a second solvent, 0.1% FA in both solvents and ROD_BOLTZMANN type of
-    BioLCCC model. The data was obtained in the joint research of Harvard 
-    University and Institute for Energy Problems for Chemical Physics, 
-    Russian Academy of Science.
+    **rpAcnFaRod** - a ChemicalBasis calibrated for the reversed phase,
+    ACN as a second solvent, 0.1% FA in both solvents and the ROD BioLCCC model.
+    The data was obtained in the joint research of Harvard University and 
+    Institute for Energy Problems for Chemical Physics, Russian Academy of
+    Science.
 
-    **rpAcnTfaCoilBoltzmann** - a chemical basis calibrated for a reversed
-    phase,
-    ACN as a second solvent, 0.1% TFA in both solvents and COIL_BOLTZMANN  
-    BioLCCC model. The initial data were taken from Guo et al, Journal of 
+    **rpAcnTfaCoil** - a chemical basis calibrated for the reversed phase,
+    ACN as a second solvent, 0.1% TFA in both solvents and the COIL BioLCCC 
+    model. The initial data were taken from Guo et al, Journal of 
     Chromatography, 359 (1986) 449-517.
-
 
 **Chromatographic conditions** - a description of a chromatographic equipment 
 and its settings. Contains:
 
-    - The geometry of the column.
-    - The properties of the adsorbent: average size of the pores, porosity
+    - the geometry of the column.
+    - the properties of the adsorbent: average size of the pores, porosity
       (i.e. percentage of volume not filled with the solid phase),
       (volume of pores)/(total volume of column) ratio, relative adsorption
       strength.
-    - Elution parameters: the shape of the gradient, the composition of
+    - elution parameters: the shape of the gradient, the composition of
       components, flow rate, delay time.
-    - The step of integration over volume.
-    - Temperature of a column (EXPERIMENTAL).
+    - the step of integration over volume.
+    - temperature of a column (EXPERIMENTAL).
 
 The default values were set rather arbitrarily.
 
@@ -177,8 +164,7 @@ Calculating retention time
 calculateRT is the first libBioLCCC function you may need.
 It requires three arguments: a peptide sequence,
 a chemical basis, and and a description of chromatographic conditions. Supplied 
-with these data, it
-calculates the retention time of the peptide.
+with these data, it calculates the retention time of the peptide.
 
 .. list-table:: Calculating the retention time of a peptide
    :widths: 40 40
@@ -188,36 +174,17 @@ calculates the retention time of the peptide.
      - Python
    * - 
 
-       .. code-block:: cpp
-
-          #include <iostream>
-          #include <string>
-          #include <biolccc.h>
-
-          int main() {
-              std::string peptide("Ac-PEPTIDE-NH2");
-              double RT = BioLCCC::calculateRT(peptide,
-                  BioLCCC::rpAcnFaRodBoltzmann,
-                  BioLCCC::standardChromoConditions);
-              std::cout << "The retention time of " 
-                        << peptide << " is " << RT << std::endl;
-              return 0;
-          }
+       .. literalinclude:: ../../../src/examples/rt_calculation.cpp
+          :language: cpp
 
      - 
 
-       .. code-block:: python
+       .. literalinclude:: ../../../src/examples/rt_calculation.py
+          :language: python
 
-          import pyBioLCCC
-
-          peptide = 'Ac-PEPTIDE-NH2'
-          RT = pyBioLCCC.calculateRT(peptide,
-                   pyBioLCCC.rpAcnFaRodBoltzmann,
-                   pyBioLCCC.standardChromoConditions)
-          print 'The retention time of', peptide, 'is', RT
-
-Please, consult with the libBioLCCC documentation for the details of calculateRT
-function.
+Please, consult with the 
+`libBioLCCC API documentation <./API/namespaceBioLCCC.html>`_
+for the details of calculateRT function.
 
 Specifying chromatographic conditions
 *************************************
@@ -234,85 +201,14 @@ replace the default parameters with your own.
      - Python
    * - 
 
-       .. code-block:: cpp
-
-          #include <iostream>
-          #include <biolccc.h>
-
-          int main() {
-              myChromoConditions = BioLCCC::ChromoConditions()
-
-              // The column length in mm.
-              myChromoConditions.setColumnLength(100.0);
-
-              // The internal column diameter in mm.
-              myChromoConditions.setColumnDiameter(0.1);
-
-              // The average pore size in A.
-              myChromoConditions.setColumnPoreSize(300.0);
-
-              // The concentration of the eluting solvent (ACN for the reversed
-              // phase) in component A in %.
-              myChromoConditions.setSecondSolventConcentrationA(5.0);
-
-              // The concentration of the eluting solvent (ACN for the reversed
-              // phase) in component B in %.
-              myChromoConditions.setSecondSolventConcentrationB(80.0);
-
-              // The shape of the gradient. The example is a linear gradient
-              // from 0% to 90% of component B over 60 minutes.
-              myChromoConditions.setGradient(
-                  BioLCCC::Gradient(0.0, 90.0, 60.0));
-              
-              // The flow rate in ml/min. 
-              myChromoConditions.setFlowRate(0.0005);
-
-              std::string peptide("Ac-PEPTIDE-NH2");
-              double RT = BioLCCC::calculateRT(peptide,
-                  BioLCCC::rpAcnFaRodBoltzmann,
-                  myChromoConditions);
-              std::cout << "The retention time of " 
-                        << peptide << " is " << RT << std::endl;
-              return 0;
-          }
+       .. literalinclude:: ../../../src/examples/chromoconditions.cpp
+          :language: cpp
 
      - 
 
-       .. code-block:: python
+       .. literalinclude:: ../../../src/examples/chromoconditions.py
+          :language: python
 
-          import pyBioLCCC
-
-          myChromoConditions = pyBioLCCC.ChromoConditions()
-
-          # The column length in mm.
-          myChromoConditions.setColumnLength(100.0)
-
-          # The internal column diameter in mm.
-          myChromoConditions.setColumnDiameter(0.1)
-
-          # The average pore size in A.
-          myChromoConditions.setColumnPoreSize(300.0)
-
-          # The concentration of the eluting solvent (ACN for the reversed
-          # phase) in component A in %.
-          myChromoConditions.setSecondSolventConcentrationA(5.0)
-
-          # The concentration of the eluting solvent (ACN for the reversed
-          # phase) in component B in %.
-          myChromoConditions.setSecondSolventConcentrationB(80.0)
-
-          # The shape of the gradient. The example is a linear gradient
-          # from 0% to 90% of component B over 60 minutes.
-          myChromoConditions.setGradient(pyBioLCCC.Gradient(0.0, 90.0, 60.0))
-
-          # The flow rate in ml/min. 
-          myChromoConditions.setFlowRate(0.0005)
-
-          peptide = 'Ac-PEPTIDE-NH2'
-          RT = pyBioLCCC.calculateRT(peptide,
-                   pyBioLCCC.rpAcnFaRodBoltzmann,
-                   myChromoConditions)
-          print 'The retention time of', peptide, 'is', RT
 
 pyBioLCCC adds another way to interact with ChromoConditions. You can use its
 instances as Python dictionaries:
@@ -324,33 +220,17 @@ instances as Python dictionaries:
    * - Python
    * - 
 
-       .. code-block:: python
+       .. literalinclude:: ../../../src/examples/chromoconditions_dict.py
+          :language: python
 
-          import pyBioLCCC
-
-          myChromoConditions = pyBioLCCC.ChromoConditions()
-          print myChromoConditions.keys()
-
-          myChromoConditions['columnLength'] = 100.0
-          myChromoConditions['columnDiameter'] = 0.1
-          myChromoConditions['columnPoreSize'] = 300.0
-          myChromoConditions['secondSolventConcentrationA'] = 5.0
-          myChromoConditions['secondSolventConcentrationB'] = 80.0
-          myChromoConditions['gradient'] = pyBioLCCC.Gradient(0.0, 90.0, 60.0)
-          myChromoConditions['flowRate'] = 0.0005
-
-          peptide = 'Ac-PEPTIDE-NH2'
-          RT = pyBioLCCC.calculateRT(peptide,
-                   pyBioLCCC.rpAcnFaRodBoltzmann,
-                   myChromoConditions)
-          print 'The retention time of', peptide, 'is', RT
 
 Besides being more convenient and compact, this syntax allows ChromoConditions 
 to be pickled. 
 
 If you want to see the full list of parameters stored in a ChromoConditions
-instance, please, take a look at the class description in the libBioLCCC
-documentation.
+instance, please, take a look at the 
+`class description <./API/classBioLCCC_1_1ChromoConditions.html>`_ 
+in the libBioLCCC API documentation.
 
 Calculating mass
 ****************
@@ -367,44 +247,37 @@ ChemicalBasis instance which contains the masses of amino acids.
      - Python
    * - 
 
-       .. code-block:: cpp
-
-          #include <iostream>
-          #include <biolccc.h>
-
-          int main() {
-
-              std::string peptide("Ac-PEPTIDE-NH2");
-
-              double averageMass = BioLCCC::calculateAverageMass(
-                  peptide, BioLCCC::rpAcnFaRodBoltzmann);
-              double monoisotopicMass = BioLCCC::calculateMonoisotopicMass(
-                  peptide, BioLCCC::rpAcnFaRodBoltzmann);
-
-              std::cout << "Average mass of " << peptide << " is " 
-                        << averageMass << " Da" << std::endl;
-              std::cout << "Monoisotopic mass of " << peptide << " is " 
-                        << monoisotopicMass << " Da" << std::endl;
-
-              return 0;
-          }
+       .. literalinclude:: ../../../src/examples/mass_calculation.cpp
+          :language: cpp
 
      - 
 
-       .. code-block:: python
+       .. literalinclude:: ../../../src/examples/mass_calculation.py
+          :language: python
 
-          import pyBioLCCC
+Getting the list of predefined chemical groups
+**********************************************
 
-          peptide = 'Ac-PEPTIDE-NH2'
+Before you begin to work with libBioLCCC/pyBioLCCC, it is useful to know which
+amino acids and terminal groups are predefined in this version of library.
+To get this information just iterate through the chemicalGroups() map of the
+predefined chemical bases.
 
-          averageMass = pyBioLCCC.calculateAverageMass(
-              peptide, pyBioLCCC.rpAcnFaRodBoltzmann)
-          monoisotopicMass = pyBioLCCC.calculateMonoisotopicMass(
-              peptide, pyBioLCCC.rpAcnFaRodBoltzmann)
+.. list-table:: Examining a predefined chemical basis
+   :widths: 40 40
+   :header-rows: 1
 
-          print 'The average mass of', peptide, 'is', averageMass, 'Da'
-          print 'The monoisotopic mass of',peptide, 'is', monoisotopicMass, 'Da'
+   * - C++
+     - Python
+   * - 
 
+       .. literalinclude:: ../../../src/examples/chemicalbasis.cpp
+          :language: cpp
+
+     - 
+
+       .. literalinclude:: ../../../src/examples/chemicalbasis.py
+          :language: python
 
 ..
     .. list-table:: example of a code snippet
@@ -415,17 +288,10 @@ ChemicalBasis instance which contains the masses of amino acids.
          - Python
        * - 
 
-           .. code-block:: cpp
-
-              #include <iostream>
-
-              int main() {
-                  return 0;
-              }
+           .. literalinclude:: ../../../src/examples/
+              :language: cpp
 
          - 
 
-           .. code-block:: python
-
-              print a+b
-
+           .. literalinclude:: ../../../src/examples/
+              :language: python

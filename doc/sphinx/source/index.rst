@@ -31,6 +31,8 @@ Documentation
    ./tutorial
    ./advanced
 
+- `API documentation <./API/namespaceBioLCCC.html>`_
+
 Mailing list
 ============
 
