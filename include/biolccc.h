@@ -40,7 +40,7 @@ const ChemicalBasis rpAcnFaRod=
 */
 std::vector<ChemicalGroup> parseSequence(
     const std::string &source,
-    const ChemicalBasis &chemBasis);
+    const ChemicalBasis &chemBasis) throw(ParsingException);
 
 //! Calculates the retention time of a peptide.
 /*!
@@ -55,7 +55,8 @@ double calculateRT(const std::string &sequence,
                    const ChemicalBasis & chemBasis,
                    const ChromoConditions & conditions =
                        standardChromoConditions,
-                   const bool continueGradient = true);
+                   const bool continueGradient = true) 
+                   throw(ParsingException, BioLCCCException);
 
 //! Calculates the average (molar) mass of a peptide.
 /*!
@@ -63,15 +64,16 @@ double calculateRT(const std::string &sequence,
     \a sequence using the given set of physicochemical constants \a chemBasis.
 */
 double calculateAverageMass(const std::string &sequence,
-                            const ChemicalBasis &chemBasis);
-
+                            const ChemicalBasis &chemBasis)
+                            throw(ParsingException);
 //! Calculates the monoisotopic mass of a peptide.
 /*!
     Calculates the monoisotopic mass of a peptide with given
     \a sequence using the given set of physicochemical constants \a chemBasis.
 */
 double calculateMonoisotopicMass(const std::string &sequence,
-                                 const ChemicalBasis &chemBasis);
+                                 const ChemicalBasis &chemBasis)
+                                 throw(ParsingException);
 
 //! Calculates the coefficient of distribution Kd for the given peptide.
 /*!
@@ -91,6 +93,7 @@ double calculateKd(const std::string &sequence,
                    const ChemicalBasis &chemBasis,
                    const double columnPoreSize = 100.0,
                    const double columnRelativeStrength = 1.0,
-                   const double temperature = 293.0);
+                   const double temperature = 293.0)
+                   throw(ParsingException, BioLCCCException);
 }
 #endif

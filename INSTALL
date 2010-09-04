@@ -21,6 +21,13 @@ PyPi: http://pypi.python.org/pypi/pyBioLCCC/
 Building libBioLCCC/pyBioLCCC from sources
 ******************************************
 
+The source code is available online at http://hg.theorchromo.ru/libbiolccc.
+You can download the archived source code or pull the mercurial repository:
+
+.. code-block:: bash
+
+    hg clone http://hg.theorchromo.ru/libbiolccc
+
 GNU/Linux
 =========
 

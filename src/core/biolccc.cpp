@@ -34,7 +34,7 @@ std::vector<double> calculateMonomerEnergyProfile(
     const ChemicalBasis & chemBasis,
     const double secondSolventConcentration,
     const double columnRelativeStrength, 
-    const double temperature)
+    const double temperature) throw (BioLCCCException)
 {
     if (parsedSequence.size() < 3)
     {
@@ -181,8 +181,7 @@ double calculateKdCoil(
     const ChemicalBasis &chemBasis,
     const double columnPoreSize,
     const double columnRelativeStrength,
-    const double temperature
-)
+    const double temperature) throw (BioLCCCException)
 {
     // At first, we need to convert the energy profile to a profile of 
     // distribution probabilities. Probability = exp(E_effective),
@@ -388,7 +387,7 @@ double calculateKdCoil(
 
 double rodAdsorptionEnergy(const std::vector<double> & rodEnergyProfile,
                            unsigned int n,
-                           bool reversed = false)
+                           bool reversed = false) throw(BioLCCCException)
 {
     if ((n < 0) || (n > rodEnergyProfile.size()))
     {
@@ -434,8 +433,7 @@ double partitionFunctionRodSubmergedIntoLayer(
     double slitWidth,
     double layerWidth,
     const std::vector<double> & rodEnergyProfile,
-    bool reversed = false
-)
+    bool reversed = false) throw(BioLCCCException)
 {
     double rodLength = segmentLength * (double)(rodEnergyProfile.size() - 1);
     double partitionFunction = 0.0;
@@ -483,8 +481,7 @@ double calculateKdRod(
     const ChemicalBasis &chemBasis,
     const double columnPoreSize,
     const double columnRelativeStrength,
-    const double temperature
-)
+    const double temperature) throw(BioLCCCException)
 {
     if (parsedSequence.size() == 0)
     {
@@ -543,7 +540,7 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
                    const ChemicalBasis &chemBasis,
                    const double columnPoreSize,
                    const double columnRelativeStrength,
-                   const double temperature)
+                   const double temperature) throw(BioLCCCException)
 {
     // assymetricCalculations shows whether the Kd for the reversed molecule 
     // will differ. It happens when a molecule cannot be divided into an integer
@@ -603,7 +600,7 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
 double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                    const ChemicalBasis &chemBasis,
                    const ChromoConditions &conditions,
-                   const bool continueGradient)
+                   const bool continueGradient) throw(BioLCCCException)
 {
     // Calculating column volumes.
     double volumeLiquidPhase = conditions.columnDiameter() *
@@ -749,7 +746,7 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
 
 std::vector<ChemicalGroup> parseSequence(
     const std::string &source,
-    const ChemicalBasis &chemBasis)
+    const ChemicalBasis &chemBasis) throw(ParsingException)
 {
     std::vector<ChemicalGroup> parsedSequence;
     ChemicalGroup NTerminus;
@@ -894,8 +891,8 @@ std::vector<ChemicalGroup> parseSequence(
         if (!aminoAcidFound)
         {
             throw ParsingException(
-                "The sequence " + source + " contains unknown amin acid" + 
-                source.substr(curPos, 1) + ".");
+                "The sequence " + source + " contains unknown amino acid \"" + 
+                source.substr(curPos, 1) + "\".");
         }
     }
     parsedSequence.insert(parsedSequence.begin(), NTerminus);
@@ -927,7 +924,8 @@ std::vector<ChemicalGroup> parseSequence(
 double calculateRT(const std::string &sequence,
                    const ChemicalBasis &chemBasis,
                    const ChromoConditions &conditions,
-                   const bool continueGradient)
+                   const bool continueGradient) 
+                   throw(BioLCCCException, ParsingException)
 {
     return calculateRT(parseSequence(sequence, chemBasis),
                        chemBasis,
@@ -941,6 +939,7 @@ double calculateKd(const std::string &sequence,
                    const double columnPoreSize,
                    const double columnRelativeStrength,
                    const double temperature)
+                   throw(ParsingException, BioLCCCException)
 {
     return calculateKd(parseSequence(sequence, chemBasis),
                        secondSolventConcentration,
@@ -952,6 +951,7 @@ double calculateKd(const std::string &sequence,
 
 double calculateAverageMass(const std::string &sequence,
                             const ChemicalBasis &chemBasis)
+                            throw(ParsingException)
 {
     std::vector<ChemicalGroup> parsedSequence =
         parseSequence(sequence, chemBasis);
@@ -969,6 +969,7 @@ double calculateAverageMass(const std::string &sequence,
 
 double calculateMonoisotopicMass(const std::string &sequence,
                                  const ChemicalBasis &chemBasis)
+                                 throw(ParsingException)
 {
     std::vector<ChemicalGroup> parsedSequence =
         parseSequence(sequence, chemBasis);
