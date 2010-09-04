@@ -50,16 +50,19 @@ public:
     */
     Gradient(double initialConcentrationB,
              double finalConcentrationB,
-             double time);
+             double time)
+             throw(GradientException, GradientPointException);
 
     //! Extends the gradient with the point \a iPoint.
-    Gradient addPoint(GradientPoint iPoint);
+    Gradient addPoint(GradientPoint iPoint)
+        throw(GradientException, GradientPointException);
 
     //! Extends the gradient with the point (\a iTime, \a iConcentrationB).
     /*!
         Valid values are \a iTime >= 0.0 and 0.0 <= \a iConcentrationB <= 100.0
      */
-    Gradient addPoint(double iTime, double iConcentrationB);
+    Gradient addPoint(double iTime, double iConcentrationB)
+        throw(GradientException, GradientPointException);
 };
 
 }

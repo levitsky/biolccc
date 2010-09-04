@@ -54,7 +54,8 @@ public:
                      double iColumnRelativeStrength = 1.0,
                      double iColumnVpToVtot = 0.5,
                      double iColumnPorosity = 0.9,
-                     double iTemperature = 293.0);
+                     double iTemperature = 293.0)
+                     throw(ChromoConditionsException);
 
     //! Returns the length of the column in mm.
     /*!
@@ -66,25 +67,29 @@ public:
     /*!
         Note that it is the length of the area filled with an adsorbent.
      */
-    void setColumnLength(double newColumnLength);
+    void setColumnLength(double newColumnLength)
+        throw(ChromoConditionsException);
 
     //! Returns the internal diameter of the column in mm.
     double columnDiameter() const;
 
     //! Sets the internal diameter of the column in mm.
-    void setColumnDiameter(double newColumnDiameter);
+    void setColumnDiameter(double newColumnDiameter)
+        throw(ChromoConditionsException);
 
     //! Returns the size of the pores in angstroms.
     double columnPoreSize() const;
 
     //! Sets the size of the pores in angstroms.
-    void setColumnPoreSize(double newColumnPoreSize);
+    void setColumnPoreSize(double newColumnPoreSize)
+        throw(ChromoConditionsException);
 
     //! Returns the ratio of the volume of pores to the total column volume.
     double columnVpToVtot() const;
 
     //! Sets the ratio of the volume of pores to the total column volume.
-    void setColumnVpToVtot(double newColumnVpToVtot);
+    void setColumnVpToVtot(double newColumnVpToVtot)
+        throw(ChromoConditionsException);
 
     //! Returns the porosity of a column.
     /*!
@@ -100,13 +105,15 @@ public:
         with a solid phase. This part is made up by pores and interstitial
         volume.
      */
-    void setColumnPorosity(double newColumnPorosity);
+    void setColumnPorosity(double newColumnPorosity)
+        throw(ChromoConditionsException);
 
     //! Returns the temperature of the column in kelvin degrees.
     double temperature() const;
 
     //! Sets the temperature of the column in kelvin degrees.
-    void setTemperature(double newTemperature);
+    void setTemperature(double newTemperature)
+        throw(ChromoConditionsException);
 
     //! Returns the relative strength of the adsorbent.
     /*!
@@ -128,7 +135,8 @@ public:
     double flowRate() const;
 
     //! Sets the flow rate in ml/min.
-    void setFlowRate(double newFlowRate);
+    void setFlowRate(double newFlowRate)
+        throw(ChromoConditionsException);
 
     //! Returns the step of integration over volume in ml.
     /*!
@@ -152,7 +160,8 @@ public:
         Note that if the dV is set to zero, than it is assumed to be equal to
         flowRate*1 min/20.
      */
-    void setDV(double newDV);
+    void setDV(double newDV)
+        throw(ChromoConditionsException);
 
     //! Returns the delay time.
     /*!
@@ -171,20 +180,23 @@ public:
 
     //!  Sets the concentration of the second solvent in component A.
     void setSecondSolventConcentrationA(
-        double newSecondSolventConcentrationA);
+        double newSecondSolventConcentrationA)
+        throw(ChromoConditionsException);
 
     //! Returns the concentration of the second solvent in component B.
     double secondSolventConcentrationB() const;
 
     //! Sets the concentration of the second solvent in component B.
     void setSecondSolventConcentrationB(
-        double newSecondSolventConcentrationB);
+        double newSecondSolventConcentrationB)
+        throw(ChromoConditionsException);
 
     //! Returns the elution gradient.
     Gradient gradient() const;
 
     //! Sets the elution gradient.
-    void setGradient(Gradient newGradient);
+    void setGradient(Gradient newGradient)
+        throw(ChromoConditionsException);
 
 private:
     double mColumnLength;

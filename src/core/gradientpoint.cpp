@@ -6,8 +6,8 @@ GradientPointException::GradientPointException(std::string message):
         BioLCCCException(message) {};
 
 GradientPoint::GradientPoint(double time,
-                             double concentrationB
-                            )
+                             double concentrationB)
+                             throw (GradientPointException)
 {
 
     setTime(time);
@@ -25,6 +25,7 @@ double GradientPoint::concentrationB() const
 }
 
 void GradientPoint::setTime(double newTime) 
+    throw (GradientPointException)
 {
     if (newTime < 0.0)
     {
@@ -35,6 +36,7 @@ void GradientPoint::setTime(double newTime)
 }
 
 void GradientPoint::setConcentrationB(double newConcentrationB) 
+    throw (GradientPointException)
 {
     if (newConcentrationB < 0.0)
     {

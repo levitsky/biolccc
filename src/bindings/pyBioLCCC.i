@@ -42,16 +42,6 @@
 %include "chromoconditions.h"
 %include "biolccc.h"
 
-%exception {
-    try {
-        $action
-    }
-    catch (BioLCCC::BioLCCCException & e) {
-        PyErr_SetString(PyExc_RuntimeError, e.what()); 
-        return NULL;
-    }
-}
-
 %extend std::map<std::string,BioLCCC::ChemicalGroup>{
     %insert("python") %{
         def __str__(self):
@@ -406,7 +396,6 @@
             return (ChromoConditions, (), self.__getstate__(),)
     %}
 };
-
 
 // Instantiate some templates
 

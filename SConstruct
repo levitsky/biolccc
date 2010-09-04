@@ -228,6 +228,6 @@ Alias('doc', docs)
 #===================================
 env.Default([libBioLCCC_shared, pyBioLCCC])
 Alias('all', 
-    [libBioLCCC_shared, libBioLCCC_shared, libgtest_static,
-     tests, pyBioLCCC, docs])
+    [libBioLCCC_shared, libBioLCCC_shared, libgtest_static, pyBioLCCC,
+     tests, test_pyBioLCCC, examples, docs])
 
