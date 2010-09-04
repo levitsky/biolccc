@@ -75,6 +75,46 @@ protected:
         // before the destructor).
     }
 
+    void parsingRulesTester(BioLCCC::ChemicalBasis basisToTest)
+    {
+        std::string peptideSource = "QWERTYIPASDFGHKLCVNM";
+
+        std::vector<BioLCCC::ChemicalGroup> parsedSequence = 
+            BioLCCC::parseSequence("foo.QWERTYIPASDFGHKLCVNM.bar", basisToTest);
+
+        for (unsigned int i=0; i<peptideSource.size(); i++)
+        {
+            ASSERT_EQ(parsedSequence[i+1].label(),
+                      peptideSource.substr(i, 1));
+        }
+
+        peptideSource = "Ac-QWERTYIPASDFGHKLCVNM-NH2";
+
+        ASSERT_THROW(
+            BioLCCC::parseSequence("ac-QWERTY-H", basisToTest),
+            BioLCCC::ParsingException);
+
+        ASSERT_THROW(
+            BioLCCC::parseSequence("QWERTY-oH", basisToTest),
+            BioLCCC::ParsingException);
+
+        ASSERT_THROW(
+            BioLCCC::parseSequence("QWERaTY", basisToTest),
+            BioLCCC::ParsingException);
+
+        ASSERT_THROW(
+            BioLCCC::parseSequence("Ac-QWERaTY-NH2", basisToTest),
+            BioLCCC::ParsingException);
+
+        ASSERT_THROW(
+            BioLCCC::parseSequence("Ac-QWERaTY-NH-NH2", basisToTest),
+            BioLCCC::ParsingException);
+        
+        ASSERT_THROW(
+            BioLCCC::parseSequence("A.Ac-QWERaTY-NH-NH2.K.K", basisToTest),
+            BioLCCC::ParsingException);
+    }
+
     void parsesStandardAminoacidsTester(BioLCCC::ChemicalBasis basisToTest)
     {
         std::string peptideSource = "QWERTYIPASDFGHKLCVNM";
@@ -157,6 +197,12 @@ protected:
     BioLCCC::ChemicalBasis testChemBasis;
 };
 
+TEST_F(BioLCCCTest, parsingRules)
+{
+    parsingRulesTester(BioLCCC::rpAcnTfaCoil);
+    parsingRulesTester(BioLCCC::rpAcnFaRod);
+}
+
 TEST_F(BioLCCCTest, parsesStandardAminoacids)
 {
     parsesStandardAminoacidsTester(BioLCCC::rpAcnTfaCoil);
@@ -183,14 +229,14 @@ TEST_F(BioLCCCTest, calculatesMonoisotopicMass)
 
 TEST_F(BioLCCCTest, calculatesKd)
 {
-    //calculatesKdTester(BioLCCC::rpAcnTfaCoil);
-    //calculatesKdTester(BioLCCC::rpAcnFaRod);
+    calculatesKdTester(BioLCCC::rpAcnTfaCoil);
+    calculatesKdTester(BioLCCC::rpAcnFaRod);
 }
 
 TEST_F(BioLCCCTest, calculatesRT)
 {
-    //calculatesRTTester(BioLCCC::rpAcnTfaCoil);
-    //calculatesRTTester(BioLCCC::rpAcnFaRod);
+    calculatesRTTester(BioLCCC::rpAcnTfaCoil);
+    calculatesRTTester(BioLCCC::rpAcnFaRod);
 }
 
 TEST_F(BioLCCCTest, matrixTest)

@@ -60,8 +60,9 @@ std::vector<double> calculateMonomerEnergyProfile(
         / chemBasis.secondSolventAverageMass() 
         / ( secondSolventConcentration * chemBasis.secondSolventDensity() 
                 / chemBasis.secondSolventAverageMass()
-            + (100.0 - secondSolventConcentration) * chemBasis.firstSolventDensity()
-                   / chemBasis.firstSolventAverageMass());
+            + (100.0 - secondSolventConcentration) 
+              * chemBasis.firstSolventDensity()
+              / chemBasis.firstSolventAverageMass());
 
     double Eab = 0.0;
     if (chemBasis.snyderApproximation()) 
@@ -827,6 +828,7 @@ std::vector<ChemicalGroup> parseSequence(
         }
 
         // Searching for known C-terminal groups.
+        bool CTerminusFound = false;
         for (std::map<std::string,ChemicalGroup>::const_iterator
                 CTerminusIterator = chemBasis.chemicalGroups().begin();
                 CTerminusIterator != chemBasis.chemicalGroups().end();
@@ -838,8 +840,16 @@ std::vector<ChemicalGroup> parseSequence(
                     CTerminusPosition) != std::string::npos)
                 {
                     CTerminus = CTerminusIterator->second;
+                    CTerminusFound = true;
                 }
             }
+        }
+        if (!CTerminusFound)
+        {
+            throw ParsingException(
+                "The sequence " + source +
+                " contains unknown C-terminal group\"" + 
+                source.substr(CTerminusPosition) + "\".");
         }
     }
     else
