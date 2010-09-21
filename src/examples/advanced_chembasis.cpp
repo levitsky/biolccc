@@ -30,7 +30,7 @@ int main()
 
     // Setting a new type of model. Without a massive recalibration
     // it will ruin the accuracy of prediction.
-    myChemicalBasis.setModel(BioLCCC::COIL);
+    myChemicalBasis.setPolymerModel(BioLCCC::CHAIN);
 
     std::string peptide("Ac-PEhoPTIDE-NH2");
     double RT = BioLCCC::calculateRT(peptide,

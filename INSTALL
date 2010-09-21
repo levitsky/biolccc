@@ -39,6 +39,7 @@ In order to compile libBioLCCC you need the following tools to be installed:
 * GNU C++ compiler
 * Python 2.6 (other versions 2.x are accepted, but not tested yet)
 * SCons build system
+* (pyBioLCCC) python-dev package
 * (pyBioLCCC) SWIG interface wrapper
 * (documentation) Doxygen documentation system
 * (documentation) Sphinx documentation system
@@ -48,8 +49,10 @@ In order to compile libBioLCCC you need the following tools to be installed:
 All these tools can be installed from the main repository of your Linux
 distribution or via pip/easy_install packaging system of Python. 
 
-To build libBioLCCC, please, download the source code, make separate build 
-directory (!) and execute in it:
+To build libBioLCCC, you need to download and extract the source code. Then 
+make a separate build directory, e.g. if the source code is stored into
+~/programming/libbiolccc/source than the build directory can be
+~/programming/libbiolccc/build. Finally, execute in the build directory:
 
 .. code-block:: bash
     
@@ -72,13 +75,16 @@ In order to compile and install the Python package:
 
   .. code-block:: bash
 
-      python setup.py build
+      python setup.py install
 
   or
 
   .. code-block:: bash
 
-      python setup.py install
+      python setup.py build
+
+  In the latter case, the built library can be found in build/lib directory.
+
 
 Windows
 =======

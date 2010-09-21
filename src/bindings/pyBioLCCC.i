@@ -186,7 +186,7 @@
                 'adsorptionLayerFactors': self.adsorptionLayerFactors,
                 'kuhnLength': self.kuhnLength,
                 'monomerLength': self.monomerLength,
-                'model': self.model,
+                'polymerModel': self.polymerModel,
                 'snyderApproximation': self.snyderApproximation,
             }[key]()
 
@@ -202,7 +202,7 @@
                 'adsorptionLayerFactors': self.setAdsorptionLayerFactors,
                 'kuhnLength': self.setKuhnLength,
                 'monomerLength': self.setMonomerLength,
-                'model': self.setModel,
+                'polymerModel': self.setPolymerModel,
                 'snyderApproximation': self.setSnyderApproximation,
             }[key](value)
 
@@ -214,7 +214,7 @@
                  'secondSolventDensity', 'secondSolventAverageMass',
                  'secondSolventBindEnergy', 'adsorptionLayerWidth', 
                  'adsorptionLayerFactors', 'kuhnLength', 'monomerLength', 
-                 'model', 'snyderApproximation']
+                 'polymerModel', 'snyderApproximation']
 
         def keys(self):
             return self._keys

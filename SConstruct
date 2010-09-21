@@ -51,19 +51,21 @@ VariantDir('.', GetOption('repository'), duplicate=True)
 
 # Setting the platform specific options.
 platform = ARGUMENTS.get('OS', Platform())
+version = open('./VERSION').readline().strip()
 
+ccflags = ' -DVERSION=\"%s\"' % version
 if platform.name in ['posix', 'linux', 'unix']:
     if buildtype=='release':
-        ccflags = ' -O2'
+        ccflags += ' -O2'
     else:
-        ccflags = ' -Wall -g'
+        ccflags += ' -Wall -g'
     tools = 'default'
 
 if platform.name in ['win32', 'windows']:
     if buildtype=='release':
-        ccflags = ' -O2'
+        ccflags += ' -O2'
     else:
-        ccflags = ' -Wall -g'
+        ccflags += ' -Wall -g'
     tools = 'mingw'
 
 env = Environment(
@@ -145,7 +147,7 @@ env.AddPostAction(pyBioLCCC, Copy(
     os.path.join(Dir('#.').abspath, 'src', 'bindings', 'post_swig.py')))
 env.AddPostAction(pyBioLCCC, 'python ' +
     os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
-        'post_swig.py'))
+        'post_swig.py') + ' ' + version)
 env.AddPostAction(pyBioLCCC, Copy(
     os.path.join(Dir('#.').abspath, 'src', 'bindings', 'pyBioLCCC.py'),
     os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',

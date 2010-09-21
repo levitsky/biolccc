@@ -1,3 +1,4 @@
+import sys
 import os
 current_dir = os.path.dirname(__file__)
 modified_file = []
@@ -22,6 +23,8 @@ with open(os.path.join(current_dir, 'pyBioLCCC.py'), 'r') as f:
     newlines = f.newlines
 
 if modified_file[0].count('import collections') == 0:
+    modified_file.insert(0, 'VERSION = \"%s\"' % sys.argv[1] 
+                            + (newlines or '\n'))
     modified_file.insert(0, 'import collections' + (newlines or '\n'))
 
 with open(os.path.join(current_dir, 'pyBioLCCC.py'), 'w') as f:

@@ -1,6 +1,6 @@
 import pyBioLCCC 
 
-for label, chemicalGroup in pyBioLCCC.rpAcnFaRod.items():
+for label, chemicalGroup in pyBioLCCC.rpAcnFaRod['chemicalGroups'].items():
     print 'Name', chemicalGroup['name']
     print 'Label', chemicalGroup['label']
     print 'Bind energy', chemicalGroup['bindEnergy']

@@ -3,14 +3,14 @@ What is BioLCCC?
 
 BioLCCC (Liquid Chromatography of Biomacromolecules at Critical Conditions) is a
 model which describes the adsorption of protein molecules on porous media. Its
-main application is retention time prediction in liquid chromatography, however
+main application is retention time prediction in liquid chromatography, although
 the list of potential applications can be easily extended. Contrary to the other
 models of peptide/protein chromatography, BioLCCC starts from very basic
 assumptions regarding flexibility of a polypeptide chain, the shape of a pore,
-type of interactions neglected, etc. Given this assumptions, the coefficient of
-distribution (Kd) of a peptide between solid phase and mobile phase can be
+type of interactions neglected, etc. Given these assumptions, the coefficient of
+distribution (Kd) of a peptide between the solid and mobile phases can be
 derived using the methods of statistical physics of macromolecules. Finally, the
-retention time of a peptide is calculated from Kd using the basis equation of
+retention time of a peptide is calculated from Kd using the basic equation of
 gradient chromatography.
 
 Owing to the physical basis of the BioLCCC model, it contains very few free
