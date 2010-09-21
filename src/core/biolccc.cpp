@@ -176,7 +176,7 @@ std::vector<double> calculateBoltzmannFactorProfile(
     return boltzmannFactorProfile;
 }
 
-double calculateKdCoil(
+double calculateKdChain(
     const std::vector<ChemicalGroup> &parsedSequence,
     const double secondSolventConcentration,
     const ChemicalBasis &chemBasis,
@@ -549,10 +549,10 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
     bool assymetricCalculations = 
         (fmod(chemBasis.monomerLength() * parsedSequence.size(), 
               chemBasis.kuhnLength()) != 0);
-    // Choosing the appropriate model.
-    if (chemBasis.model()==COIL)
+    // Choosing the appropriate polymerModel.
+    if (chemBasis.polymerModel()==CHAIN)
     {
-        double Kd = calculateKdCoil(parsedSequence,
+        double Kd = calculateKdChain(parsedSequence,
                                     secondSolventConcentration, 
                                     chemBasis, columnPoreSize,
                                     columnRelativeStrength, temperature);
@@ -562,7 +562,7 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
                 parsedSequence;
             std::reverse(revParsedSequence.begin(),
                          revParsedSequence.end());
-            Kd = (Kd + calculateKdCoil(revParsedSequence,
+            Kd = (Kd + calculateKdChain(revParsedSequence,
                                        secondSolventConcentration,
                                        chemBasis,
                                        columnPoreSize,
@@ -571,7 +571,7 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
         }
         return Kd;
     }
-    else if (chemBasis.model() == ROD)
+    else if (chemBasis.polymerModel() == ROD)
     {
         double Kd = calculateKdRod(parsedSequence,
                                    secondSolventConcentration, 
@@ -747,7 +747,7 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
 
 std::vector<ChemicalGroup> parseSequence(
     const std::string &source,
-    const ChemicalBasis &chemBasis) throw(ParsingException)
+    const ChemicalBasis &chemBasis) throw(BioLCCCException)
 {
     std::vector<ChemicalGroup> parsedSequence;
     ChemicalGroup NTerminus;
@@ -935,7 +935,7 @@ double calculateRT(const std::string &sequence,
                    const ChemicalBasis &chemBasis,
                    const ChromoConditions &conditions,
                    const bool continueGradient) 
-                   throw(BioLCCCException, ParsingException)
+                   throw(BioLCCCException)
 {
     return calculateRT(parseSequence(sequence, chemBasis),
                        chemBasis,
@@ -949,7 +949,7 @@ double calculateKd(const std::string &sequence,
                    const double columnPoreSize,
                    const double columnRelativeStrength,
                    const double temperature)
-                   throw(ParsingException, BioLCCCException)
+                   throw(BioLCCCException)
 {
     return calculateKd(parseSequence(sequence, chemBasis),
                        secondSolventConcentration,
@@ -961,7 +961,7 @@ double calculateKd(const std::string &sequence,
 
 double calculateAverageMass(const std::string &sequence,
                             const ChemicalBasis &chemBasis)
-                            throw(ParsingException)
+                            throw(BioLCCCException)
 {
     std::vector<ChemicalGroup> parsedSequence =
         parseSequence(sequence, chemBasis);
@@ -979,7 +979,7 @@ double calculateAverageMass(const std::string &sequence,
 
 double calculateMonoisotopicMass(const std::string &sequence,
                                  const ChemicalBasis &chemBasis)
-                                 throw(ParsingException)
+                                 throw(BioLCCCException)
 {
     std::vector<ChemicalGroup> parsedSequence =
         parseSequence(sequence, chemBasis);

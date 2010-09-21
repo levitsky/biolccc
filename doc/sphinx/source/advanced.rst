@@ -17,8 +17,8 @@ where *C* denotes concentration.
 
 The function calculateKd does the calculations and requires the concentration of
 the second solvent, a chemical basis, and the size of the pores. The optional
-arguments are the relative strength of a column and temperature, but keep in
-mind that they are experimental.
+arguments are the relative adsorption strength of a column and temperature, but
+keep in mind that they are experimental.
 
 .. list-table:: Calculating the distribution coefficient
    :widths: 40 40
@@ -78,8 +78,8 @@ The following code does that:
        .. literalinclude:: ../../../src/examples/gradient.py
           :language: python
 
-Changing chemical bases
-***********************
+Changing a chemical basis
+*************************
 
 If you need to change the predefined values of physicochemical constants, you
 may edit an instance of ChemicalBasis. The 
@@ -90,17 +90,17 @@ Please, keep in mind a few rules on editing a ChemicalBasis instance:
 
 - **You cannot change the label of a ChemicalGroup.**
 
-  This is happening, because the label of a ChemicalGroup is also used in a
+  This is happening because the label of a ChemicalGroup is also used in a
   ChemicalGroups map of a ChemicalBasis. If you still want for some reason 
-  change modify it, you need to remove this group and add a new one with the
+  change modify it, remove this group and add a new one with the
   same chemical properties but another label.
 
 - **Do not modify the predefined chemical bases.**
  
-  You cannot broke this rule in C++, since the predefined bases made constant
+  You cannot brake this rule in C++, since the predefined bases made constant
   there. But in Python there are no constants, and you can accidentally 
   modify variables pyBioLCCC.rpAcnFaRod and 
-  pyBioLCCC.rpAcnTfaCoil. You should avoid this because you can easily
+  pyBioLCCC.rpAcnTfaCoil. You should avoid this since you can easily
   forget about it later and use these bases as if they were intact.
 
   If you need to derive a new basis from a predefined one, use an alternative
@@ -118,8 +118,8 @@ Please, keep in mind a few rules on editing a ChemicalBasis instance:
   correspond to the local maximum of predicting ability for a given combination
   of solvents and stationary phase. According to our experience, it is unlikely
   that a change in a single constant will rise the accuracy of prediction. If
-  you need to adopt BioLCCC to a custom retention chemistry or another type of
-  BioLCCC model, you need to conduct the whole calibration procedure which
+  you need to adopt BioLCCC to a custom retention chemistry or another model of
+  a polymer, you need to conduct the whole calibration procedure which
   includes the LC-experiment with the calibration mixture and the further data
   processing.
 
@@ -145,8 +145,8 @@ Here is an example of code modifying a ChemicalBasis instance:
 Once again, the libBioLCCC documentation contains the full list of available
 parameters of ChemicalBasis.
 
-Parsing peptide sequence
-************************
+Parsing a peptide sequence
+**************************
 
 Sequence parsing is a process in which a text sequence is translated into a list
 of chemical groups. The resulting list begins with the N-terminal group,
@@ -196,8 +196,9 @@ Advanced customization
 Segmentation mechanism
 ======================
 
-BioLCCC uses two type of units to divide a polymer molecule. The first is a
-conventional monomer, i.e. a building block of a molecule. In case of proteins
+BioLCCC uses two units to divide a polymer molecule into blocks. 
+The first one is a
+conventional monomer, the building block of a molecule. In case of proteins
 it is an amino acid residue. The terminal groups are not considered as monomers,
 rather they are modifiers attached to monomers.
 
@@ -206,33 +207,33 @@ always a good unit. The standard model of a long polymer molecule is a chain of
 free jointed rigid rods, or Kuhn segments. The length of a Kuhn segment does not
 necessarily equal to the length of a monomer, and it even may not be its 
 multiple.
-That is why we use in BioLCCC an additional scale, the Kuhn length of a polymer.
+That is why we use another unit, the Kuhn length of a polymer.
 The Kuhn length is a minimal distance between two chemical bonds in a polymer
 backbone, whose orientations are *almost* independent of each other.
 
 The calculation procedure is the following. At first, we define the sequence of
 monomers in a polymer chain and calculate their effective adsorption energies. 
-Then we divide the chain into Kuhn segments and assign each monomers to the
+Then we divide the chain into Kuhn segments and assign each monomer to the
 corresponding segment. If a boundary between Kuhn segments crosses the monomer
 then the monomer itself is divided into two parts, and each is assigned to the
 corresponding segment. The effective adsorption of a Kuhn segment is a sum of
 effective energies of monomers it contains. If a segment contains only a part of
 monomer then its energy is taken proportional to its length. 
 
-In the case of COIL model, the centers of this segments are modelled as
+In the case of CHAIN model, the centers of this segments are modelled as
 adsorbing beads which are connected by freely jointed rods. 
 For the ROD model, the centers of segments become the beads threaded regularly 
 on a single rigid rod. The distance between the beads in both cases equals to
 the Kuhn length.
 
-Adsorption factors in the COIL model
-====================================
+Adsorption factors in the CHAIN model
+=====================================
 
-The standard COIL BioLCCC model assumes that adsorption occurs only in
-a single layer, which is closest to the wall. In this case
+The standard CHAIN model assumes that adsorption occurs only in
+a single layer, which is closest to the wall. 
 This assumption can be generalized to the case when several near-wall layers
 adsorb the segments of a polymer chain. In terms of translational matrices it
-means, that the second and further rows would contain the exponential terms.
+means that the second and further rows would contain the exponential terms.
 Because the energy of binding to these layers may differ, we introduce
 the vector of layer-specific values of adsorption strength. It is contained in 
 adsorptionLayerFactors() function of a ChemicalBasis instance. 

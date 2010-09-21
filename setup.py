@@ -9,25 +9,15 @@ import glob
 #from setuptools import setup, Extension
 
 sources = glob.glob("src/core/*.cpp") + ['./src/bindings/pyBioLCCC_wrap.cc']
-#sources=[
-#    './src/core/biolcccexception.cpp',
-#    './src/core/chemicalgroup.cpp',
-#    './src/core/chemicalbasis.cpp',
-#    './src/core/gradientpoint.cpp',
-#    './src/core/gradient.cpp',
-#    './src/core/chromoconditions.cpp',
-#    './src/core/biolccc.cpp',
-#    './src/bindings/pyBioLCCC_wrap.cc',
-#    #'./src/bindings/pyBioLCCC.i',
-#    ]
+version = open('./VERSION').readline().strip()
 
 pyBioLCCC_ext = Extension(
     '_pyBioLCCC',
     sources=sources,
     include_dirs=['./include'],
+    extra_compile_args=['-DVERSION=\"%s\"' % version,]
     )
 
-version = open('./VERSION').readline().strip()
 setup(name = 'pyBioLCCC',
     version = version,
     description      = """Bindings for the libBioLCCC""",

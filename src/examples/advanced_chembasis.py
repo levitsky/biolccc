@@ -24,7 +24,7 @@ myChemicalBasis.addChemicalGroup(
 
 # Setting a new type of model. Without a massive recalibration
 # it will ruin the accuracy of prediction.
-myChemicalBasis.setModel(pyBioLCCC.COIL);
+myChemicalBasis.setModel(pyBioLCCC.CHAIN);
 
 peptide = "Ac-PEhoPTIDE-NH2"
 RT = pyBioLCCC.calculateRT(peptide,

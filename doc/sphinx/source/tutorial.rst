@@ -29,31 +29,29 @@ why we supply code snippets both for C++ and Python. Here is an example:
 The Python examples are specific to Python 2.x, since our project doesn't
 support Python 3.x.
 
-Basis conceptions
+Basic conceptions
 *****************
 
 There are a few simple conceptions which are widely used in libBioLCCC. Most of
 them are represented by a corresponding class. Here they are:
 
-**BioLCCC model type** - a set of assumptions on the properties of protein
-molecules. Strictly speaking, BioLCCC is a family of models, each based on the
-different assumptions. This version of the BioLCCC model contains two types of
-model:
+**Polymer model** - the set of assumptions used to describe a polymer molecule.
+This version of the BioLCCC model contains two models:
 
-    **ROD** - in this type of model a peptide is represented as an
-    absolutely rigid rod. Amino acids are modelled as regularly spaced beads
-    threaded on this rod. This assumption works better for peptides rather
-    than protein molecules.
+    **ROD** - this model represents a peptide as an absolutely rigid rod.
+    Amino acids are modelled as regularly spaced beads
+    threaded on this rod. This model describes peptides better comparing to
+    long protein molecules.
 
     The equations for the ROD model are to be published in the upcoming
     paper.
     
-    **COIL** - in this model a protein molecule is described as
-    a flexible polymer. The conformations of this molecule in a pore can be
-    modelled as a random walk in the field of adsorbing walls. This assumption
-    should work better for long protein molecules.
+    **CHAIN** - in this model a protein molecule is described as
+    a free-joint chain of rods. The conformations of this molecule in a pore 
+    can be modelled as a random walk in the field of adsorbing walls.
+    This assumption should work better for long protein molecules.
 
-    The COIL model was described in ''Liquid Chromatography at Critical 
+    The CHAIN model was described in ''Liquid Chromatography at Critical 
     Conditions: Comprehensive Approach to Sequence-Dependent Retention Time 
     Prediction'', Alexander V. Gorshkov et al, Analytical Chemistry, 2006, 78
     (22), 7770-7777. `Link <http://dx.doi.org/10.1021/ac060913x>`_.
@@ -73,7 +71,7 @@ BioLCCC equations. This set contains:
     - the chemical properties of solvents: densities, molar mass and
       adsorption energies (adsorption energy of the first solvent always
       equals zero);
-    - the type of BioLCCC model being used in calculations and
+    - the model of a polymer molecule being used in calculations and
       approximations used in the equations;
     - peptide geometry: the length of amino acid and the Kuhn length;
     - the range of an interaction between an amino acid and the surface of 
@@ -84,23 +82,23 @@ The properties of a chemical basis are stored in the
 
 A chemical basis is specific to a type of retention chemistry, solvents
 and ion paring agent being used in the experiment. In addition, it must be used
-only with the same type of model as the one used in the calibration of the
+only with the same polymer model as the one used in the calibration of the
 chemical basis.
 
 **Predefined chemical basis** - a chemical basis, calculated (or, more
-precisely, calibrated) for the specific retention chemistry and type of
-BioLCCC model. The current version of libBioLCCC contains two predefined
+precisely, calibrated) for the specific retention chemistry and model of a
+polymer molecule. The current version of libBioLCCC contains two predefined
 chemical bases:
 
     **rpAcnFaRod** - a ChemicalBasis calibrated for the reversed phase,
-    ACN as a second solvent, 0.1% FA in both solvents and the ROD BioLCCC model.
+    ACN as a second solvent, 0.1% FA in both solvents and the ROD polymer model.
     The data was obtained in the joint research of Harvard University and 
     Institute for Energy Problems for Chemical Physics, Russian Academy of
     Science.
 
-    **rpAcnTfaCoil** - a chemical basis calibrated for the reversed phase,
-    ACN as a second solvent, 0.1% TFA in both solvents and the COIL BioLCCC 
-    model. The initial data were taken from Guo et al, Journal of 
+    **rpAcnTfaChain** - a chemical basis calibrated for the reversed phase,
+    ACN as a second solvent, 0.1% TFA in both solvents and the CHAIN model. 
+    The initial data were taken from Guo et al, Journal of 
     Chromatography, 359 (1986) 449-517.
 
 **Chromatographic conditions** - a description of a chromatographic equipment 
@@ -236,7 +234,7 @@ Calculating mass
 ****************
 
 libBioLCCC contains functions to calculate the monoisotopic and average masses
-of a peptide. Besides the sequence of a peptide, you need to supply a
+of a peptide. Besides the sequence of a peptide, you need to specify a
 ChemicalBasis instance which contains the masses of amino acids. 
 
 .. list-table:: Calculating mass of a peptide

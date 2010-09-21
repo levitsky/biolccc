@@ -17,21 +17,29 @@ public:
     ChemicalBasisException(std::string message);
 };
 
-//! A set of assumptions of the BioLCCC model.
+//! The model of polymer being used in calculations.
 /*!
-    Different models come from different sets of initial assumption. For the
-    better explanation see the theory of the BioLCCC model.
+    There are different representations of a polymer model, each suitable for
+    different substances and described by different set of equations. At this
+    step, the BioLCCC theory describes a polymer molecule as a free-joint chain
+    or a rigid rod.
  */
-enum ModelType
+
+enum PolymerModel
 {
-    /*! The standard BioLCCC model with the assumption of absolute 
-        flexibility of a protein molecule. It use actively matrix calculations.
+    /*! The model in which a polymer molecule is assumed to be absolutely rigid.
+        This model works better for short molecules, e.g. peptides. The
+        advantage of this model is that it uses explicit expressions for Kd.
+        The equations are valid only for molecules, which are shorter than the
+        size of a pore. More precisely:
+        Length < PoreSize - 2 * AdsorptionLayerWidth 
         */
-    COIL,
-    /*! The BioLCCC model with the assumption of absolute rigidity of 
-        a protein molecule. It works better for short molecules. It use explicit
-        expressions for Kd. */
-    ROD
+    ROD,
+
+    /*! The free-joint chain model of a polymer. This model relies heavily on
+        the matrix equations.
+        */
+    CHAIN
 };
 
 //! This enum describes the predefined sets of physicochemical constants.
@@ -42,16 +50,18 @@ enum ModelType
  */
 enum PredefinedChemicalBasis
 {
-    //! Reversed phase, ACN, trifluoracetic acid, COIL model.
+    //! Reversed phase, ACN, trifluoracetic acid, CHAIN model.
     /*! A ChemicalBasis calibrated for reversed phase, ACN as a second solvent,
-        0.1% TFA and COIL type of BioLCCC model. The data was 
-        obtained in Guo et al, Journal of Chromatography, 359 (1986) 449-517. */
-    RP_ACN_TFA_COIL, 
+        0.1% TFA and CHAIN type of BioLCCC model. The data was 
+        obtained in Guo et al, Journal of Chromatography, 359 (1986) 449-517.
+        */
+    RP_ACN_TFA_CHAIN, 
     //! Reversed phase, ACN, formic acid, ROD model.
     /*! A ChemicalBasis calibrated for reversed phase, ACN as a second solvent,
         0.1% FA and ROD type of BioLCCC model. The data was obtained
         in the joint research of Harvard University and Institute for Energy 
-        Problems for Chemical Physics, Russian Academy of Science. */
+        Problems for Chemical Physics, Russian Academy of Science.
+        */
     RP_ACN_FA_ROD 
 };
 
@@ -140,11 +150,11 @@ public:
     */
     void setSecondSolventBindEnergy(double newEnergy);
 
-    //! Sets the type of BioLCCC model (e.g. CoilBoltzmann, CoilSnydel).
-    void setModel(ModelType newModel);
+    //! Sets the model of a polymer (CHAIN or ROD).
+    void setPolymerModel(PolymerModel newModel);
 
-    //! Returns the type of BioLCCC model (e.g. CoilBoltzmann, CoilSnydel).
-    const ModelType model() const;
+    //! Returns the model of a polymer (CHAIN or ROD).
+    const PolymerModel polymerModel() const;
 
     //! Returns the length of a single monomer in a polymer chain in angstroms.
     /*!
@@ -180,7 +190,7 @@ public:
         is still used to calculate the energy profile of a rod. The whole rod is
         divided into segments of kuhnLength and each segment transforms into an
         adsorbing bead. The effective energy of adsorption equals to the total
-        effective energy of a segment, with the same expression as in the COIL
+        effective energy of a segment, with the same expression as in the CHAIN
         model.
     */
     double kuhnLength() const;
@@ -200,7 +210,7 @@ public:
         is still used to calculate the energy profile of a rod. The whole rod is
         divided into segments of kuhnLength and each segment transforms into an
         adsorbing bead. The effective energy of adsorption equals to the total
-        effective energy of a segment, with the same expression as in the COIL
+        effective energy of a segment, with the same expression as in the CHAIN
         model.
     */
     void setKuhnLength(double newKuhnLength)
@@ -227,9 +237,9 @@ public:
     void setAdsorptionLayerWidth(double newAdsorptionLayerWidth)
         throw(ChemicalBasisException);
 
-    //! Returns the absorption factors of the near-wall layers in COIL model.
+    //! Returns the absorption factors of the near-wall layers in CHAIN model.
     /*! 
-        The standard COIL BioLCCC model assumes that adsorption occurs only in
+        The standard CHAIN BioLCCC model assumes that adsorption occurs only in
         one layer, which is closest to the wall. This assumption can be
         generalized to the case when several near-wall layers adsorb segments 
         of a polymer chain. adsorptionLayerFactors() vector contains the 
@@ -240,13 +250,13 @@ public:
         multiplied by it. The first element of the vector corresponds to the
         layer closest to the wall, second to the next and so on.
 
-        This value is used only in the COIL model.
+        This value is used only in the CHAIN model.
      */
     const std::vector<double> & adsorptionLayerFactors() const;
 
-    //! Sets the absorption factors of the near-wall layers in COIL model.
+    //! Sets the absorption factors of the near-wall layers in CHAIN model.
     /*! 
-        The standard COIL BioLCCC model assumes that adsorption occurs only in
+        The standard CHAIN BioLCCC model assumes that adsorption occurs only in
         one layer, which is closest to the wall. This assumption can be
         generalized to the case when several near-wall layers adsorb segments 
         of a polymer chain. adsorptionLayerFactors() vector contains the 
@@ -257,7 +267,7 @@ public:
         multiplied by it. The first element of the vector corresponds to the
         layer closest to the wall, second to the next and so on.
 
-        This value is used only in the COIL model.
+        This value is used only in the CHAIN model.
      */
     void setAdsorptionLayerFactors(
         std::vector<double> newAdsorptionLayerFactors);
@@ -317,7 +327,7 @@ private:
     double mKuhnLength;
     double mAdsorptionLayerWidth;
     std::vector<double> mAdsorptionLayerFactors;
-    ModelType mModel;
+    PolymerModel mPolymerModel;
     double mFirstSolventDensity;
     double mSecondSolventDensity;
     double mFirstSolventAverageMass;

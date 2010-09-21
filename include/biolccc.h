@@ -21,12 +21,12 @@ public:
 //! A ChromoConditions instance with the standard chromatographic conditions.
 const ChromoConditions standardChromoConditions = ChromoConditions();
 
-//! A ChemicalBasis instance of predefined RP_ACN_TFA_COIL.
-const ChemicalBasis rpAcnTfaCoil=
-    ChemicalBasis(RP_ACN_TFA_COIL);
+//! A ChemicalBasis instance of predefined RP_ACN_TFA_CHAIN.
+const ChemicalBasis rpAcnTfaChain =
+    ChemicalBasis(RP_ACN_TFA_CHAIN);
 
 //! A ChemicalBasis instance of predefined RP_ACN_FA_ROD.
-const ChemicalBasis rpAcnFaRod=
+const ChemicalBasis rpAcnFaRod =
     ChemicalBasis(RP_ACN_FA_ROD);
 
 //! Parses the given peptide sequence.
@@ -40,7 +40,7 @@ const ChemicalBasis rpAcnFaRod=
 */
 std::vector<ChemicalGroup> parseSequence(
     const std::string &source,
-    const ChemicalBasis &chemBasis) throw(ParsingException);
+    const ChemicalBasis &chemBasis) throw(BioLCCCException);
 
 //! Calculates the retention time of a peptide.
 /*!
@@ -56,7 +56,7 @@ double calculateRT(const std::string &sequence,
                    const ChromoConditions & conditions =
                        standardChromoConditions,
                    const bool continueGradient = true) 
-                   throw(ParsingException, BioLCCCException);
+                   throw(BioLCCCException);
 
 //! Calculates the average (molar) mass of a peptide.
 /*!
@@ -65,7 +65,7 @@ double calculateRT(const std::string &sequence,
 */
 double calculateAverageMass(const std::string &sequence,
                             const ChemicalBasis &chemBasis)
-                            throw(ParsingException);
+                            throw(BioLCCCException);
 //! Calculates the monoisotopic mass of a peptide.
 /*!
     Calculates the monoisotopic mass of a peptide with given
@@ -73,7 +73,7 @@ double calculateAverageMass(const std::string &sequence,
 */
 double calculateMonoisotopicMass(const std::string &sequence,
                                  const ChemicalBasis &chemBasis)
-                                 throw(ParsingException);
+                                 throw(BioLCCCException);
 
 //! Calculates the coefficient of distribution Kd for the given peptide.
 /*!
@@ -94,6 +94,6 @@ double calculateKd(const std::string &sequence,
                    const double columnPoreSize = 100.0,
                    const double columnRelativeStrength = 1.0,
                    const double temperature = 293.0)
-                   throw(ParsingException, BioLCCCException);
+                   throw(BioLCCCException);
 }
 #endif

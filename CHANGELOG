@@ -1,3 +1,19 @@
+1.1.0
+*****
+
+General:
+========
+
+- Multiples fixes in the documentation.
+
+API changes:
+============
+
+- add variable VERSION which contains the version of the library.
+- COIL model is CHAIN now.
+- ModelType, setModel and model and now PolymerModel, setPolymerModel and
+  polymerModel.
+
 1.0.0
 *****
 
@@ -29,7 +45,7 @@ Predefined chemical bases:
 API changes:
 ============
 
-- Functions does not return error codes now. 
+- Functions do not return error codes now. 
 - Add the exception-based mechanism of error handling.
 - Merge Terminus and Aminoacid into ChemicalGroup class. Remove corresponding
   methods of ChemicalBasis. Add new chemicalGroups(), clearChemicalGroups(),

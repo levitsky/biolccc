@@ -7,7 +7,7 @@ ChemicalBasisException::ChemicalBasisException(std::string message):
 
 ChemicalBasis::ChemicalBasis()
 {
-    setModel(COIL);
+    setPolymerModel(CHAIN);
     setFirstSolventDensity(1e-10);
     setFirstSolventAverageMass(1e-10);
     setSecondSolventDensity(1e-19);
@@ -164,14 +164,14 @@ void ChemicalBasis::clearChemicalGroups()
 //    it->second.setBindEnergy(newBindEnergy);
 //}
 
-const ModelType ChemicalBasis::model() const
+const PolymerModel ChemicalBasis::polymerModel() const
 {
-    return mModel;
+    return mPolymerModel;
 }
 
-void ChemicalBasis::setModel(ModelType newModel)
+void ChemicalBasis::setPolymerModel(PolymerModel newModel)
 {
-    mModel = newModel;
+    mPolymerModel = newModel;
 }
 
 bool ChemicalBasis::snyderApproximation() const 
@@ -255,9 +255,9 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
 {
     switch ( predefinedChemicalBasisId ) 
     {
-        case RP_ACN_TFA_COIL:
+        case RP_ACN_TFA_CHAIN:
         {
-            setModel(COIL);
+            setPolymerModel(CHAIN);
             // Water as the first solvent.
             setFirstSolventDensity(1000.0);
             setFirstSolventAverageMass(18.02);
@@ -426,7 +426,7 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
 
         case RP_ACN_FA_ROD:
         {
-            setModel(ROD);
+            setPolymerModel(ROD);
             setAdsorptionLayerWidth(16.0);
             setAdsorptionLayerFactors(std::vector<double>(1, 1.0));
             setMonomerLength(4.0);

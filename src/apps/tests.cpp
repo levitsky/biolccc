@@ -12,7 +12,7 @@ protected:
     {
         // The set-up work for each test.
         testChemBasis = BioLCCC::ChemicalBasis();
-        testChemBasis.setModel(BioLCCC::COIL);
+        testChemBasis.setPolymerModel(BioLCCC::CHAIN);
         testChemBasis.setFirstSolventDensity(1.0);
         testChemBasis.setFirstSolventAverageMass(1.0);
         testChemBasis.setSecondSolventDensity(1.0);
@@ -199,43 +199,43 @@ protected:
 
 TEST_F(BioLCCCTest, parsingRules)
 {
-    parsingRulesTester(BioLCCC::rpAcnTfaCoil);
+    parsingRulesTester(BioLCCC::rpAcnTfaChain);
     parsingRulesTester(BioLCCC::rpAcnFaRod);
 }
 
 TEST_F(BioLCCCTest, parsesStandardAminoacids)
 {
-    parsesStandardAminoacidsTester(BioLCCC::rpAcnTfaCoil);
+    parsesStandardAminoacidsTester(BioLCCC::rpAcnTfaChain);
     parsesStandardAminoacidsTester(BioLCCC::rpAcnFaRod);
 }
 
 TEST_F(BioLCCCTest, parsesPhosphoAminoacids)
 {
-    parsesPhosphoAminoacidsTester(BioLCCC::rpAcnTfaCoil);
+    parsesPhosphoAminoacidsTester(BioLCCC::rpAcnTfaChain);
     parsesPhosphoAminoacidsTester(BioLCCC::rpAcnFaRod);
 }
 
 TEST_F(BioLCCCTest, parsesStandardTerminalGroups)
 {
-    parsesStandardTerminalGroupsTester(BioLCCC::rpAcnTfaCoil);
+    parsesStandardTerminalGroupsTester(BioLCCC::rpAcnTfaChain);
     parsesStandardTerminalGroupsTester(BioLCCC::rpAcnFaRod);
 }
 
 TEST_F(BioLCCCTest, calculatesMonoisotopicMass)
 {
-    calculatesMonoisotopicMassTester(BioLCCC::rpAcnTfaCoil);
+    calculatesMonoisotopicMassTester(BioLCCC::rpAcnTfaChain);
     calculatesMonoisotopicMassTester(BioLCCC::rpAcnFaRod);
 }
 
 TEST_F(BioLCCCTest, calculatesKd)
 {
-    calculatesKdTester(BioLCCC::rpAcnTfaCoil);
+    calculatesKdTester(BioLCCC::rpAcnTfaChain);
     calculatesKdTester(BioLCCC::rpAcnFaRod);
 }
 
 TEST_F(BioLCCCTest, calculatesRT)
 {
-    calculatesRTTester(BioLCCC::rpAcnTfaCoil);
+    calculatesRTTester(BioLCCC::rpAcnTfaChain);
     calculatesRTTester(BioLCCC::rpAcnFaRod);
 }
 
@@ -375,19 +375,19 @@ TEST_F(BioLCCCTest, segmentEnergyProfileTest)
 
 TEST_F(BioLCCCTest, backwardCalculationCompatibility)
 {
-    BioLCCC::ChemicalBasis chemBasisCoil(BioLCCC::RP_ACN_TFA_COIL);
-    chemBasisCoil.setFirstSolventDensity(5.56);
-    chemBasisCoil.setFirstSolventAverageMass(1.0);
-    chemBasisCoil.setSecondSolventDensity(1.91);
-    chemBasisCoil.setSecondSolventAverageMass(1.0);
+    BioLCCC::ChemicalBasis chemBasisChain(BioLCCC::RP_ACN_TFA_CHAIN);
+    chemBasisChain.setFirstSolventDensity(5.56);
+    chemBasisChain.setFirstSolventAverageMass(1.0);
+    chemBasisChain.setSecondSolventDensity(1.91);
+    chemBasisChain.setSecondSolventAverageMass(1.0);
 
     ASSERT_LT(
-        abs(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 20.0, chemBasisCoil) - 
+        abs(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 20.0, chemBasisChain) - 
             104.76633),
         1e-5);
 
     ASSERT_LT(
-        abs(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM", chemBasisCoil) - 
+        abs(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM", chemBasisChain) - 
             43.48354),
         1e-5);
 
