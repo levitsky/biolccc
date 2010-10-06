@@ -10,6 +10,7 @@
 #include "gradientpoint.h"
 #include "gradient.h"
 #include "chromoconditions.h"
+#include "auxiliary.h"
 #include "biolccc.h"
 %}
 
@@ -17,9 +18,11 @@
 %include "std_map.i"
 %include "std_vector.i"
 %include "std_list.i"
+%include "carrays.i"
 %include "pyabc.i"
 %include "exception.i"
 
+%array_class(double, doubleArray);
 %pythonabc(ChemicalGroup, collections.MutableMapping);
 %pythonabc(ChemicalBasis, collections.MutableMapping);
 %pythonabc(ChromoConditions, collections.MutableMapping);
@@ -40,6 +43,7 @@
 %include "gradientpoint.h"
 %include "gradient.h"
 %include "chromoconditions.h"
+%include "auxiliary.h"
 %include "biolccc.h"
 
 %extend std::map<std::string,BioLCCC::ChemicalGroup>{

@@ -345,21 +345,16 @@ double calculateKdChain(
         {
             for (unsigned int j = 0; j < latticeSize; j++)
             {
-                //std::cout << transitionMatrix[j + i * latticeSize] << " ";
                 densityBuffer[i] = densityBuffer[i] + density[j] *
                                    transitionMatrix[j + i * latticeSize];
             }
-            //std::cout << std::endl;
         }
 
         // Transferring the results from the density vector.
         for (unsigned int i = 0; i < latticeSize; i++)
         {
             density[i] = densityBuffer[i];
-            //std::cout << density[i] << " ";
         }
-        //std::cout << std::endl;
-        //std::cout << std::endl;
     }
 
     // Kd is a sum of elements of the density vector, normalized to the size 
@@ -598,12 +593,98 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
     }
 }
 
+class KdCalculator
+{
+public:
+    KdCalculator(const std::vector<ChemicalGroup> &parsedSequence,
+                 const ChemicalBasis &chemBasis, 
+                 const double columnPoreSize,
+                 const double columnRelativeStrength,
+                 const double temperature,
+                 const unsigned int numInterpolationPoints) :
+                     mParsedSequence(parsedSequence),
+                     mChemicalBasis(chemBasis),
+                     mColumnPoreSize(columnPoreSize),
+                     mColumnRelativeStrength(columnRelativeStrength),
+                     mTemperature(temperature),
+                     mNumInterpolationPoints(numInterpolationPoints)
+    {
+        if (mNumInterpolationPoints > 0)
+        {
+            mSecondSolventConcentrations = new double[mNumInterpolationPoints];
+            mLogKds = new double[mNumInterpolationPoints];
+            for (unsigned int i=0; i < mNumInterpolationPoints; i++) 
+            {
+                mSecondSolventConcentrations[i] =
+                    i * (100.0) / (mNumInterpolationPoints-1);
+                mLogKds[i] = log(calculateKd(mParsedSequence,
+                    mSecondSolventConcentrations[i],
+                    mChemicalBasis, 
+                    mColumnPoreSize,
+                    mColumnRelativeStrength,
+                    mTemperature));
+            }
+
+            mSecondDers = new double[mNumInterpolationPoints];
+            fitSpline(mSecondSolventConcentrations, mLogKds,
+                mNumInterpolationPoints, mSecondDers);
+        }
+    }
+
+    ~KdCalculator()
+    {
+        if (mNumInterpolationPoints > 0)
+        {
+            delete[] mSecondSolventConcentrations;
+            delete[] mLogKds;
+            delete[] mSecondDers;
+        }
+    }
+
+    double operator()(double secondSolventConcentration) 
+        throw (BioLCCCException)
+    {
+        if (mNumInterpolationPoints == 0) 
+        {
+            return calculateKd(mParsedSequence,
+                               secondSolventConcentration,
+                               mChemicalBasis, 
+                               mColumnPoreSize,
+                               mColumnRelativeStrength,
+                               mTemperature);
+        }
+        else 
+        {
+            return exp(calculateSpline(mSecondSolventConcentrations, mLogKds,
+                mSecondDers, mNumInterpolationPoints, 
+                secondSolventConcentration));
+        }
+    }
+
+private:
+    const std::vector<ChemicalGroup> &mParsedSequence;
+    const ChemicalBasis & mChemicalBasis;
+    const double mColumnPoreSize;
+    const double mColumnRelativeStrength;
+    const double mTemperature;
+    const unsigned int mNumInterpolationPoints;
+    double * mSecondSolventConcentrations;
+    double * mLogKds;
+    double * mSecondDers;
+};
+
 double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                    const ChemicalBasis &chemBasis,
                    const ChromoConditions &conditions,
+                   const unsigned int numInterpolationPoints,
                    const bool continueGradient) throw(BioLCCCException)
 {
     // Calculating column volumes.
+    if (numInterpolationPoints < 0)
+    {
+        throw BioLCCCException(
+            "The number of interpolation points must be non-negative.");
+    }
     double volumeLiquidPhase = conditions.columnDiameter() *
                                conditions.columnDiameter() * 3.1415 * 
                                conditions.columnLength() / 4.0 /
@@ -651,17 +732,23 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                 conditions.secondSolventConcentrationB()));
     }
 
+    std::vector<std::pair<int, double> >::const_iterator currentGradientPoint=
+        convertedGradient.begin();
+    std::vector<std::pair<int, double> >::const_iterator previousGradientPoint=
+        convertedGradient.begin();
+
+    KdCalculator kdCalculator(parsedSequence, chemBasis,
+                              conditions.columnPoreSize(),
+                              conditions.columnRelativeStrength(),
+                              conditions.temperature(),
+                              numInterpolationPoints);
+
+    double secondSolventConcentration = 0.0;
     // The part of a column passed by molecules. When it exceeds 1.0,
     // molecule elute from the column.
     double S = 0.0;
     // The current iteration number.
     int j = 0;
-    double secondSolventConcentration = 0.0;
-
-    std::vector<std::pair<int, double> >::const_iterator currentGradientPoint=
-        convertedGradient.begin();
-    std::vector<std::pair<int, double> >::const_iterator previousGradientPoint=
-        convertedGradient.begin();
     while (S < 1.0)
     {
         j++;
@@ -683,42 +770,26 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                     // One case is that a peptide elutes during this section or
                     // the section is the last.
                     bool peptideElutes = 
-                        ((1.0 - S) / dV * calculateKd(
-                            parsedSequence,
-                            currentGradientPoint->second,
-                            chemBasis, 
-                            conditions.columnPoreSize(),
-                            conditions.columnRelativeStrength(),
-                            conditions.temperature()) * volumePore < 
+                        ((1.0 - S) / dV
+                        * kdCalculator(currentGradientPoint->second)
+                        * volumePore < 
                         (currentGradientPoint->first - j + 1));
 
                     if (peptideElutes ||
                         (currentGradientPoint == --convertedGradient.end()))
                     {
-                        j += (int)ceil((1.0 - S) / dV *
-                            calculateKd(
-                               parsedSequence,
-                               currentGradientPoint->second,
-                               chemBasis,
-                               conditions.columnPoreSize(),
-                               conditions.columnRelativeStrength(),
-                               conditions.temperature()) *
-                            volumePore);
+                        j += (int)ceil((1.0 - S) / dV 
+                            * kdCalculator(currentGradientPoint->second)
+                            * volumePore);
                         break;
                     }
                     // Another case is that this section is not long enough for
                     // a peptide to elute.
                     else
                     {
-                        S += dV / calculateKd(
-                                 parsedSequence,
-                                 currentGradientPoint->second,
-                                 chemBasis,
-                                 conditions.columnPoreSize(),
-                                 conditions.columnRelativeStrength(),
-                                 conditions.temperature()) /
-                             volumePore * (currentGradientPoint->first -
-                                           previousGradientPoint->first);
+                        S += dV / kdCalculator(currentGradientPoint->second)
+                             / volumePore * (currentGradientPoint->first -
+                                             previousGradientPoint->first);
                         j = currentGradientPoint->first;
                     }
                 }
@@ -732,11 +803,9 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
             (currentGradientPoint->second - previousGradientPoint->second) /
             (currentGradientPoint->first - previousGradientPoint->first) *
             (currentGradientPoint->first - (double) j);
-        S += dV / calculateKd(
-                 parsedSequence, secondSolventConcentration,
-                 chemBasis, conditions.columnPoreSize(),
-                 conditions.columnRelativeStrength(),
-                 conditions.temperature()) / volumePore;
+        S += dV / kdCalculator(secondSolventConcentration) / volumePore;
+        //std::cout << secondSolventConcentration << " " 
+        //          << S << "\n";
     }
 
     double RT = j * dV / conditions.flowRate() + conditions.delayTime() +
@@ -909,37 +978,21 @@ std::vector<ChemicalGroup> parseSequence(
     parsedSequence.push_back(CTerminus);
     return parsedSequence;
 
-    /*
-    // Finally, we build an energy profile if it was defined.
-    if (peptideEnergyProfile != NULL)
-    {
-        peptideEnergyProfile->clear();
-        for (std::vector<ChemicalGroup>::const_iterator currentAminoAcid =
-                    parsedSequence.begin();
-                currentAminoAcid != parsedSequence.end();
-                currentAminoAcid++)
-        {
-            peptideEnergyProfile->push_back(currentAminoAcid->bindEnergy());
-        }
-
-        // Modifing energies of terminal amino acid residues.
-        *(peptideEnergyProfile->begin()) = *(peptideEnergyProfile->begin()) +
-                                           NTerminus->bindEnergy();
-        *(--peptideEnergyProfile->end()) = *(--peptideEnergyProfile->end()) +
-                                           CTerminus->bindEnergy();
-    }
-    */
 }
 
 double calculateRT(const std::string &sequence,
                    const ChemicalBasis &chemBasis,
                    const ChromoConditions &conditions,
+                   const unsigned int numInterpolationPoints,
                    const bool continueGradient) 
                    throw(BioLCCCException)
 {
-    return calculateRT(parseSequence(sequence, chemBasis),
+    std::vector<ChemicalGroup> parsedSequence = 
+        parseSequence(sequence, chemBasis);
+    return calculateRT(parsedSequence,
                        chemBasis,
                        conditions,
+                       numInterpolationPoints,
                        continueGradient);
 }
 

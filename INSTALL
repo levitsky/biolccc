@@ -44,6 +44,7 @@ In order to compile libBioLCCC you need the following tools to be installed:
 * (documentation) Doxygen documentation system
 * (documentation) Sphinx documentation system
 * (documentation) DVIPNG converter
+* (documentation) matplotlib Python library 
 * (optional) Mercurial version control system
 
 All these tools can be installed from the main repository of your Linux

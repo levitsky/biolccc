@@ -1,7 +1,8 @@
 #ifndef BIOLCCC_H
 #define BIOLCCC_H
 
-#include <math.h>
+#include <cmath>
+#include "auxiliary.h"
 #include "biolcccexception.h"
 #include "chemicalbasis.h"
 #include "chromoconditions.h"
@@ -55,6 +56,7 @@ double calculateRT(const std::string &sequence,
                    const ChemicalBasis & chemBasis,
                    const ChromoConditions & conditions =
                        standardChromoConditions,
+                   const unsigned int numInterpolationPoints = 0,
                    const bool continueGradient = true) 
                    throw(BioLCCCException);
 

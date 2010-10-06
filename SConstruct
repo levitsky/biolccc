@@ -51,7 +51,7 @@ VariantDir('.', GetOption('repository'), duplicate=True)
 
 # Setting the platform specific options.
 platform = ARGUMENTS.get('OS', Platform())
-version = open('./VERSION').readline().strip()
+version = open(str(File('./VERSION').srcnode())).readline().strip()
 
 ccflags = ' -DVERSION=\"%s\"' % version
 if platform.name in ['posix', 'linux', 'unix']:
@@ -200,11 +200,15 @@ Depends(doc_doxygen, libBioLCCC_shared)
 
 # Sphinx documentation.
 #----------------------
-doc_sphinx = env.Command('doc_sphinx', '', 'cd ./doc/sphinx; make html; cd ../')
+doc_sphinx = env.Command('doc_sphinx', '', 
+    'mkdir ./doc/sphinx/source/examples; '
+    'cp src/examples/*.py ./doc/sphinx/source/examples; '
+    'cp src/examples/*.cpp ./doc/sphinx/source/examples; '
+    'cd ./doc/sphinx; make html; cd ../')
 Depends(doc_sphinx, Glob('doc/sphinx/*'))
-Depends(doc_sphinx, Glob('doc/sphinx/build/*'))
 Depends(doc_sphinx, Glob('doc/sphinx/source/*'))
 Depends(doc_sphinx, Glob('doc/sphinx/source/_static/*'))
+Depends(doc_sphinx, Glob('doc/sphinx/source/_sphinxext/*.py'))
 Depends(doc_sphinx, Glob('doc/sphinx/source/_templates/*'))
 Depends(doc_sphinx, 'VERSION')
 Depends(doc_sphinx, 'README')
@@ -216,7 +220,9 @@ Depends(doc_sphinx, Glob('src/examples/*.cpp'))
 # Complete documentation.
 #------------------------
 docs = env.Command('docs', '',
+    #[''])
     ['mv doc/sphinx/build/html/* doc/',
+     'mkdir doc/build',
      'mkdir doc/API',
      'mv doc/doxygen/html/* doc/API',
      'rm -r doc/doxygen',
