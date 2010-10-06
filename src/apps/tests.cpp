@@ -1,8 +1,8 @@
-#include "biolccc.h"
-#include <gtest/gtest.h>
 #include <cmath>
 #include <vector>
 #include <time.h>
+#include <gtest/gtest.h>
+#include "biolccc.h"
 
 // The fixture for testing BioLCCC functions.
 class BioLCCCTest: public ::testing::Test
@@ -53,6 +53,7 @@ protected:
             0.0,
             0.0,
             0.0));
+
     }
 
     virtual ~BioLCCCTest()
@@ -474,6 +475,66 @@ TEST_F(BioLCCCTest, assignsChemicalBasis)
     testValue = (float)(rand() % 1000);
     myChemicalBasis.setMonomerLength(testValue);
     ASSERT_EQ(myChemicalBasis.monomerLength(), testValue);
+}
+
+TEST_F(BioLCCCTest, fitsSpline) 
+{
+    double * x = new double[11];
+    double * y = new double[11];
+    double * y2 = new double[11];
+
+    for (int i=0; i<11; i++)
+    {
+        x[i] = i;
+        y[i] = 1.0 / (x[i] + 1.0);
+    }
+    BioLCCC::fitSpline(x, y, 11, y2);
+
+    for (int i=0; i<11; i++)
+    {
+        ASSERT_LE(
+            fabs(BioLCCC::calculateSpline(x, y, y2, 11, i/2.0) * (i / 2.0 + 1.0)
+                 - 1.0),
+            0.1);
+    }
+    delete[] x, y, y2;
+}
+
+TEST_F(BioLCCCTest, calculatesRTwithInterpolation) 
+{
+    std::vector<std::string> peptideStandard;
+    peptideStandard.push_back("KYIPGTK");
+    peptideStandard.push_back("YIPGTK");
+    peptideStandard.push_back("IFVQK");
+    peptideStandard.push_back("KTGQAPGFSYTDANK");
+    peptideStandard.push_back("TGQAPGFSYTDANK");
+    peptideStandard.push_back("GEREDLIAYLKK");
+    peptideStandard.push_back("TGPNLHGLFGR");
+    peptideStandard.push_back("MIFAGIK");
+    peptideStandard.push_back("EDLIAYLK");
+    peptideStandard.push_back("IFVQKCAQCHTVEK");
+    peptideStandard.push_back("GITWGEETLMEYLENPKK");
+    peptideStandard.push_back("GITWGEETLMEYLENPK");
+    peptideStandard.push_back(std::string(20, 'T'));
+    peptideStandard.push_back(std::string(30, 'T'));
+    peptideStandard.push_back(std::string(40, 'T'));
+    peptideStandard.push_back(std::string(50, 'T'));
+
+    for (std::vector<std::string>::const_iterator peptide =
+            peptideStandard.begin();
+        peptide != peptideStandard.end();
+        peptide++)
+    {
+        std::cout << *peptide << "\n";
+        ASSERT_LE(
+            fabs(BioLCCC::calculateRT(*peptide, BioLCCC::rpAcnTfaChain,
+                                      BioLCCC::standardChromoConditions, 0) 
+                 / BioLCCC::calculateRT(*peptide, BioLCCC::rpAcnTfaChain,
+                                      BioLCCC::standardChromoConditions, 21) 
+                 - 1.0),
+            0.01);
+
+    }
 }
 
 int main(int argc, char **argv)

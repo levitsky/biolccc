@@ -28,12 +28,12 @@ keep in mind that they are experimental.
      - Python
    * - 
 
-       .. literalinclude:: ../../../src/examples/kd_calculation.cpp
+       .. literalinclude:: examples/kd_calculation.cpp
           :language: cpp
 
      - 
 
-       .. literalinclude:: ../../../src/examples/kd_calculation.py
+       .. literalinclude:: examples/kd_calculation.py
           :language: python
 
 
@@ -70,12 +70,12 @@ The following code does that:
      - Python
    * - 
 
-       .. literalinclude:: ../../../src/examples/gradient.cpp
+       .. literalinclude:: examples/gradient.cpp
           :language: cpp
 
      - 
 
-       .. literalinclude:: ../../../src/examples/gradient.py
+       .. literalinclude:: examples/gradient.py
           :language: python
 
 Changing a chemical basis
@@ -133,12 +133,12 @@ Here is an example of code modifying a ChemicalBasis instance:
      - Python
    * - 
 
-       .. literalinclude:: ../../../src/examples/advanced_chembasis.cpp
+       .. literalinclude:: examples/advanced_chembasis.cpp
           :language: cpp
 
      - 
 
-       .. literalinclude:: ../../../src/examples/advanced_chembasis.py
+       .. literalinclude:: examples/advanced_chembasis.py
           :language: python
 
 
@@ -160,19 +160,21 @@ continues with the amino acids and ends with the C-Terminal group.
      - Python
    * - 
 
-       .. literalinclude:: ../../../src/examples/sequence_parsing.cpp
+       .. literalinclude:: examples/sequence_parsing.cpp
           :language: cpp
 
      - 
 
-       .. literalinclude:: ../../../src/examples/sequence_parsing.py
+       .. literalinclude:: examples/sequence_parsing.py
           :language: python
 
+Changing the precision of calculation
+*************************************
 
-Changing the calculation precision
-**********************************
+Changing the integration step
+=============================
 
-The main equation of liquid chromatography involves the intergration over the
+The main equation of liquid chromatography involves the integration over the
 pumped volume of binary solvent:
 
 .. math::
@@ -187,8 +189,41 @@ retention volume of a substance, *V*\ :sub:`P` is the volume of pores and
 libBioLCCC computes this integral as a summation over values of V. The step of
 this summation is dV. You can change this value using an instance of
 ChromoConditions. By default, dV equals zero, which means that its value is
-derived from the flow rate. Currently, if dV == 0 than 
-:math:`dV = flow\; rate/20`
+derived from the flow rate. Currently, if dV == 0 than dV = flow rate / 20
+
+The following picture illustrates the effect of changing dV on the accuracy of
+RT prediction for ten random peptides of different length, from 5 to 40 amino
+acid residues. The x axis denotes the divisor used to calculate dV as dV =
+flow rate / x.
+
+.. plot:: examples/dV_accuracy.py
+
+As you can see, for most peptides dV = flow rate / 100 is enough for an accurate
+result.
+      
+Using the fast RT calculation algorithm
+=======================================
+
+The standard RT calculating procedure recalculates the coefficient of
+distribution at each step of integration. However, there is no need to invoke
+these computationally-intensive formulas for each value of second solvent 
+concentration. The value of Kd can be calculated only in several points
+distributed uniformly all over the concentration range, and than the whole
+function can be reconstructed using the interpolation.
+
+Because log(Kd) is a slowly changing function with a narrow range of values (see
+the figure below), we interpolate it and then recalculate Kd itself.
+
+.. plot:: examples/log_kd.py
+
+The accuracy of this fast algorithm depends strongly on the number of
+interpolating points. The figure below shows how the difference between the new
+and standard algorithms depends on the number of interpolating points.
+
+.. plot:: examples/interpolation_accuracy.py
+
+We recommend to use 21 interpolation point to obtain both fast and accurate
+calculation procedure.
 
 Advanced customization
 **********************

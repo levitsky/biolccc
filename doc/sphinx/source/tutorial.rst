@@ -17,12 +17,12 @@ why we supply code snippets both for C++ and Python. Here is an example:
      - Python
    * - 
 
-       .. literalinclude:: ../../../src/examples/snippet_example.cpp
+       .. literalinclude:: examples/snippet_example.cpp
           :language: cpp
 
      - 
 
-       .. literalinclude:: ../../../src/examples/snippet_example.py
+       .. literalinclude:: examples/snippet_example.py
           :language: python
 
 
@@ -172,12 +172,12 @@ with these data, it calculates the retention time of the peptide.
      - Python
    * - 
 
-       .. literalinclude:: ../../../src/examples/rt_calculation.cpp
+       .. literalinclude:: examples/rt_calculation.cpp
           :language: cpp
 
      - 
 
-       .. literalinclude:: ../../../src/examples/rt_calculation.py
+       .. literalinclude:: examples/rt_calculation.py
           :language: python
 
 Please, consult with the 
@@ -199,12 +199,12 @@ replace the default parameters with your own.
      - Python
    * - 
 
-       .. literalinclude:: ../../../src/examples/chromoconditions.cpp
+       .. literalinclude:: examples/chromoconditions.cpp
           :language: cpp
 
      - 
 
-       .. literalinclude:: ../../../src/examples/chromoconditions.py
+       .. literalinclude:: examples/chromoconditions.py
           :language: python
 
 
@@ -218,7 +218,7 @@ instances as Python dictionaries:
    * - Python
    * - 
 
-       .. literalinclude:: ../../../src/examples/chromoconditions_dict.py
+       .. literalinclude:: examples/chromoconditions_dict.py
           :language: python
 
 
@@ -245,12 +245,12 @@ ChemicalBasis instance which contains the masses of amino acids.
      - Python
    * - 
 
-       .. literalinclude:: ../../../src/examples/mass_calculation.cpp
+       .. literalinclude:: examples/mass_calculation.cpp
           :language: cpp
 
      - 
 
-       .. literalinclude:: ../../../src/examples/mass_calculation.py
+       .. literalinclude:: examples/mass_calculation.py
           :language: python
 
 Getting the list of predefined chemical groups
@@ -269,12 +269,12 @@ predefined chemical bases.
      - Python
    * - 
 
-       .. literalinclude:: ../../../src/examples/chemicalbasis.cpp
+       .. literalinclude:: examples/chemicalbasis.cpp
           :language: cpp
 
      - 
 
-       .. literalinclude:: ../../../src/examples/chemicalbasis.py
+       .. literalinclude:: examples/chemicalbasis.py
           :language: python
 
 ..
