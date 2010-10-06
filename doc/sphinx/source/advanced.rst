@@ -36,7 +36,6 @@ keep in mind that they are experimental.
        .. literalinclude:: examples/kd_calculation.py
           :language: python
 
-
 Non-linear gradients
 ********************
 
@@ -198,14 +197,26 @@ flow rate / x.
 
 .. plot:: examples/dV_accuracy.py
 
-As you can see, for most peptides dV = flow rate / 100 is enough for an accurate
-result.
+As you can see, for most peptides dV = flow rate / 20 is enough for the most
+accurate result. However, for those who use non-standard gradients with sharp
+or short steps, we recommend to find the required dV using the code from this
+example.
+
+Also, starting from the version 1.2.0 a new integration routine is used. 
+In the previous version of the calculateRT, the expression under the 
+integral was summed until it was greater than 1.0. The obtained value of
+retention volume was therefore a multiple of dV and the RT was a multiple of
+dV / flow rate. Now the integral is taken until the sum equals 1.0 precisely,
+i.e. the last dV increment can be taken partially.
+It significantly increases the accuracy of prediction for big values of dV. If
+you need for some reason to emulate the old behaviour of calculateRT, set the
+backwardCompatibility argument to true.
       
 Using the fast RT calculation algorithm
 =======================================
 
 The standard RT calculating procedure recalculates the coefficient of
-distribution at each step of integration. However, there is no need to invoke
+distribution at each step of integration. There is no need to invoke
 these computationally-intensive formulas for each value of second solvent 
 concentration. The value of Kd can be calculated only in several points
 distributed uniformly all over the concentration range, and than the whole
@@ -222,8 +233,28 @@ and standard algorithms depends on the number of interpolating points.
 
 .. plot:: examples/interpolation_accuracy.py
 
-We recommend to use 21 interpolation point to obtain both fast and accurate
+We recommend to use 21 interpolating point to obtain both fast and accurate
 calculation procedure.
+
+To enable the interpolation, set the number of interpolating points in the 
+numInterpolationPoints argument of calculateRT. The default value of
+numInterpolationPoints means that interpolation is disabled.
+
+.. list-table:: Changing the number of interpolating points.
+   :widths: 40 40
+   :header-rows: 1
+
+   * - C++
+     - Python
+   * - 
+
+       .. literalinclude:: examples/interpolation.cpp
+          :language: cpp
+
+     - 
+
+       .. literalinclude:: examples/interpolation.py
+          :language: python
 
 Advanced customization
 **********************

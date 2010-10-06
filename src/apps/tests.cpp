@@ -383,13 +383,24 @@ TEST_F(BioLCCCTest, backwardCalculationCompatibility)
     chemBasisChain.setSecondSolventAverageMass(1.0);
 
     ASSERT_LT(
-        abs(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 20.0, chemBasisChain) - 
-            104.76633),
+        abs(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 20.0, chemBasisChain)
+            - 104.76633),
         1e-5);
 
     ASSERT_LT(
-        abs(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM", chemBasisChain) - 
-            43.48354),
+        abs(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM", chemBasisChain,
+            BioLCCC::standardChromoConditions, 0, true, true) 
+            - 43.48354),
+        1e-5);
+
+    BioLCCC::ChromoConditions accurate_chromoconditions;
+    accurate_chromoconditions.setDV(
+        accurate_chromoconditions.flowRate() / 1000.0);
+    ASSERT_LT(
+        abs(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM", chemBasisChain,
+            BioLCCC::standardChromoConditions, 0, true, true) 
+            - BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM", chemBasisChain,
+            BioLCCC::standardChromoConditions, 0, true, false)),
         1e-5);
 
     BioLCCC::ChemicalBasis chemBasisRod(BioLCCC::RP_ACN_FA_ROD);
@@ -399,13 +410,21 @@ TEST_F(BioLCCCTest, backwardCalculationCompatibility)
     chemBasisRod.setSecondSolventAverageMass(1.0);
 
     ASSERT_LT(
-        abs(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 20.0, chemBasisRod) - 
-            22.64802),
+        abs(BioLCCC::calculateKd("QWERTYIPASDFGHKLCVNM", 20.0, chemBasisRod)
+            - 22.64802),
         1e-5);
 
     ASSERT_LT(
-        abs(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM", chemBasisRod) - 
-            36.53354),
+        abs(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM", chemBasisRod,
+            BioLCCC::standardChromoConditions, 0, true, true) 
+            - 36.53354),
+        1e-5);
+
+    ASSERT_LT(
+        abs(BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM", chemBasisRod,
+            BioLCCC::standardChromoConditions, 0, true, true) 
+            - BioLCCC::calculateRT("QWERTYIPASDFGHKLCVNM", chemBasisRod,
+            BioLCCC::standardChromoConditions, 0, true, false)),
         1e-5);
 }
 
@@ -500,6 +519,28 @@ TEST_F(BioLCCCTest, fitsSpline)
     delete[] x, y, y2;
 }
 
+TEST_F(BioLCCCTest, partialPolynomialInterpolation) 
+{
+    double * x = new double[11];
+    double * y = new double[11];
+
+    for (int i=0; i<11; i++)
+    {
+        x[i] = i;
+        y[i] = 1.0 / (x[i] + 1.0);
+    }
+
+    for (int i=0; i<11; i++)
+    {
+        ASSERT_LE(
+            fabs(BioLCCC::partPolInterpolate(x, y, 11, 3, i/2.0) 
+                 * (i / 2.0 + 1.0)
+                 - 1.0),
+            0.05);
+    }
+    delete[] x, y;
+}
+
 TEST_F(BioLCCCTest, calculatesRTwithInterpolation) 
 {
     std::vector<std::string> peptideStandard;
@@ -525,15 +566,13 @@ TEST_F(BioLCCCTest, calculatesRTwithInterpolation)
         peptide != peptideStandard.end();
         peptide++)
     {
-        std::cout << *peptide << "\n";
         ASSERT_LE(
             fabs(BioLCCC::calculateRT(*peptide, BioLCCC::rpAcnTfaChain,
-                                      BioLCCC::standardChromoConditions, 0) 
-                 / BioLCCC::calculateRT(*peptide, BioLCCC::rpAcnTfaChain,
                                       BioLCCC::standardChromoConditions, 21) 
+                 / BioLCCC::calculateRT(*peptide, BioLCCC::rpAcnTfaChain,
+                                      BioLCCC::standardChromoConditions, 0) 
                  - 1.0),
             0.01);
-
     }
 }
 

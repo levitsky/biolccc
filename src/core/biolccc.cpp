@@ -601,22 +601,41 @@ public:
                  const double columnPoreSize,
                  const double columnRelativeStrength,
                  const double temperature,
-                 const unsigned int numInterpolationPoints) :
+                 const int numInterpolationPoints) :
                      mParsedSequence(parsedSequence),
                      mChemicalBasis(chemBasis),
                      mColumnPoreSize(columnPoreSize),
                      mColumnRelativeStrength(columnRelativeStrength),
                      mTemperature(temperature),
-                     mNumInterpolationPoints(numInterpolationPoints)
+                     mN(numInterpolationPoints)
     {
-        if (mNumInterpolationPoints > 0)
+        if (mN > 0)
         {
-            mSecondSolventConcentrations = new double[mNumInterpolationPoints];
-            mLogKds = new double[mNumInterpolationPoints];
-            for (unsigned int i=0; i < mNumInterpolationPoints; i++) 
+            mSecondSolventConcentrations = new double[mN];
+            mLogKds = new double[mN];
+            // The number of extra points in the terminal segments.
+            // This points significantly increase the accuracy of spline
+            // interpolation.
+            int NETP = 1;
+            for (int i=0; i < mN; i++) 
             {
-                mSecondSolventConcentrations[i] =
-                    i * (100.0) / (mNumInterpolationPoints-1);
+                if (i <= NETP)
+                {
+                    mSecondSolventConcentrations[i] =
+                        i * 100.0 / (mN - 2.0 * NETP - 1.0) / (NETP + 1.0);
+                }
+                else if (i > (mN - NETP - 2))
+                {
+                    mSecondSolventConcentrations[i] = 
+                        ((mN - 2.0 * NETP - 2.0)
+                            + (i - mN + NETP + 2.0) / (NETP + 1.0))
+                         * 100.0 / (mN - 2.0 * NETP - 1.0);
+                }
+                else
+                {
+                    mSecondSolventConcentrations[i] =
+                        (i - NETP) * 100.0 / (mN - 2.0 * NETP - 1.0);
+                }
                 mLogKds[i] = log(calculateKd(mParsedSequence,
                     mSecondSolventConcentrations[i],
                     mChemicalBasis, 
@@ -625,15 +644,15 @@ public:
                     mTemperature));
             }
 
-            mSecondDers = new double[mNumInterpolationPoints];
+            mSecondDers = new double[mN];
             fitSpline(mSecondSolventConcentrations, mLogKds,
-                mNumInterpolationPoints, mSecondDers);
+                mN, mSecondDers);
         }
     }
 
     ~KdCalculator()
     {
-        if (mNumInterpolationPoints > 0)
+        if (mN > 0)
         {
             delete[] mSecondSolventConcentrations;
             delete[] mLogKds;
@@ -644,7 +663,7 @@ public:
     double operator()(double secondSolventConcentration) 
         throw (BioLCCCException)
     {
-        if (mNumInterpolationPoints == 0) 
+        if (mN == 0) 
         {
             return calculateKd(mParsedSequence,
                                secondSolventConcentration,
@@ -656,8 +675,12 @@ public:
         else 
         {
             return exp(calculateSpline(mSecondSolventConcentrations, mLogKds,
-                mSecondDers, mNumInterpolationPoints, 
+                mSecondDers, mN, 
                 secondSolventConcentration));
+            //return exp(partPolInterpolate(
+            //    mSecondSolventConcentrations, mLogKds,
+            //    mN, 2,
+            //    secondSolventConcentration));
         }
     }
 
@@ -667,7 +690,7 @@ private:
     const double mColumnPoreSize;
     const double mColumnRelativeStrength;
     const double mTemperature;
-    const unsigned int mNumInterpolationPoints;
+    const int mN;
     double * mSecondSolventConcentrations;
     double * mLogKds;
     double * mSecondDers;
@@ -676,8 +699,9 @@ private:
 double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                    const ChemicalBasis &chemBasis,
                    const ChromoConditions &conditions,
-                   const unsigned int numInterpolationPoints,
-                   const bool continueGradient) throw(BioLCCCException)
+                   const int numInterpolationPoints,
+                   const bool continueGradient,
+                   const bool backwardCompatibility) throw(BioLCCCException)
 {
     // Calculating column volumes.
     if (numInterpolationPoints < 0)
@@ -747,6 +771,7 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
     // The part of a column passed by molecules. When it exceeds 1.0,
     // molecule elute from the column.
     double S = 0.0;
+    double dS = 0.0;
     // The current iteration number.
     int j = 0;
     while (S < 1.0)
@@ -754,9 +779,6 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
         j++;
         if (j > currentGradientPoint->first)
         {
-            // If j exceeds the last point of a gradient, the value of the
-            // second solvent concentration is calculated by a prolongation of
-            // the last gradient section.
             if (currentGradientPoint != --convertedGradient.end())
             {
                 previousGradientPoint = currentGradientPoint;
@@ -768,23 +790,27 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                         previousGradientPoint->second)
                 {
                     // One case is that a peptide elutes during this section or
-                    // the section is the last.
+                    // the section is the last. Then we can calculate the
+                    // retention time directly.
                     bool peptideElutes = 
                         ((1.0 - S) / dV
-                        * kdCalculator(currentGradientPoint->second)
-                        * volumePore < 
+                            * kdCalculator(currentGradientPoint->second)
+                            * volumePore < 
                         (currentGradientPoint->first - j + 1));
 
                     if (peptideElutes ||
                         (currentGradientPoint == --convertedGradient.end()))
                     {
-                        j += (int)ceil((1.0 - S) / dV 
-                            * kdCalculator(currentGradientPoint->second)
-                            * volumePore);
+                        dS = dV / kdCalculator(currentGradientPoint->second) 
+                            / volumePore;
+                        j += (int) ceil((1.0 - S) / dS);
+                        S += (int) ceil((1.0 - S) / dS) * dS;
                         break;
                     }
+
                     // Another case is that this section is not long enough for
-                    // a peptide to elute.
+                    // a peptide to elute. In this case we calculate the
+                    // increase of S during this section.
                     else
                     {
                         S += dV / kdCalculator(currentGradientPoint->second)
@@ -794,22 +820,29 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                     }
                 }
             }
+            // If j exceeds the last point of a gradient, the value of the
+            // second solvent concentration is calculated by a prolongation of
+            // the last gradient section.
             else if (!continueGradient)
             {
                 break;
             }
         }
+
         secondSolventConcentration = currentGradientPoint->second -
             (currentGradientPoint->second - previousGradientPoint->second) /
             (currentGradientPoint->first - previousGradientPoint->first) *
-            (currentGradientPoint->first - (double) j);
-        S += dV / kdCalculator(secondSolventConcentration) / volumePore;
-        //std::cout << secondSolventConcentration << " " 
-        //          << S << "\n";
+            (currentGradientPoint->first - (double) (j-0.5));
+        dS = dV / kdCalculator(secondSolventConcentration) / volumePore;
+        S += dS;
     }
 
     double RT = j * dV / conditions.flowRate() + conditions.delayTime() +
                 volumeLiquidPhase / conditions.flowRate();
+    if (!backwardCompatibility)
+    {
+        RT -= (S - 1.0) / dS * dV / conditions.flowRate();
+    }
     return RT;
 }
 }
@@ -983,8 +1016,9 @@ std::vector<ChemicalGroup> parseSequence(
 double calculateRT(const std::string &sequence,
                    const ChemicalBasis &chemBasis,
                    const ChromoConditions &conditions,
-                   const unsigned int numInterpolationPoints,
-                   const bool continueGradient) 
+                   const int numInterpolationPoints,
+                   const bool continueGradient,
+                   const bool backwardCompatibility) 
                    throw(BioLCCCException)
 {
     std::vector<ChemicalGroup> parsedSequence = 
@@ -993,7 +1027,8 @@ double calculateRT(const std::string &sequence,
                        chemBasis,
                        conditions,
                        numInterpolationPoints,
-                       continueGradient);
+                       continueGradient,
+                       backwardCompatibility);
 }
 
 double calculateKd(const std::string &sequence,

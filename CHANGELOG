@@ -1,3 +1,28 @@
+1.2.0
+*****
+
+General:
+========
+
+- Add the fast version of calculateRT function which calculates Kd only in a few
+  points and than use interpolation to find the remaining values.
+- Change the way dV is used. Now the accuracy of calculateRT is almost
+  independent of dV for shallow gradients. 
+- The introduced changes are documented in the chapter "Changing the precision
+  of calculation".
+
+API changes:
+============
+
+- New arguments in calculateRT function: numInterpolationPoints and
+  backwardCompatibility. The former is used to set the number of points used to
+  interpolate the value of Kd. The default value is 0, which means that
+  interpolation is disabled. backwardCompatibility controls the way dV is
+  treated. If it is true, then the old equations for RT are used, otherwise the
+  new routine is invoked which almost independent of dV.
+- New "auxiliary" sublibrary, which contains various math functions. Currently,
+  it contains interpolation routines.
+
 1.1.0
 *****
 

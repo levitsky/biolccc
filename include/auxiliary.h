@@ -9,7 +9,7 @@ namespace BioLCCC
     The function should be described by its \a n values \a y at consecutive
     points \a x. The function stores its output in the array \a y2 of size \a n.
  */
-void fitSpline(const double *x, const double *y, unsigned int n, double * y2);
+void fitSpline(const double *x, const double *y, const int n, double * y2);
 
 //! Calculates the value of a function using the cubic spline interpolation.
 /*!
@@ -18,14 +18,14 @@ void fitSpline(const double *x, const double *y, unsigned int n, double * y2);
     at \a n consecutive points \a x.
  */
 double calculateSpline(const double *x, const double *y, const double * y2,
-    const unsigned int n, const double x_in);
+    const int n, const double x_in);
 
 //! Calculates the value of a function using a piecewise linear interpolation.
 /*!
     Calculates the value of a function at the point \a x_in. The values of the
     function at \a n points \a x are known and equal \a y.
 */
-double linInterpolate(const double * x, const double * y, const unsigned int n, 
+double linInterpolate(const double * x, const double * y, const int n, 
                       const double x_in);
 
 //! Calculates the value of a function using a polynomial interpolation.
@@ -33,7 +33,7 @@ double linInterpolate(const double * x, const double * y, const unsigned int n,
     Finds the value of a function at the point \a x_in. The values of the
     function at \a n points \a x are known and equal \a y.
  */
-double polInterpolate(const double * x, const double * y, const unsigned int n, 
+double polInterpolate(const double * x, const double * y, const int n, 
                       const double x_in);
 
 //! Calculates the value of a function using a partial polynomial interpolation.
@@ -42,28 +42,28 @@ double polInterpolate(const double * x, const double * y, const unsigned int n,
     using only the values of the function at \a n_part * 2 nearest points.
  */
 double partPolInterpolate(const double * x, const double * y, 
-    const unsigned int n, const unsigned int n_part, const double x_in);
+    const int n, const int n_part, const double x_in);
 
 //! Solves a linear matrix equation m * x = rhs for square matrix m of size nxn
 /*!
     The equation is solved using the Gauss-Jordan elimination method. The
     resulting solution vector x is written to \a rhs.
  */
-void solveMatrixEquation(double * m, double * rhs, int n);
+void solveMatrixEquation(double * m, double * rhs, const int n);
 
 //! Constructs a polynomial whose values at n points x equals y.
 /*!
     The computed coefficients before terms x^0, x^1, ... , x^(n-1) are 
     stored in \a y.
  */
-void fitPolynomial(double * x, double * y, int n);
+void fitPolynomial(double * x, double * y, const int n);
 
 //! Calculates the value of a polynomial of (n-1)th power at point x.
 /*!
     The computed coefficients before terms x^0, x^1, ... , x^(n-1) should
     stored in \a coeffs.
  */
-double calculatePolynomial(double * coeffs, int n, double x);
+double calculatePolynomial(const double * coeffs, const int n, const double x);
 
 }
 

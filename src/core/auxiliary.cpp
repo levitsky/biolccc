@@ -1,10 +1,11 @@
+#include <iostream>
 #include <cmath>
 #include "auxiliary.h"
 
 namespace BioLCCC
 {
 
-void fitSpline(const double *x, const double *y, unsigned int n, double * y2)
+void fitSpline(const double *x, const double *y, const int n, double * y2)
 {
     double a,b,c,d;
     double * c1 = new double[n-1];
@@ -12,7 +13,7 @@ void fitSpline(const double *x, const double *y, unsigned int n, double * y2)
     c1[0] = 0.0;
     d1[0] = 0.0;
     
-    for (unsigned int i = 1; i < n - 1; i++)
+    for (int i = 1; i < n - 1; i++)
     {
         a = x[i] - x[i-1];
         b = 2.0 * (x[i+1] - x[i-1]);
@@ -33,7 +34,7 @@ void fitSpline(const double *x, const double *y, unsigned int n, double * y2)
 }
 
 double calculateSpline(const double *x, const double *y, const double * y2,
-    const unsigned int n, const double x_in)
+    const int n, const double x_in)
 {
     int j = 0;
     int j_up = n - 1;
@@ -57,10 +58,10 @@ double calculateSpline(const double *x, const double *y, const double * y2,
           * (dx * dx) / 6.0;
 }
 
-double linInterpolate(const double * x, const double * y, const unsigned int n,
+double linInterpolate(const double * x, const double * y, const int n,
                       const double x_in)
 {
-    for (unsigned int i=0; i<n-1; ++i)
+    for (int i=0; i<n-1; ++i)
     {
         if ((x[i] <= x_in) && (x_in <= x[i+1]))
         {
@@ -70,17 +71,17 @@ double linInterpolate(const double * x, const double * y, const unsigned int n,
     return y[n];
 }
 
-double polInterpolate(const double * x, const double * y, const unsigned int n, 
+double polInterpolate(const double * x, const double * y, const int n, 
                       const double x_in)
 {
     double * p = new double[n];
-    for (unsigned int i=0; i<n; i++)
+    for ( int i=0; i<n; i++)
     {
         p[i] = y[i];
     }
-    for (unsigned int i=1; i<n; i++)
+    for (int i=1; i<n; i++)
     {
-        for (unsigned int j=0; j<n-i; j++)
+        for (int j=0; j<n-i; j++)
         {
             p[j] = (p[j] * (x_in - x[j+i]) + p[j+1] * (x[j] - x_in))
                    / (x[j] - x[j+i]);
@@ -92,7 +93,7 @@ double polInterpolate(const double * x, const double * y, const unsigned int n,
 }
 
 double partPolInterpolate(const double * x, const double * y, 
-    const unsigned int n, const unsigned int n_part, const double x_in)
+    const int n, const int n_part, const double x_in)
 {
     int k = 0;
     int k_up = n - 1;
@@ -108,17 +109,17 @@ double partPolInterpolate(const double * x, const double * y,
         }
     }
 
-    k = (k - n_part + 1 > 0) ? k - n_part + 1 : 0;
+    k = ((k - n_part + 1) > 0) ? (k - n_part + 1) : 0;
     k = (k + 2 * n_part < n ) ? k : n - 2 * n_part;
 
     double * p = new double[n_part*2];
-    for (unsigned int i=0; i<n_part*2; i++)
+    for (int i=0; i<n_part*2; i++)
     {
         p[i] = y[k+i];
     }
-    for (unsigned int i=1; i<n_part*2; i++)
+    for (int i=1; i<n_part*2; i++)
     {
-        for (unsigned int j=0; j<n_part*2-i; j++)
+        for (int j=0; j<n_part*2-i; j++)
         {
             p[j] = (p[j] * (x_in - x[k+j+i]) + p[j+1] * (x[k+j] - x_in))
                    / (x[k+j] - x[k+j+i]);
@@ -129,7 +130,7 @@ double partPolInterpolate(const double * x, const double * y,
     return output;
 }
 
-void solveMatrixEquation(double * m, double * rhs, int n)
+void solveMatrixEquation(double * m, double * rhs, const int n)
 {
     double temp;
     bool * reduced = new bool[n];
@@ -205,7 +206,7 @@ void solveMatrixEquation(double * m, double * rhs, int n)
     delete[] reduced;
 }
 
-void fitPolynomial(double * x, double * y, int n) 
+void fitPolynomial(double * x, double * y, const int n) 
 {
     double * matrix = new double[n*n];
     for (int i=0; i<n; i++)
@@ -219,7 +220,7 @@ void fitPolynomial(double * x, double * y, int n)
     solveMatrixEquation(matrix, y, n);
 }    
 
-double calculatePolynomial(double * coeffs, int n, double x)
+double calculatePolynomial(const double * coeffs, const int n, const double x)
 {
     double output = 0;
     for (int i=0; i<n; i++)
