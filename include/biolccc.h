@@ -51,13 +51,18 @@ std::vector<ChemicalGroup> parseSequence(
     
     If \a continueGradient is true, than the last section of a gradient is
     prolonged.
+
+    If \a backwardCompatibility is true, than the calculated RT will be 
+    a multiple of dV/flow rate. This type of calculations was used in the 
+    version 1.1.0 and earlier.
 */
 double calculateRT(const std::string &sequence,
                    const ChemicalBasis & chemBasis,
                    const ChromoConditions & conditions =
                        standardChromoConditions,
-                   const unsigned int numInterpolationPoints = 0,
-                   const bool continueGradient = true) 
+                   const int numInterpolationPoints = 0,
+                   const bool continueGradient = true,
+                   const bool backwardCompatibility = false) 
                    throw(BioLCCCException);
 
 //! Calculates the average (molar) mass of a peptide.
