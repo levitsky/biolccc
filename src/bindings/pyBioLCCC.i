@@ -11,6 +11,9 @@
 #include "gradient.h"
 #include "chromoconditions.h"
 #include "auxiliary.h"
+#include "parsing.h"
+#include "rod_model.h"
+#include "chain_model.h"
 #include "biolccc.h"
 %}
 
@@ -44,6 +47,9 @@
 %include "gradient.h"
 %include "chromoconditions.h"
 %include "auxiliary.h"
+%include "parsing.h"
+%include "chain_model.h"
+%include "rod_model.h"
 %include "biolccc.h"
 
 %extend std::map<std::string,BioLCCC::ChemicalGroup>{
