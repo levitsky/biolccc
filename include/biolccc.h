@@ -1,23 +1,17 @@
 #ifndef BIOLCCC_H
 #define BIOLCCC_H
 
-#include <cmath>
 #include "auxiliary.h"
 #include "biolcccexception.h"
 #include "chemicalbasis.h"
 #include "chromoconditions.h"
+#include "parsing.h"
+#include "chain_model.h"
+#include "rod_model.h"
 
 //! Apart from classes, BioLCCC contains calculation methods and constants.
 namespace BioLCCC
 {
-
-//! This exception is raised when parsing process cannot be completed.
-class ParsingException : public BioLCCCException
-{
-public:
-    //! Constructs an instance ParsingException with the given \a message.
-    ParsingException(std::string message);
-};
 
 //! A ChromoConditions instance with the standard chromatographic conditions.
 const ChromoConditions standardChromoConditions = ChromoConditions();
@@ -29,19 +23,6 @@ const ChemicalBasis rpAcnTfaChain =
 //! A ChemicalBasis instance of predefined RP_ACN_FA_ROD.
 const ChemicalBasis rpAcnFaRod =
     ChemicalBasis(RP_ACN_FA_ROD);
-
-//! Parses the given peptide sequence.
-/*!
-    Parses the given peptide sequence \a source using \a chemBasis. Writes
-    the parsed peptide structure into \a parsedPeptideStructure, terminal groups
-    into \a NTerminus and \a CTerminus. Writes the energy profile of a peptide
-    into \a peptideEnergyProfile.
-
-    Throws ParsingException if the peptide is not parseable.
-*/
-std::vector<ChemicalGroup> parseSequence(
-    const std::string &source,
-    const ChemicalBasis &chemBasis) throw(BioLCCCException);
 
 //! Calculates the retention time of a peptide.
 /*!
