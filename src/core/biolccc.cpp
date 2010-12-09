@@ -50,7 +50,8 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
         double Kd = calculateKdRod(parsedSequence,
                                    secondSolventConcentration, 
                                    chemBasis, columnPoreSize,
-                                   columnRelativeStrength, temperature);
+                                   columnRelativeStrength, temperature,
+                                   chemBasis.specialRodModel());
         if (assymetricCalculations) 
         {
             std::vector<ChemicalGroup> revParsedSequence = 
@@ -62,7 +63,8 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
                                       chemBasis,
                                       columnPoreSize,
                                       columnRelativeStrength, 
-                                      temperature)) / 2.0 ;
+                                      temperature,
+                                      chemBasis.specialRodModel())) / 2.0 ;
         }
         return Kd;
     }
