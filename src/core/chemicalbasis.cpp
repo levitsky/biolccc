@@ -18,6 +18,7 @@ ChemicalBasis::ChemicalBasis()
     setAdsorptionLayerWidth(1.0e-10);
     setAdsorptionLayerFactors(std::vector<double>(1, 1.0));
     setSnyderApproximation(false);
+    setSpecialRodModel(true);
 }
 
 ChemicalBasis::ChemicalBasis(PredefinedChemicalBasis predefinedChemicalBasisId)
@@ -184,6 +185,16 @@ void ChemicalBasis::setSnyderApproximation(bool flag)
     mSnyderApproximation = flag;
 }
 
+bool ChemicalBasis::specialRodModel() const 
+{
+    return mSpecialRodModel;
+}
+
+void ChemicalBasis::setSpecialRodModel(bool flag) 
+{
+    mSpecialRodModel = flag;
+}
+
 double ChemicalBasis::firstSolventDensity() const
 {
     return mFirstSolventDensity;
@@ -274,6 +285,7 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
             setMonomerLength(10.0);
             setKuhnLength(10.0);
             setSnyderApproximation(false);
+            setSpecialRodModel(true);
 
             clearChemicalGroups();
             addChemicalGroup(ChemicalGroup ("Alanine",
@@ -439,6 +451,7 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
             setSecondSolventAverageMass(41.05);
             setSecondSolventBindEnergy(2.4);
             setSnyderApproximation(false);
+            setSpecialRodModel(true);
 
             clearChemicalGroups();
             addChemicalGroup(ChemicalGroup ("Alanine",

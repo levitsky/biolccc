@@ -198,6 +198,7 @@
                 'monomerLength': self.monomerLength,
                 'polymerModel': self.polymerModel,
                 'snyderApproximation': self.snyderApproximation,
+                'specialRodModel': self.specialRodModel,
             }[key]()
 
         def __setitem__(self, key, value):
@@ -214,6 +215,7 @@
                 'monomerLength': self.setMonomerLength,
                 'polymerModel': self.setPolymerModel,
                 'snyderApproximation': self.setSnyderApproximation,
+                'specialRodModel': self.setSpecialRodModel,
             }[key](value)
 
         def __delitem__(self, key):
@@ -224,7 +226,7 @@
                  'secondSolventDensity', 'secondSolventAverageMass',
                  'secondSolventBindEnergy', 'adsorptionLayerWidth', 
                  'adsorptionLayerFactors', 'kuhnLength', 'monomerLength', 
-                 'polymerModel', 'snyderApproximation']
+                 'polymerModel', 'snyderApproximation', 'specialRodModel']
 
         def keys(self):
             return self._keys

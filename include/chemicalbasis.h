@@ -288,6 +288,12 @@ public:
      */
     void setSnyderApproximation(bool flag);
 
+    //! Returns true if equations for the special case of rod model are used.
+    bool specialRodModel() const;
+    
+    //! Enables the usage of old equations for the special case of rod model.
+    void setSpecialRodModel(bool flag);
+
     //! Returns the density of the first solvent in kg/m^3.
     double firstSolventDensity() const;
 
@@ -333,6 +339,7 @@ private:
     double mFirstSolventAverageMass;
     double mSecondSolventAverageMass;
     bool mSnyderApproximation;
+    bool mSpecialRodModel;
 };
 
 }

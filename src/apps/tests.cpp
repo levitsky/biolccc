@@ -308,6 +308,14 @@ TEST_F(BioLCCCTest, adsorptionStrengthTest)
     double kd4 = 
         BioLCCC::calculateKd("H-OBO-OH", 100.0, testChemBasis, 100.0, 2.0);
     ASSERT_EQ(kd1, kd4);
+
+    // Check if zero column adsorption strength works as a non-adsorbed peptide 
+    // in a non-adsorbed second solvent.
+    double kd5 = 
+        BioLCCC::calculateKd("H-OOO-OH", 100.0, testChemBasis, 100.0, 0.0);
+    double kd6 = 
+        BioLCCC::calculateKd("H-BBB-OH", 0.0, testChemBasis, 100.0, 1.0);
+    ASSERT_EQ(kd5, kd6);
 }
 
 TEST_F(BioLCCCTest, monomerEnergyProfileTest)
@@ -574,6 +582,165 @@ TEST_F(BioLCCCTest, calculatesRTwithInterpolation)
                  - 1.0),
             0.01);
     }
+}
+
+TEST_F(BioLCCCTest, rodModelSpecial) 
+{
+    BioLCCC::ChemicalBasis chemBasis1(BioLCCC::RP_ACN_FA_ROD);
+    BioLCCC::ChemicalBasis chemBasis2(BioLCCC::RP_ACN_FA_ROD);
+    chemBasis1.setMonomerLength(10.0);
+    chemBasis1.setKuhnLength(10.0);
+    chemBasis1.setAdsorptionLayerWidth(20.0);
+    chemBasis2.setMonomerLength(10.0);
+    chemBasis2.setKuhnLength(10.0);
+    chemBasis2.setAdsorptionLayerWidth(1.0e-10);
+    std::string sequence1("QWERTYIPAS");
+    std::string sequence2("DFGHKLCVNM");
+    
+    double kd1 = BioLCCC::calculateKd(sequence1, 0.0, chemBasis1, 300.0, 0.0);
+    double kd2 = BioLCCC::calculateKd(sequence2, 0.0, chemBasis2, 300.0, 0.0);
+    ASSERT_DOUBLE_EQ(kd1, kd2);
+}
+
+TEST_F(BioLCCCTest, rodModelGeneral) 
+{
+    // Test if the width of adsorbing layer does not affect Kd when no
+    // adsorption occurs.
+    BioLCCC::ChemicalBasis chemBasis1(BioLCCC::RP_ACN_FA_ROD);
+    BioLCCC::ChemicalBasis chemBasis2(BioLCCC::RP_ACN_FA_ROD);
+    chemBasis1.setSpecialRodModel(false);
+    chemBasis1.setMonomerLength(10.0);
+    chemBasis1.setKuhnLength(10.0);
+    chemBasis1.setAdsorptionLayerWidth(30.0);
+    chemBasis2.setSpecialRodModel(false);
+    chemBasis2.setMonomerLength(10.0);
+    chemBasis2.setKuhnLength(10.0);
+    chemBasis2.setAdsorptionLayerWidth(1.0e-10);
+    std::string sequence(30, 'W');
+    
+    double kd1 = BioLCCC::calculateKd(sequence, 0.0, chemBasis1, 300.0, 0.0);
+    double kd2 = BioLCCC::calculateKd(sequence, 0.0, chemBasis2, 300.0, 0.0);
+    ASSERT_DOUBLE_EQ(kd1, kd2);
+
+    // Check each term in general model.
+    double segmentLength = 5.0;
+    double slitWidth = 100.0;
+    double layerWidth = 20.0;
+
+    int Ns[] = {10, 20, 30, 40};
+    
+    for (int i=0; i<4; i++)
+    {
+        int N = Ns[i];
+        for (int n1 = 1; n1 < N; ++n1)
+        {
+            for (int n2 = 1; n2 < N - n1; ++n2)
+            {
+                // Checking whether the general term remains the same when n1
+                // and n2 are swapped.
+                double term1 =
+                    BioLCCC::partitionFunctionRodPartiallySubmergedTermGeneral(
+                        segmentLength, slitWidth, layerWidth, N, n1, n2);
+                double term2 = 
+                    BioLCCC::partitionFunctionRodPartiallySubmergedTermGeneral(
+                        segmentLength, slitWidth, layerWidth, N, n2, n1);
+                term1 = (term1 > 1e-20) ? term1 : 0.0;
+                term2 = (term2 > 1e-20) ? term2 : 0.0;
+                ASSERT_FLOAT_EQ(term1, term2);
+                //std::cout << N << " " << n1 
+                //          << " " << n2 
+                //          << " " << term1 << std::endl;
+
+                // If the length of the part of the rod between the adsorbed 
+                // parts of the rod is less then the width of the free slit.
+                if ((N - n1 - n2 + 1) * segmentLength 
+                       < slitWidth - 2.0*layerWidth)
+                {
+                    ASSERT_EQ(term1, 0.0);
+                }
+
+            }
+
+            // Checking whether the general algorithm gives the same number
+            // for the special case, when the rod do not reach the opposite
+            // layer.
+            bool normalRodTouchesOppositeLayer = (
+                (N - n1) * segmentLength > slitWidth - 2.0 * layerWidth);
+            if (!normalRodTouchesOppositeLayer) 
+            {
+                double pft1 =
+                    BioLCCC::partitionFunctionRodPartiallySubmergedTermSpecial(
+                        segmentLength, slitWidth, layerWidth, N, n1);
+                double pft2 =
+                    BioLCCC::partitionFunctionRodPartiallySubmergedTermGeneral(
+                        segmentLength, slitWidth, layerWidth, N, n1, 0);
+                ASSERT_FLOAT_EQ(pft1, pft2);
+            }
+            
+            // Checking whether the general algorithm gives a different number
+            // when the rod do reach the opposite layer.
+            bool rodCanBeNormalToWall = 
+                ((n1 - 1) * segmentLength <= layerWidth);
+            bool inclinedRodTouchesOppositLayer = 
+                (N - 1 > (n1 -1) / layerWidth * (slitWidth - layerWidth));
+            if ((rodCanBeNormalToWall && normalRodTouchesOppositeLayer) ||
+                ((!rodCanBeNormalToWall) && inclinedRodTouchesOppositLayer))
+            {
+                double pft1 =
+                    BioLCCC::partitionFunctionRodPartiallySubmergedTermSpecial(
+                        segmentLength, slitWidth, layerWidth, N, n1);
+                double pft2 =
+                    BioLCCC::partitionFunctionRodPartiallySubmergedTermGeneral(
+                        segmentLength, slitWidth, layerWidth, N, n1, 0);
+                SCOPED_TRACE(N);
+                SCOPED_TRACE(n1);
+                EXPECT_EQ(pft1, pft2);
+                SCOPED_TRACE(N);
+                SCOPED_TRACE(n1);
+                EXPECT_NE(pft1, pft2);
+                //EXPECT_PRED_FORMAT2(::testing::FloatLE, 
+                //    (pft1+pft2) * 1.0e-5, fabs(pft1 - pft2));
+            }
+        }
+    }
+
+    std::vector<double> rodEnergyProfile;
+    for (int i = 0; i < 10; ++i)
+    {
+        rodEnergyProfile.push_back(0.0);
+    }
+    double pf1 = BioLCCC::partitionFunctionRodPartiallySubmergedSpecial(
+        10.0,   //segmentLength,
+        100.0, //slitWidth,
+        20.0,  //layerWidth,
+        rodEnergyProfile);
+    double pf2 = BioLCCC::partitionFunctionRodPartiallySubmergedGeneral(
+        10.0,   //segmentLength,
+        100.0, //slitWidth,
+        20.0,  //layerWidth,
+        rodEnergyProfile);
+    ASSERT_FLOAT_EQ(pf1, pf2);
+}
+
+TEST_F(BioLCCCTest, rodModelGeneralVsSpecial) 
+{
+    // Both models must give the same results when there is no adsorption.
+    // Test the case where the bridge conformation may occur.
+    BioLCCC::ChemicalBasis chemBasis1(BioLCCC::RP_ACN_FA_ROD);
+    BioLCCC::ChemicalBasis chemBasis2(BioLCCC::RP_ACN_FA_ROD);
+    chemBasis1.setSpecialRodModel(false);
+    chemBasis1.setMonomerLength(10.0);
+    chemBasis1.setKuhnLength(10.0);
+    chemBasis1.setAdsorptionLayerWidth(30.0);
+    chemBasis2.setSpecialRodModel(true);
+    chemBasis2.setMonomerLength(10.0);
+    chemBasis2.setKuhnLength(10.0);
+    chemBasis2.setAdsorptionLayerWidth(30.0);
+    std::string sequence(30, 'W');
+    
+    double kd1 = BioLCCC::calculateKd(sequence, 0.0, chemBasis1, 300.0, 0.0);
+    double kd2 = BioLCCC::calculateKd(sequence, 0.0, chemBasis2, 300.0, 0.0);
+    ASSERT_DOUBLE_EQ(kd1, kd2);
 }
 
 int main(int argc, char **argv)
