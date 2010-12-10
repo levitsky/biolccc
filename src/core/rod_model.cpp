@@ -252,13 +252,13 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
         }
         if (N==40) 
         {
-            std::cout << critPoints[i];
-            std::cout << " " << n1 << " " << n2 << " " << N << " " ;
-            std::cout << critPoints.size() << " ";
-            std::cout << term;
-            std::cout << std::endl;
+            //std::cout << critPoints[i];
+            //std::cout << " " << n1 << " " << n2 << " " << N << " " ;
+            //std::cout << critPoints.size() << " ";
+            //std::cout << term;
+            //std::cout << std::endl;
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
     }
 
     return 2.0 * PI * rodLength * rodLength * integral;

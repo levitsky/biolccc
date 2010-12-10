@@ -60,21 +60,26 @@ std::vector<double> calculateMonomerEnergyProfile(
             ++residue)
     {
         double residueEnergy = residue->bindEnergy();
+        double residueArea = residue->bindArea();
 
         // Adding the energy of the N-terminal group to the first residue.
         if (residue == ++(parsedSequence.begin()))
         {
             residueEnergy += parsedSequence.begin()->bindEnergy();
+            residueArea += parsedSequence.begin()->bindArea();
         }
 
         // Adding the energy of the C-terminal group to the last residue.
         else if (residue == --(--(parsedSequence.end())))
         {
             residueEnergy += (--(parsedSequence.end()))->bindEnergy();
+            residueArea += (--(parsedSequence.end()))->bindArea();
         }
 
         monomerEnergyProfile.push_back(
-            columnRelativeStrength*(residueEnergy - Eab) * 293.0 / temperature);
+            columnRelativeStrength * 
+                //(residueEnergy - Eab) * 293.0 / temperature);
+                (residueEnergy - residueArea * Eab) * 293.0 / temperature);
     }
     return monomerEnergyProfile;
 }

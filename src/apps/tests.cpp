@@ -46,10 +46,12 @@ protected:
             "H-",
             0.0,
             0.0,
+            0.0, 
             0.0));
         testChemBasis.addChemicalGroup(BioLCCC::ChemicalGroup(
             "empty C-Terminal group",
             "-OH",
+            0.0,
             0.0,
             0.0,
             0.0));

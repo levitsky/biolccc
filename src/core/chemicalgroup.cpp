@@ -7,7 +7,8 @@ ChemicalGroup::ChemicalGroup(std::string name,
                              std::string label,
                              double bindEnergy,
                              double averageMass,
-                             double monoisotopicMass
+                             double monoisotopicMass,
+                             double bindArea
                             )
 {
     mName = name;
@@ -15,6 +16,7 @@ ChemicalGroup::ChemicalGroup(std::string name,
     mAverageMass = averageMass;
     mMonoisotopicMass = monoisotopicMass;
     mBindEnergy = bindEnergy;
+    mBindArea = bindArea;
 }
 
 std::string ChemicalGroup::name() const
@@ -32,6 +34,11 @@ double ChemicalGroup::bindEnergy() const
     return mBindEnergy;
 }
 
+double ChemicalGroup::bindArea() const
+{
+    return mBindArea;
+}
+
 double ChemicalGroup::averageMass() const
 {
     return mAverageMass;
@@ -47,6 +54,10 @@ void ChemicalGroup::setBindEnergy(double newBindEnergy)
     mBindEnergy = newBindEnergy;
 }
 
+void ChemicalGroup::setBindArea(double newBindArea)
+{
+    mBindArea = newBindArea;
+}
 
 void ChemicalGroup::setName(std::string newName)
 {

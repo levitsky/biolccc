@@ -116,6 +116,7 @@
                 'name' : self.name,
                 'label': self.label,
                 'bindEnergy': self.bindEnergy,
+                'bindArea': self.bindArea,
                 'averageMass': self.averageMass,
                 'monoisotopicMass': self.monoisotopicMass,
             }[key]()
@@ -128,6 +129,7 @@
                 'name' : self.setName,
                 'label': self.__raiseLabelException__,
                 'bindEnergy': self.setBindEnergy,
+                'bindArea': self.setBindArea,
                 'averageMass': self.setAverageMass,
                 'monoisotopicMass': self.setMonoisotopicMass,
             }[key](value)
@@ -135,7 +137,7 @@
         def __delitem__(self, key):
             pass
 
-        _keys = ['name', 'label', 'bindEnergy', 'averageMass',
+        _keys = ['name', 'label', 'bindEnergy', 'bindArea', 'averageMass',
                 'monoisotopicMass']
 
         def keys(self):
@@ -259,7 +261,8 @@
                             value['label'],
                             value['bindEnergy'],
                             value['averageMass'],
-                            value['monoisotopicMass']))
+                            value['monoisotopicMass'],
+                            value['bindArea']))
                 elif type(value).__name__ == 'pyBioLCCC.ChemicalBasis':
                     self.addChemicalGroup(value)
                 else:

@@ -29,12 +29,14 @@ public:
         measured in kT.
         \param averageMass The average mass of the group in Da.
         \param monoisotopicMass The monoisotopic mass of the group in Da.
+        \param bindArea The area of the contact between the group and the surface.
      */
     ChemicalGroup(std::string name = "",
                   std::string label = "",
                   double bindEnergy = 0.0,
                   double averageMass = 0.0,
-                  double monoisotopicMass = 0.0
+                  double monoisotopicMass = 0.0,
+                  double bindArea = 1.0
                  );
 
     //! Returns the full name of the chemical group.
@@ -79,6 +81,15 @@ public:
     */
     double bindEnergy() const;
 
+    //! Returns the area of the contact with the surface of a solid phase.
+    /*!
+        The unit of the bind area is the area of ACN contact.
+        The bind area of a terminal group is added to the area of
+        the corresponding terminal amino acid.
+    */
+    double bindArea() const;
+
+
     //! Shows whether the group is N-Terminal.
     bool isNTerminal() const;
 
@@ -97,6 +108,9 @@ public:
     //! Sets the binding energy value.
     void setBindEnergy(double newBindEnergy);
 
+    //! Sets the binding energy value.
+    void setBindArea(double newBindArea);
+
     //! Sets the average mass of the chemical group.
     void setAverageMass(double newAverageMass);
 
@@ -107,6 +121,7 @@ private:
     std::string mName;
     std::string mLabel;
     double mBindEnergy;
+    double mBindArea;
     double mAverageMass;
     double mMonoisotopicMass;
 };
