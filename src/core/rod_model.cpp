@@ -393,7 +393,8 @@ double calculateKdRod(
     const double columnPoreSize,
     const double columnRelativeStrength,
     const double temperature,
-    const bool specialRodModel
+    const bool specialRodModel,
+    const bool neglectPartiallyDesorbedStates 
     ) throw(BioLCCCException)
 {
     if (parsedSequence.size() == 0)
@@ -427,39 +428,42 @@ double calculateKdRod(
                 segmentEnergyProfile,
                 segmentEnergyProfile.size(), 
                 0));
-    if (specialRodModel)
-    {
-        Kd += 2.0 * partitionFunctionRodPartiallySubmergedSpecial(
-                chemBasis.kuhnLength(),
-                columnPoreSize,
-                chemBasis.adsorptionLayerWidth(),
-                segmentEnergyProfile,
-                false)
 
-              + 2.0 * partitionFunctionRodPartiallySubmergedSpecial(
-                  chemBasis.kuhnLength(),
-                  columnPoreSize,
-                  chemBasis.adsorptionLayerWidth(),
-                  segmentEnergyProfile,
-                  true);
-    }
-    else
+    if (!neglectPartiallyDesorbedStates)
     {
-        Kd += 2.0 * partitionFunctionRodPartiallySubmergedGeneral(
-                chemBasis.kuhnLength(),
-                columnPoreSize,
-                chemBasis.adsorptionLayerWidth(),
-                segmentEnergyProfile,
-                false)
+        if (specialRodModel)
+        {
+            Kd += 2.0 * partitionFunctionRodPartiallySubmergedSpecial(
+                    chemBasis.kuhnLength(),
+                    columnPoreSize,
+                    chemBasis.adsorptionLayerWidth(),
+                    segmentEnergyProfile,
+                    false)
 
-              + 2.0 * partitionFunctionRodPartiallySubmergedGeneral(
-                  chemBasis.kuhnLength(),
-                  columnPoreSize,
-                  chemBasis.adsorptionLayerWidth(),
-                  segmentEnergyProfile,
-                  true);
+                  + 2.0 * partitionFunctionRodPartiallySubmergedSpecial(
+                      chemBasis.kuhnLength(),
+                      columnPoreSize,
+                      chemBasis.adsorptionLayerWidth(),
+                      segmentEnergyProfile,
+                      true);
+        }
+        else
+        {
+            Kd += 2.0 * partitionFunctionRodPartiallySubmergedGeneral(
+                    chemBasis.kuhnLength(),
+                    columnPoreSize,
+                    chemBasis.adsorptionLayerWidth(),
+                    segmentEnergyProfile,
+                    false)
+
+                  + 2.0 * partitionFunctionRodPartiallySubmergedGeneral(
+                      chemBasis.kuhnLength(),
+                      columnPoreSize,
+                      chemBasis.adsorptionLayerWidth(),
+                      segmentEnergyProfile,
+                      true);
+        }
     }
-         
 
     Kd /= partitionFunctionRodFreeVolume(
             rodLength,

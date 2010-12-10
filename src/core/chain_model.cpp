@@ -28,7 +28,8 @@ double calculateKdChain(
     const ChemicalBasis &chemBasis,
     const double columnPoreSize,
     const double columnRelativeStrength,
-    const double temperature) throw (BioLCCCException)
+    const double temperature,
+    const bool neglectPartiallyDesorbedStates) throw (BioLCCCException)
 {
     // At first, we need to convert the energy profile to a profile of 
     // distribution probabilities. Probability = exp(E_effective),
@@ -57,13 +58,19 @@ double calculateKdChain(
                     chemBasis.kuhnLength())));
     }
 
+    if (neglectPartiallyDesorbedStates) {
+        boltzmannFactorProfiles.push_back(
+            std::vector<double>(
+                boltzmannFactorProfiles.back().size(), 0.0));
+    }
+
     // The size of the lattice must be greater than 
     // (number of adsorbing layers) * 2.
     // double round (double x) {return floor(x+0.5);}
     const unsigned int latticeSize = 
         floor(columnPoreSize / chemBasis.kuhnLength() + 0.5);
 
-    if (latticeSize < chemBasis.adsorptionLayerFactors().size() * 2)
+    if (latticeSize < boltzmannFactorProfiles.size() * 2)
     {
         throw BioLCCCException(
             "The pore size is too small for the given number of adsorbing "
@@ -102,6 +109,15 @@ double calculateKdChain(
     for (unsigned int i = 0; i < latticeSize; i++)
     {
         density[i] = 1.0;
+    }
+
+    // If we want to analyze only the fully adsorbed state, then there is no 
+    // monomers outside the adsorbing layer. 
+    if (neglectPartiallyDesorbedStates) {
+        for (unsigned int i = 0; i < latticeSize; i++)
+        {
+            density[i] = 0.0;
+        }
     }
 
     for (unsigned int i = 0; i < boltzmannFactorProfiles.size(); ++i) 
