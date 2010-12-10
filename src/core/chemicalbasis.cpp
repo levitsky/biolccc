@@ -417,22 +417,26 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
                                            "H-",
                                            -1.69,
                                            1.0079,
-                                           1.00782));
+                                           1.00782,
+                                           0.0));
             addChemicalGroup(ChemicalGroup("N-terminal acetyl",
                                            "Ac-",
                                            0.0,
                                            43.0452,
-                                           43.01839));
+                                           43.01839,
+                                           0.0));
             addChemicalGroup(ChemicalGroup("C-terminal carboxyl group",
                                            "-OH",
                                            -0.03,
                                            17.0073,
-                                           17.00274));
+                                           17.00274,
+                                           0.0));
             addChemicalGroup(ChemicalGroup("C-terminal amide",
                                            "-NH2",
                                            0.0,
                                            16.0226,
-                                           16.01872));
+                                           16.01872,
+                                           0.0));
             break;
         }
 
@@ -583,22 +587,26 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
                                            "H-",
                                            -2.39,
                                            1.0079,
-                                           1.00782));
+                                           1.00782,
+                                           0.0));
             addChemicalGroup(ChemicalGroup("N-terminal acetyl",
                                            "Ac-",
                                            -0.05,
                                            43.0452,
-                                           43.01839));
+                                           43.01839,
+                                           0.0));
             addChemicalGroup(ChemicalGroup("C-terminal carboxyl group",
                                            "-OH",
                                            1.02,
                                            17.0073,
-                                           17.00274));
+                                           17.00274,
+                                           0.0));
             addChemicalGroup(ChemicalGroup("C-terminal amide",
                                            "-NH2",
                                            0.55,
                                            16.0226,
-                                           16.01872));
+                                           16.01872,
+                                           0.0));
             break;
         }
     }
