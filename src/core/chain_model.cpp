@@ -111,15 +111,6 @@ double calculateKdChain(
         density[i] = 1.0;
     }
 
-    // If we want to analyze only the fully adsorbed state, then there is no 
-    // monomers outside the adsorbing layer. 
-    if (neglectPartiallyDesorbedStates) {
-        for (unsigned int i = 0; i < latticeSize; i++)
-        {
-            density[i] = 0.0;
-        }
-    }
-
     for (unsigned int i = 0; i < boltzmannFactorProfiles.size(); ++i) 
     {
         density[i] = boltzmannFactorProfiles[i][0];
