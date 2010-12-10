@@ -51,7 +51,8 @@ double calculateKdRod(
     const double columnPoreSize,
     const double columnRelativeStrength,
     const double temperature,
-    const bool specialRodModel
+    const bool specialRodModel,
+    const bool neglectPartiallyDesorbedStates = false
     ) throw(BioLCCCException);
 }
 
