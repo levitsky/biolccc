@@ -58,21 +58,19 @@ double calculateKdChain(
                     chemBasis.kuhnLength())));
     }
 
-    if (neglectPartiallyDesorbedStates) 
-    {
-        boltzmannFactorProfiles.push_back(
-            std::vector<double>(
-                boltzmannFactorProfiles.back().size(), 0.0));
-    }
-
     // The size of the lattice must be greater than 
     // (number of adsorbing layers) * 2.
     // double round (double x) {return floor(x+0.5);}
     unsigned int latticeSize = 
         floor(columnPoreSize / chemBasis.kuhnLength() + 0.5);
 
+    // If we want to neglect the partially desorbed states, we need to insert
+    // two impenetrable layers right after the near-wall ones.
     if (neglectPartiallyDesorbedStates)
     {
+        boltzmannFactorProfiles.push_back(
+            std::vector<double>(
+                boltzmannFactorProfiles.back().size(), 0.0));
         latticeSize += 2;
     }
 
@@ -223,6 +221,7 @@ double calculateKdChain(
     {
         Kd += density[i];
     }
+
     if (neglectPartiallyDesorbedStates)
     {
         Kd = Kd / (double)(latticeSize - 2);
