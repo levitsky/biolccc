@@ -32,6 +32,14 @@ General:
   be excluded from calculation. This option is intended for study of
   BioLCCC properties, and should not be used in routine applications."
 
+- Code refactoring: biolccc.cpp/.h was splitted into biolccc.cpp/.h,
+  parsing.cpp/.h, rod_model.cpp/.h and chain_model.cpp/.h.
+
+API changes:
+============
+
+- Parsing functionality is now available through parsing.cpp.
+
 1.2.0
 *****
 
