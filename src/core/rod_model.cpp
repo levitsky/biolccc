@@ -187,11 +187,6 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
         {
             lowerLimit = std::make_pair(0.0, 1.0);
         }
-        //std::cout << (lowerLimit.first * 
-        //              (critPoints[i] + critPoints[i+1]) / 2.0
-        //              + lowerLimit.second);
-        //std::cout << " " << critPoints[i] << " " << critPoints[i+1];
-        //std::cout << std::endl;
 
         std::pair<double, double> upperLimit = *(upperLimits.begin());
         for (std::vector<std::pair<double, double> >::const_iterator lineIter =
@@ -213,16 +208,6 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
         {
             upperLimit = std::make_pair(0.0, 1.0);
         }
-        //std::cout << std::left << std::setw(12) << critPoints[i] << " ";
-        //std::cout << std::left << std::setw(12) << lowerLimit.first  << " ";
-        //std::cout << std::left << std::setw(12) << lowerLimit.second << " ";
-        //std::cout << std::left << std::setw(12) << upperLimit.first  << " ";
-        //std::cout << std::left << std::setw(12) << upperLimit.second << " ";
-        //std::cout << std::left << std::setw(12) << 
-        //    (lowerLimit.first - upperLimit.first) 
-        //    * (critPoints[i] + critPoints[i+1]) / 2.0 
-        //    + (lowerLimit.second - upperLimit.second);
-        //std::cout << std::endl;
 
         terms.push_back(
             std::make_pair(
@@ -260,12 +245,8 @@ double partitionFunctionRodPartiallySubmergedGeneral(
     {
         for (int n2 = 0; n2 <= N-n1; n2++)
         {
-            //double term;
             if (reversed)
             {
-            //    term = partitionFunctionRodPartiallySubmergedTermGeneral(
-            //            segmentLength, slitWidth, layerWidth, N, n1, n2)
-            //        * exp(rodAdsorptionEnergy(rodEnergyProfile, n2, n1));
                 partitionFunction +=
                     ( (n2 == 0 ) ? 1.0 : 0.5 ) *
                     partitionFunctionRodPartiallySubmergedTermGeneral(
@@ -274,17 +255,12 @@ double partitionFunctionRodPartiallySubmergedGeneral(
             }
             else
             {
-            //    term = partitionFunctionRodPartiallySubmergedTermGeneral(
-            //            segmentLength, slitWidth, layerWidth, N, n1, n2)
-            //        * exp(rodAdsorptionEnergy(rodEnergyProfile, n1, n2));
                 partitionFunction +=
                     ( (n2 == 0 ) ? 1.0 : 0.5 ) *
                     partitionFunctionRodPartiallySubmergedTermGeneral(
                         segmentLength, slitWidth, layerWidth, N, n1, n2)
                     * exp(rodAdsorptionEnergy(rodEnergyProfile, n1, n2));
             }
-            //std::cout << "General N=" << N << " n1=" << n1 << " n2=" << n2 
-            //          << " " << term << std::endl;
         }
     }
     return partitionFunction;
@@ -329,14 +305,8 @@ double partitionFunctionRodPartiallySubmergedSpecial(
     double partitionFunction = 0.0;
     for (unsigned int n1 = 1; n1 < rodEnergyProfile.size(); ++n1)
     {
-        //double term;
         if (reversed)
         {
-        //    term =
-        //        partitionFunctionRodPartiallySubmergedTermSpecial(
-        //            segmentLength, slitWidth, layerWidth, 
-        //            rodEnergyProfile.size(), n1)
-        //        * exp(rodAdsorptionEnergy(rodEnergyProfile, 0, n1));
             partitionFunction +=
                 partitionFunctionRodPartiallySubmergedTermSpecial(
                     segmentLength, slitWidth, layerWidth, 
@@ -345,20 +315,12 @@ double partitionFunctionRodPartiallySubmergedSpecial(
         }
         else
         {
-        //    term = 
-        //        partitionFunctionRodPartiallySubmergedTermSpecial(
-        //            segmentLength, slitWidth, layerWidth, 
-        //            rodEnergyProfile.size(), n1)
-        //        * exp(rodAdsorptionEnergy(rodEnergyProfile, n1, 0));
             partitionFunction += 
                 partitionFunctionRodPartiallySubmergedTermSpecial(
                     segmentLength, slitWidth, layerWidth, 
                     rodEnergyProfile.size(), n1)
                 * exp(rodAdsorptionEnergy(rodEnergyProfile, n1, 0));
         }
-        //std::cout << "Special N=" << rodEnergyProfile.size()
-        //          << " n1=" << n1 << " n2=" << 0
-        //          << " " << term << std::endl;
     }
     return partitionFunction;
 }
