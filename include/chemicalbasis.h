@@ -291,8 +291,36 @@ public:
     //! Returns true if equations for the special case of rod model are used.
     bool specialRodModel() const;
     
-    //! Enables the usage of old equations for the special case of rod model.
-    void setSpecialRodModel(bool flag);
+    //! Enables the usage of the special equation for the rod model.
+    /*!
+      The special equation of the rod model do not account for the bridge
+      conformations of a polymer, in which both its ends are adsorbed to
+      the opposite walls of a pore. Therefore, it is valid only when
+      polymerLength < slitWidth - 2 * layerWidth.
+
+      If specialRodModel is set to false, than the general equation is
+      used. It is valid for polymers of any length, but requires more
+      computational resources.
+     */
+	void setSpecialRodModel(bool flag);
+	
+	//! Returns true if partially desorbed states are neglected.
+	bool neglectPartiallyDesorbedStates() const;
+
+	//! Excludes partially desorbed states from calculation. FOR MODEL STUDY ONLY.
+    /*!  
+      In BioLCCC model, the distribution coefficient of a polymer
+      is calculated by integration over all its possible
+      conformations. These could be differentiated into three distinct
+      groups: totally adsorbed, totally desorbed and partially
+      desorbed states. The latter are of particular interest, because
+      these conformations give rise to sequence specificity of BioLCCC
+      model. Using setNeglectPartiallyDesorbedStates function, these
+      conformations can be excluded from calculation. This option is
+      intended for study of BioLCCC properties, and should not be used
+      in routine applications.
+     */
+	void setNeglectPartiallyDesorbedStates(bool flag);
 
     //! Returns the density of the first solvent in kg/m^3.
     double firstSolventDensity() const;
@@ -340,6 +368,7 @@ private:
     double mSecondSolventAverageMass;
     bool mSnyderApproximation;
     bool mSpecialRodModel;
+	bool mNeglectPartiallyDesorbedStates;
 };
 
 }

@@ -23,13 +23,13 @@ std::vector<double> calculateBoltzmannFactorProfile(
 }
 
 double calculateKdChain(
-    const std::vector<ChemicalGroup> &parsedSequence,
-    const double secondSolventConcentration,
-    const ChemicalBasis &chemBasis,
-    const double columnPoreSize,
-    const double columnRelativeStrength,
-    const double temperature,
-    const bool neglectPartiallyDesorbedStates) throw (BioLCCCException)
+						const std::vector<ChemicalGroup> &parsedSequence,
+						const double secondSolventConcentration,
+						const ChemicalBasis &chemBasis,
+						const double columnPoreSize,
+						const double columnRelativeStrength,
+						const double temperature
+						) throw (BioLCCCException)
 {
     // At first, we need to convert the energy profile to a profile of 
     // distribution probabilities. Probability = exp(E_effective),
@@ -66,7 +66,7 @@ double calculateKdChain(
 
     // If we want to neglect the partially desorbed states, we need to insert
     // two impenetrable layers right after the near-wall ones.
-    if (neglectPartiallyDesorbedStates)
+    if (chemBasis.neglectPartiallyDesorbedStates())
     {
         boltzmannFactorProfiles.push_back(
             std::vector<double>(
@@ -222,7 +222,7 @@ double calculateKdChain(
         Kd += density[i];
     }
 
-    if (neglectPartiallyDesorbedStates)
+    if (chemBasis.neglectPartiallyDesorbedStates())
     {
         Kd = Kd / (double)(latticeSize - 2);
     }

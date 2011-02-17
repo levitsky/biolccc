@@ -19,6 +19,7 @@ ChemicalBasis::ChemicalBasis()
     setAdsorptionLayerFactors(std::vector<double>(1, 1.0));
     setSnyderApproximation(false);
     setSpecialRodModel(true);
+	setNeglectPartiallyDesorbedStates(false);
 }
 
 ChemicalBasis::ChemicalBasis(PredefinedChemicalBasis predefinedChemicalBasisId)
@@ -195,6 +196,16 @@ void ChemicalBasis::setSpecialRodModel(bool flag)
     mSpecialRodModel = flag;
 }
 
+bool ChemicalBasis::neglectPartiallyDesorbedStates() const
+{
+	return mNeglectPartiallyDesorbedStates;
+}
+
+void ChemicalBasis::setNeglectPartiallyDesorbedStates(bool flag)
+{
+	mNeglectPartiallyDesorbedStates = flag;
+}
+
 double ChemicalBasis::firstSolventDensity() const
 {
     return mFirstSolventDensity;
@@ -206,7 +217,7 @@ void ChemicalBasis::setFirstSolventDensity(double newFirstSolventDensity)
     if (newFirstSolventDensity < 0.0)
     {
         throw ChemicalBasisException(
-            "The density must have a not-negative value.");
+            "The density must have a non-negative value.");
     }
     mFirstSolventDensity = newFirstSolventDensity;
 }
@@ -239,7 +250,7 @@ void ChemicalBasis::setFirstSolventAverageMass(
     if (newFirstSolventAverageMass < 0.0)
     {
         throw ChemicalBasisException(
-            "The average mass must have a not-negative value.");
+            "The average mass must have a non-negative value.");
     }
     mFirstSolventAverageMass = newFirstSolventAverageMass;
 }
@@ -286,6 +297,7 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
             setKuhnLength(10.0);
             setSnyderApproximation(false);
             setSpecialRodModel(true);
+			setNeglectPartiallyDesorbedStates(false);
 
             clearChemicalGroups();
             addChemicalGroup(ChemicalGroup ("Alanine",
@@ -456,6 +468,7 @@ ChemicalBasis ChemicalBasis::setPredefinedChemicalBasis(
             setSecondSolventBindEnergy(2.4);
             setSnyderApproximation(false);
             setSpecialRodModel(true);
+			setNeglectPartiallyDesorbedStates(false);
 
             clearChemicalGroups();
             addChemicalGroup(ChemicalGroup ("Alanine",

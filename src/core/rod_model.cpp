@@ -86,14 +86,12 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
     int N, int n1, int n2)
 {
     const double rodLength = (N - 1) * segmentLength;
-    double integral = 0.0;
     std::vector<std::pair<double, double> > lowerLimits;
     std::vector<std::pair<double, double> > upperLimits;
-    std::vector<std::pair<double, double> > allLimits;
 
-    // Filling the limits of integral over theta.
+    // Calculating the limits of integration over theta.
     // A limit is the minimal or maximal value of cos(theta) at which 
-    // the conformation is still acceptable. 
+    // a rod conformation is still acceptable. 
 
     // The maximal angle at which the bead next to the n1-th one is still out
     // of the adsorbing layer.
@@ -128,11 +126,12 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
             (slitWidth - layerWidth) / (N - n2) / segmentLength));
     }
 
-    // Finding the point at which the dependency of the limits of integration
-    // over theta on z may change.
+    std::vector<std::pair<double, double> > allLimits;
     allLimits.insert(allLimits.begin(), lowerLimits.begin(), lowerLimits.end());
     allLimits.insert(allLimits.begin(), upperLimits.begin(), upperLimits.end());
 
+    // Finding the point at which the dependency of the limits of integration
+    // over theta on z may change.
     std::vector<double> critPoints;
     for (std::vector<std::pair<double, double> >::const_iterator lineIter1 =
             allLimits.begin();
@@ -152,7 +151,7 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
     critPoints.push_back(layerWidth);
     critPoints.push_back(0.0);
 
-    // Exluding points out of the range of possible z.
+    // Removing points lying out the range [0; layerWidth].
     critPoints.erase(std::remove_if(critPoints.begin(), critPoints.end(),
         bind2nd(std::less <double>(), 0)), critPoints.end());
 
@@ -161,15 +160,8 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
 
     // Excluding repeating points.
     std::sort(critPoints.begin(), critPoints.end());
-
     critPoints.erase(
         std::unique(critPoints.begin(), critPoints.end()), critPoints.end());
-
-    //for (int i = 0; i < critPoints.size() - 1; i++)
-    //{
-    //    std::cout << (- critPoints[i] + critPoints[i+1]) << " ";
-    //}
-    //std::cout << std::endl;
 
     // Finding the exact dependencies for each subrange of z.
     std::vector<std::pair<double, double> > terms;
@@ -237,7 +229,9 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
                 lowerLimit.first - upperLimit.first,
                 lowerLimit.second - upperLimit.second));
     }
-    
+
+    // Calculating the integral.
+    double integral = 0.0;
     for (int i = 0; i < critPoints.size() - 1; i++) 
     {
         double term = 
@@ -247,18 +241,7 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
         if (term > 0.0)
         {
             integral += term;
-            //std::cout << 2.0 * PI * rodLength * rodLength * term << " " 
-            //          << 2.0 * PI * rodLength * rodLength * integral << "\n";
         }
-        if (N==40) 
-        {
-            //std::cout << critPoints[i];
-            //std::cout << " " << n1 << " " << n2 << " " << N << " " ;
-            //std::cout << critPoints.size() << " ";
-            //std::cout << term;
-            //std::cout << std::endl;
-        }
-        //std::cout << std::endl;
     }
 
     return 2.0 * PI * rodLength * rodLength * integral;
@@ -387,15 +370,13 @@ double partitionFunctionRodFreeVolume(double rodLength,
 }
 
 double calculateKdRod(
-    const std::vector<ChemicalGroup> &parsedSequence,
-    const double secondSolventConcentration,
-    const ChemicalBasis &chemBasis,
-    const double columnPoreSize,
-    const double columnRelativeStrength,
-    const double temperature,
-    const bool specialRodModel,
-    const bool neglectPartiallyDesorbedStates 
-    ) throw(BioLCCCException)
+					  const std::vector<ChemicalGroup> &parsedSequence,
+					  const double secondSolventConcentration,
+					  const ChemicalBasis &chemBasis,
+					  const double columnPoreSize,
+					  const double columnRelativeStrength,
+					  const double temperature
+					  ) throw(BioLCCCException)
 {
     if (parsedSequence.size() == 0)
     {
@@ -429,9 +410,9 @@ double calculateKdRod(
                 segmentEnergyProfile.size(), 
                 0));
 
-    if (!neglectPartiallyDesorbedStates)
+    if (!chemBasis.neglectPartiallyDesorbedStates())
     {
-        if (specialRodModel)
+        if (chemBasis.specialRodModel())
         {
             Kd += 2.0 * partitionFunctionRodPartiallySubmergedSpecial(
                     chemBasis.kuhnLength(),
