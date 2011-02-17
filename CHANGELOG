@@ -1,3 +1,37 @@
+1.3.0
+*****
+
+General:
+========
+
+- Add a general expression for the rod model. The previously used
+  special expression did not account for bridge conformations of a
+  polymer, in which both its ends are adsorbed to the opposite walls
+  of a pore. The special expression is valid only when polymerLength <
+  slitWidth - 2 * layerWidth. The newly introduced general expression
+  is valid for polymers of any length, but requires more computational
+  resources. The general expression is disabled by default and can be
+  enabled by setting specialRodModel variable of a ChemicalBasis to
+  false. 
+
+- Add bindArea variable to ChemicalGroup class. This variable contains
+  the size of the chemical group. This size is defined as a number of
+  binary solvent molecules which are desorbed when the chemical group
+  is adsorbed to the surface. By default every chemical group has a
+  size of 1.0, except for the terminal groups, which has zero size.
+
+- Add experimental option neglectPartiallyDesorbedStates.
+  Corresponding citation from the documentation: "In BioLCCC model,
+  the distribution coefficient of a polymer is calculated by
+  integration over all its possible conformations. These could be
+  differentiated into three distinct groups: totally adsorbed, totally
+  desorbed and partially desorbed states. The latter are of particular
+  interest, because these conformations give rise to sequence
+  specificity of BioLCCC model. Using
+  setNeglectPartiallyDesorbedStates function, these conformations can
+  be excluded from calculation. This option is intended for study of
+  BioLCCC properties, and should not be used in routine applications."
+
 1.2.0
 *****
 
@@ -6,8 +40,10 @@ General:
 
 - Add the fast version of calculateRT function which calculates Kd only in a few
   points and than use interpolation to find the remaining values.
+
 - Change the way dV is used. Now the accuracy of calculateRT is almost
   independent of dV for shallow gradients. 
+
 - The introduced changes are documented in the chapter "Changing the precision
   of calculation".
 
@@ -20,6 +56,7 @@ API changes:
   interpolation is disabled. backwardCompatibility controls the way dV is
   treated. If it is true, then the old equations for RT are used, otherwise the
   new routine is invoked which almost independent of dV.
+
 - New "auxiliary" sublibrary, which contains various math functions. Currently,
   it contains interpolation routines.
 
@@ -34,8 +71,10 @@ General:
 API changes:
 ============
 
-- add variable VERSION which contains the version of the library.
+- Add variable VERSION which contains the version of the library.
+
 - COIL model is CHAIN now.
+
 - ModelType, setModel and model and now PolymerModel, setPolymerModel and
   polymerModel.
 
