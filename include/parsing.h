@@ -7,7 +7,7 @@
 namespace BioLCCC
 {
 
-//! This exception is raised when parsing process cannot be completed.
+//! This exception is raised when a parsing process cannot be completed.
 class ParsingException : public BioLCCCException
 {
 public:
@@ -15,12 +15,10 @@ public:
     ParsingException(std::string message);
 };
 
-//! Parses the given peptide sequence.
+//! Parses a given peptide sequence.
 /*!
-    Parses the given peptide sequence \a source using \a chemBasis. Writes
-    the parsed peptide structure into \a parsedPeptideStructure, terminal groups
-    into \a NTerminus and \a CTerminus. Writes the energy profile of a peptide
-    into \a peptideEnergyProfile.
+    Parses a given peptide sequence \a source using \a chemBasis.
+    Returns a vector with chemical groups.
 
     Throws ParsingException if the peptide is not parseable.
 */
