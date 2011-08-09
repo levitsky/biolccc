@@ -89,14 +89,14 @@ Please, keep in mind a few rules on editing a ChemicalBasis instance:
 
 - **You cannot change the label of a ChemicalGroup.**
 
-  This is happening because the label of a ChemicalGroup is also used in a
-  ChemicalGroups map of a ChemicalBasis. If you still want for some reason 
-  change modify it, remove this group and add a new one with the
+  This is the case because the label of a ChemicalGroup is also used in a
+  ChemicalGroups map of ChemicalBasis. If you still want 
+  to modify it, remove this group and add a new one with the
   same chemical properties but another label.
 
 - **Do not modify the predefined chemical bases.**
  
-  You cannot brake this rule in C++, since the predefined bases made constant
+  You cannot break this rule in C++, since the predefined bases are made constant
   there. But in Python there are no constants, and you can accidentally 
   modify variables pyBioLCCC.rpAcnFaRod and 
   pyBioLCCC.rpAcnTfaCoil. You should avoid this since you can easily
@@ -106,8 +106,8 @@ Please, keep in mind a few rules on editing a ChemicalBasis instance:
   ChemicalBasis constructor. This constructor requires a name of predefined
   chemical basis and fills a newly created instance with the corresponding data.
 
-  The names of predefined chemical bases contain in PredefinedChemicalBasis
-  type. For the further information, please consult libBioLCCC documentation.
+  The names of predefined chemical bases are stored in the PredefinedChemicalBasis
+  type. For further information, please consult libBioLCCC documentation.
 
 - **Arbitrary changes in a chemical basis are likely to worsen the accuracy of 
   prediction.**
@@ -117,7 +117,7 @@ Please, keep in mind a few rules on editing a ChemicalBasis instance:
   correspond to the local maximum of predicting ability for a given combination
   of solvents and stationary phase. According to our experience, it is unlikely
   that a change in a single constant will rise the accuracy of prediction. If
-  you need to adopt BioLCCC to a custom retention chemistry or another model of
+  you need to adapt BioLCCC to a custom retention chemistry or another model of
   a polymer, you need to conduct the whole calibration procedure which
   includes the LC-experiment with the calibration mixture and the further data
   processing.
@@ -185,7 +185,7 @@ where *V* is the volume of binary solvent pumped through the column,
 retention volume of a substance, *V*\ :sub:`P` is the volume of pores and 
 *V*\ :sub:`0` is the dead volume of the chromatographic system.
 
-libBioLCCC computes this integral as a summation over values of V. The step of
+libBioLCCC computes this integral as a sum over values of V. The step of
 this summation is dV. You can change this value using an instance of
 ChromoConditions. By default, dV equals zero, which means that its value is
 derived from the flow rate. Currently, if dV == 0 than dV = flow rate / 20
@@ -203,7 +203,7 @@ or short steps, we recommend to find the required dV using the code from this
 example.
 
 Also, starting from the version 1.2.0 a new integration routine is used. 
-In the previous version of the calculateRT, the expression under the 
+In the previous version of calculateRT, the expression under the 
 integral was summed until it was greater than 1.0. The obtained value of
 retention volume was therefore a multiple of dV and the RT was a multiple of
 dV / flow rate. Now the integral is taken until the sum equals 1.0 precisely,
@@ -228,15 +228,15 @@ the figure below), we interpolate it and then recalculate Kd itself.
 .. plot:: examples/log_kd.py
 
 The accuracy of this fast algorithm depends strongly on the number of
-interpolating points. The figure below shows how the difference between the new
-and standard algorithms depends on the number of interpolating points.
+interpolation points. The figure below shows how the difference between the new
+and the standard algorithms depends on the number of interpolation points.
 
 .. plot:: examples/interpolation_accuracy.py
 
-We recommend to use 21 interpolating point to obtain both fast and accurate
+We recommend to use 21 interpolation point for both fast and accurate
 calculation procedure.
 
-To enable the interpolation, set the number of interpolating points in the 
+To enable the interpolation, set the number of interpolation points in the 
 numInterpolationPoints argument of calculateRT. The default value of
 numInterpolationPoints means that interpolation is disabled.
 

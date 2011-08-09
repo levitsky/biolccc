@@ -16,14 +16,14 @@ Install pip and execute in the command line:
 Windows
 =======
 
-The easiest way to install pyBioLCCC on Windows is by using a precompiled .exe package is available for download from the pyBioLCCC page on
+The easiest way to install pyBioLCCC on Windows is by using a precompiled .exe package available for download from the pyBioLCCC page on
 PyPi: http://pypi.python.org/pypi/pyBioLCCC/
 
 If a precompiled package for your version of Python is not available,
 you may compile it yourself. The ready-to-use Python distributions,
 like ActivePython Community Edition or Enthought Python Distribution,
-already contains all the required tools for package building. The
-latter is free for academic usage. With these distributions, pyBioLCCC
+already contain all the tools required for package building. The
+latter is free for academic use. With these distributions, pyBioLCCC
 can be installed via the standard routine:
 
 .. code-block:: bash
@@ -31,7 +31,7 @@ can be installed via the standard routine:
     easy_install pip
     pip install pyBioLCCC
 
-If you distribution lacks building tools, you may try to install them
+If your distribution lacks building tools, you may try to install them
 yourself.
 
 1) You will need to download and install MinGW compiler suite
@@ -40,9 +40,9 @@ http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/mingw-
 that a C++ compiler is not installed by default and should be checked
 during the installation process.
 
-2) Download and install setuptools package (http://pypi.python.org/pypi/setuptools).
+2) Download and install the setuptools package (http://pypi.python.org/pypi/setuptools).
 
-3) Execute the following text in the command line:
+3) Execute the following commands in the command line:
          
 .. code-block:: bash
    
@@ -51,7 +51,7 @@ during the installation process.
     c:\Python27\Scripts\easy_install.exe pip
     c:\Python27\Scripts\pip.exe install pyBioLCCC
  
-Do not forget to change path to python distribution according to your
+Do not forget to change the path to the python distribution according to your
 own directory structure.
 
 Building libBioLCCC/pyBioLCCC from sources
@@ -106,7 +106,7 @@ manager.
 
 In order to build libBioLCCC, you need to download and extract the
 source code. Then make a separate build directory, e.g. if the source
-code is stored into ~/programming/libbiolccc/source than the build
+code is stored at ~/programming/libbiolccc/source then the build
 directory can be ~/programming/libbiolccc/build. Finally, execute in
 the build directory:
 
