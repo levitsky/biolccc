@@ -185,15 +185,6 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
         throw BioLCCCException(
             "The number of interpolation points must be non-negative.");
     }
-    double volumeLiquidPhase = conditions.columnDiameter() *
-                               conditions.columnDiameter() * 3.1415 * 
-                               conditions.columnLength() / 4.0 /
-                               1000.0 * (conditions.columnPorosity()-
-                                   conditions.columnVpToVtot());
-    double volumePore = conditions.columnDiameter() *
-                        conditions.columnDiameter() * 3.1415 * 
-                        conditions.columnLength() / 4.0 /
-                        1000.0 * conditions.columnVpToVtot();
 
     // Recalculating dV. By default dV is calculated as the flow rate divided
     // by 20.
@@ -218,7 +209,7 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
     // and the y-coordinate to the scale of second solvent concentration.
     std::vector<std::pair<int, double> > convertedGradient;
 
-    double secondSolventConcentrationPump = 0.0
+    double secondSolventConcentrationPump = 0.0;
     for (Gradient::size_type i = 0;
         i != conditions.gradient().size();
         i++)
@@ -274,14 +265,14 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                     bool peptideElutes = 
                         ((1.0 - S) / dV
                             * kdCalculator(currentGradientPoint->second)
-                            * volumePore < 
+                            * conditions.columnPoreVolume() < 
                         (currentGradientPoint->first - j + 1));
 
                     if (peptideElutes ||
                         (currentGradientPoint == --convertedGradient.end()))
                     {
                         dS = dV / kdCalculator(currentGradientPoint->second) 
-                            / volumePore;
+                            / conditions.columnPoreVolume();
                         j += (int) ceil((1.0 - S) / dS);
                         S += (int) ceil((1.0 - S) / dS) * dS;
                         break;
@@ -293,8 +284,9 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                     else
                     {
                         S += dV / kdCalculator(currentGradientPoint->second)
-                             / volumePore * (currentGradientPoint->first -
-                                             previousGradientPoint->first);
+                             / conditions.columnPoreVolume() 
+                             * (currentGradientPoint->first -
+                                previousGradientPoint->first);
                         j = currentGradientPoint->first;
                     }
                 }
@@ -312,12 +304,13 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
             (currentGradientPoint->second - previousGradientPoint->second) /
             (currentGradientPoint->first - previousGradientPoint->first) *
             (currentGradientPoint->first - (double) (j-0.5));
-        dS = dV / kdCalculator(secondSolventConcentration) / volumePore;
+        dS = dV / kdCalculator(secondSolventConcentration) 
+             / conditions.columnPoreVolume();
         S += dS;
     }
 
     double RT = j * dV / conditions.flowRate() + conditions.delayTime() +
-                volumeLiquidPhase / conditions.flowRate();
+                conditions.columnInterstitialVolume() / conditions.flowRate();
     if (!backwardCompatibility)
     {
         RT -= (S - 1.0) / dS * dV / conditions.flowRate();
