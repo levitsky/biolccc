@@ -176,7 +176,8 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                    const ChromoConditions &conditions,
                    const int numInterpolationPoints,
                    const bool continueGradient,
-                   const bool backwardCompatibility) throw(BioLCCCException)
+                   const bool backwardCompatibility,
+                   const bool mixingCorrection) throw(BioLCCCException)
 {
     // Calculating column volumes.
     if (numInterpolationPoints < 0)
@@ -217,18 +218,21 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
     // and the y-coordinate to the scale of second solvent concentration.
     std::vector<std::pair<int, double> > convertedGradient;
 
+    double secondSolventConcentrationPump = 0.0
     for (Gradient::size_type i = 0;
         i != conditions.gradient().size();
         i++)
     {
+        secondSolventConcentrationPump =                
+                (100.0 - conditions.gradient()[i].concentrationB()) / 100.0 *
+                conditions.secondSolventConcentrationA() +
+                conditions.gradient()[i].concentrationB() / 100.0 *
+                conditions.secondSolventConcentrationB();
         convertedGradient.push_back(
             std::pair<int,double>(
                 int(floor(conditions.gradient()[i].time() *
                           conditions.flowRate() / dV)),
-                (100.0 - conditions.gradient()[i].concentrationB())/100.0 *
-                conditions.secondSolventConcentrationA() +
-                conditions.gradient()[i].concentrationB() / 100.0 *
-                conditions.secondSolventConcentrationB()));
+                secondSolventConcentrationPump));
     }
 
     std::vector<std::pair<int, double> >::const_iterator currentGradientPoint=
@@ -327,7 +331,8 @@ double calculateRT(const std::string &sequence,
                    const ChromoConditions &conditions,
                    const int numInterpolationPoints,
                    const bool continueGradient,
-                   const bool backwardCompatibility) 
+                   const bool backwardCompatibility,
+                   const bool mixingCorrection) 
                    throw(BioLCCCException)
 {
     std::vector<ChemicalGroup> parsedSequence = 
@@ -337,7 +342,8 @@ double calculateRT(const std::string &sequence,
                        conditions,
                        numInterpolationPoints,
                        continueGradient,
-                       backwardCompatibility);
+                       backwardCompatibility,
+                       mixingCorrection);
 }
 
 double calculateKd(const std::string &sequence,
