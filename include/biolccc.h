@@ -43,7 +43,8 @@ double calculateRT(const std::string &sequence,
                        standardChromoConditions,
                    const int numInterpolationPoints = 0,
                    const bool continueGradient = true,
-                   const bool backwardCompatibility = false) 
+                   const bool backwardCompatibility = false,
+                   const bool mixingCorrection = true) 
                    throw(BioLCCCException);
 
 //! Calculates the average (molar) mass of a peptide.
