@@ -33,6 +33,7 @@ ChromoConditions::ChromoConditions(double iColumnLength,
     setDelayTime(iDelayTime);
     setSecondSolventConcentrationA(iSecondSolventConcentrationA);
     setSecondSolventConcentrationB(iSecondSolventConcentrationB);
+    recalculateVolumes();
 }
 
 double ChromoConditions::columnLength() const
@@ -48,6 +49,7 @@ void ChromoConditions::setColumnLength(double newColumnLength)
         throw(ChromoConditionsException("The new column length is negative."));
     }
     mColumnLength = newColumnLength;
+    recalculateVolumes();
 }
 
 double ChromoConditions::columnDiameter() const
@@ -64,6 +66,7 @@ void ChromoConditions::setColumnDiameter(double newColumnDiameter)
             "The new column diameter is negative."));
     }
     mColumnDiameter = newColumnDiameter;
+    recalculateVolumes();
 }
 
 double ChromoConditions::columnPoreSize() const
@@ -101,6 +104,7 @@ void ChromoConditions::setColumnVpToVtot(double newColumnVpToVtot)
             "The new column VpToVtot is greater than 1.0."));
     }
     mColumnVpToVtot = newColumnVpToVtot;
+    recalculateVolumes();
 }
 
 double ChromoConditions::columnPorosity() const
@@ -122,6 +126,22 @@ void ChromoConditions::setColumnPorosity(double newColumnPorosity)
             "The new column porosity is greater than 1.0"));
     }
     mColumnPorosity = newColumnPorosity;
+    recalculateVolumes();
+}
+
+double ChromoConditions::columnTotalVolume() const
+{
+    return mColumnTotalVolume;
+}
+
+double ChromoConditions::columnInterstitialVolume() const
+{
+    return mColumnInterstitialVolume;
+}
+
+double ChromoConditions::columnPoreVolume() const
+{
+    return mColumnPoreVolume;
 }
 
 double ChromoConditions::temperature() const
@@ -252,6 +272,17 @@ void ChromoConditions::setGradient(Gradient newGradient)
             "The gradient must contain at least two points.");
     }
     mGradient = newGradient;
+}
+
+void ChromoConditions::recalculateVolumes()
+{
+    mColumnTotalVolume = columnDiameter() * columnDiameter() * 3.1415 / 4.0 *
+                         columnLength() / 1000.0;
+
+    mColumnInterstitialVolume = mColumnTotalVolume * 
+                                (columnPorosity() -  columnVpToVtot());
+
+    mColumnPoreVolume = mColumnTotalVolume * columnVpToVtot();
 }
 }
 

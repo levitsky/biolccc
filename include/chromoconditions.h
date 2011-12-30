@@ -108,6 +108,15 @@ public:
     void setColumnPorosity(double newColumnPorosity)
         throw(ChromoConditionsException);
 
+    //! Returns the total volume of a column.
+    double columnTotalVolume() const;
+
+    //! Returns the interstitial or interparticle volume of a column.
+    double columnInterstitialVolume() const;
+    
+    //! Returns the pore or intraparticle volume of a column.
+    double columnPoreVolume() const;
+
     //! Returns the temperature of the column in kelvin degrees.
     double temperature() const;
 
@@ -204,6 +213,9 @@ private:
     double mColumnPoreSize;
     double mColumnVpToVtot;
     double mColumnPorosity;
+    double mColumnTotalVolume;
+    double mColumnInterstitialVolume;
+    double mColumnPoreVolume;
     double mTemperature;
     double mColumnRelativeStrength;
     double mFlowRate;
@@ -212,6 +224,8 @@ private:
     Gradient mGradient;
     double mSecondSolventConcentrationA;
     double mSecondSolventConcentrationB;
+
+    void recalculateVolumes();
 };
 
 }
