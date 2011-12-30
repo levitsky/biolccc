@@ -215,9 +215,9 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
         i++)
     {
         secondSolventConcentrationPump =                
-                (100.0 - conditions.gradient()[i].concentrationB()) / 100.0 *
+                (100.0 - conditions.gradient()[i].concentration()) / 100.0 *
                 conditions.secondSolventConcentrationA() +
-                conditions.gradient()[i].concentrationB() / 100.0 *
+                conditions.gradient()[i].concentration() / 100.0 *
                 conditions.secondSolventConcentrationB();
         convertedGradient.push_back(
             std::pair<int,double>(
