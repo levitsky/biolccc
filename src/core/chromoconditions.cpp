@@ -313,6 +313,19 @@ void ChromoConditions::recalculateSSConcentrations()
     {
         return;
     }
+    
+    // If the gradient is isocratic, add a single point only.
+    if ((gradient().size() == 2) 
+         && (gradient().front().concentrationB() 
+             == gradient().back().concentrationB()))
+    {
+        mSSConcentrations.push_back(
+            (100.0 - gradient().front().concentrationB()) / 100.0 
+            * secondSolventConcentrationA() 
+            + gradient().front().concentrationB() / 100.0
+            * secondSolventConcentrationB());
+        return;
+    }
 
     double secondSolventConcentrationPump = 0.0;
     double time = dV() / 2.0 / flowRate();
