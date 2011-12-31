@@ -179,7 +179,6 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                    const bool backwardCompatibility
                    ) throw(BioLCCCException)
 {
-    // Calculating column volumes.
     if (numInterpolationPoints < 0)
     {
         throw BioLCCCException(
@@ -192,45 +191,55 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                               conditions.temperature(),
                               numInterpolationPoints);
 
-    // The part of a column passed by molecules. When it exceeds 1.0,
-    // the analyte elutes from the column.
-    double S = 0.0;
-    double dS = 0.0;
-    // The current iteration number.
-    int j = 0;
-    double currentSSConcentration;
-    while (S < 1.0)
+    double RT = 0.0;
+    if (gradient().SSConcentrations.size() == 1)
     {
-        j++;
-        if (j < conditions.SSConcentrations().size())
+        RT = kdCalculator(conditions.SSConcentrations()[0]) 
+             * conditions.columnPoreVolume() / conditions.flowRate();
+    }
+    else
+    {
+        // The part of a column passed by molecules. When it exceeds 1.0,
+        // the analyte elutes from the column.
+        double S = 0.0;
+        double dS = 0.0;
+        int j = 0;
+        double currentSSConcentration = 0.0;
+        while (S < 1.0)
         {
-            currentSSConcentration = conditions.SSConcentrations()[j];
-        }
-        else
-        {
-            if (continueGradient)
+            j++;
+            if (j < conditions.SSConcentrations().size())
             {
-                currentSSConcentration += 
-                    conditions.SSConcentrations.back()
-                    - *(conditions.SSConcentrations.end() - 2);
+                currentSSConcentration = conditions.SSConcentrations()[j];
             }
             else
             {
-                break;
+                if (continueGradient)
+                {
+                    currentSSConcentration += 
+                        conditions.SSConcentrations.back()
+                        - *(conditions.SSConcentrations.end() - 2);
+                }
+                else
+                {
+                    break;
+                }
             }
+            dS = conditions.dV() 
+                 / kdCalculator(conditions.SSConcentrations()[j]) 
+                 / conditions.columnPoreVolume();
+            S += dS;
         }
-        dS = conditions.dV() / kdCalculator(conditions.SSConcentrations()[j]) 
-             / conditions.columnPoreVolume();
-        S += dS;
+
+        RT = j * conditions.dV() / conditions.flowRate();
+        if ((!backwardCompatibility) && (S > 1.0))
+        {
+            RT -= (S - 1.0) / dS * conditions.dV() / conditions.flowRate();
+        }
     }
 
-    double RT = j * conditions.dV() / conditions.flowRate() 
-                + conditions.delayTime() 
-                + conditions.columnInterstitialVolume() / conditions.flowRate();
-    if ((!backwardCompatibility) && (S > 1.0))
-    {
-        RT -= (S - 1.0) / dS * conditions.dV() / conditions.flowRate();
-    }
+    RT += conditions.delayTime() 
+          + conditions.columnInterstitialVolume() / conditions.flowRate();
     return RT;
 }
 }
