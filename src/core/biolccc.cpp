@@ -198,9 +198,27 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
     double dS = 0.0;
     // The current iteration number.
     int j = 0;
-    while ((S < 1.0) && (j < conditions.SSConcentrations().size()))
+    double currentSSConcentration;
+    while (S < 1.0)
     {
         j++;
+        if (j < conditions.SSConcentrations().size())
+        {
+            currentSSConcentration = conditions.SSConcentrations()[j];
+        }
+        else
+        {
+            if (continueGradient)
+            {
+                currentSSConcentration += 
+                    conditions.SSConcentrations.back()
+                    - *(conditions.SSConcentrations.end() - 2);
+            }
+            else
+            {
+                break;
+            }
+        }
         dS = conditions.dV() / kdCalculator(conditions.SSConcentrations()[j]) 
              / conditions.columnPoreVolume();
         S += dS;
