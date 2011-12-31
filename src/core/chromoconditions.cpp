@@ -1,3 +1,4 @@
+#include <iostream>
 #include "chromoconditions.h"
 
 namespace BioLCCC
@@ -20,10 +21,11 @@ ChromoConditions::ChromoConditions(double iColumnLength,
                                    double iTemperature)
                                    throw(ChromoConditionsException)
 {
+    // Set an empty gradient to prevent recalculation of SSConcentrations.
+    mGradient = Gradient();
     setColumnLength(iColumnLength);
     setColumnDiameter(iColumnDiameter);
     setColumnPoreSize(iColumnPoreSize);
-    setGradient(iGradient);
     setColumnVpToVtot(iColumnVpToVtot);
     setColumnPorosity(iColumnPorosity);
     setTemperature(iTemperature);
@@ -33,7 +35,7 @@ ChromoConditions::ChromoConditions(double iColumnLength,
     setDelayTime(iDelayTime);
     setSecondSolventConcentrationA(iSecondSolventConcentrationA);
     setSecondSolventConcentrationB(iSecondSolventConcentrationB);
-    recalculateVolumes();
+    setGradient(iGradient);
 }
 
 double ChromoConditions::columnLength() const
@@ -50,6 +52,7 @@ void ChromoConditions::setColumnLength(double newColumnLength)
     }
     mColumnLength = newColumnLength;
     recalculateVolumes();
+    recalculateSSConcentrations();
 }
 
 double ChromoConditions::columnDiameter() const
@@ -67,6 +70,7 @@ void ChromoConditions::setColumnDiameter(double newColumnDiameter)
     }
     mColumnDiameter = newColumnDiameter;
     recalculateVolumes();
+    recalculateSSConcentrations();
 }
 
 double ChromoConditions::columnPoreSize() const
@@ -105,6 +109,7 @@ void ChromoConditions::setColumnVpToVtot(double newColumnVpToVtot)
     }
     mColumnVpToVtot = newColumnVpToVtot;
     recalculateVolumes();
+    recalculateSSConcentrations();
 }
 
 double ChromoConditions::columnPorosity() const
@@ -127,6 +132,7 @@ void ChromoConditions::setColumnPorosity(double newColumnPorosity)
     }
     mColumnPorosity = newColumnPorosity;
     recalculateVolumes();
+    recalculateSSConcentrations();
 }
 
 double ChromoConditions::columnTotalVolume() const
@@ -183,11 +189,19 @@ void ChromoConditions::setFlowRate(double newFlowRate)
         throw(ChromoConditionsException("The new flow rate is negative."));
     }
     mFlowRate = newFlowRate;
+    recalculateSSConcentrations();
 }
 
 double ChromoConditions::dV() const
 {
-    return mDV;
+    if (mDV == 0.0)
+    {
+        return flowRate() / 20.0;
+    }
+    else
+    {
+        return mDV;
+    }
 }
 
 void ChromoConditions::setDV(double newDV)
@@ -198,6 +212,7 @@ void ChromoConditions::setDV(double newDV)
         throw(ChromoConditionsException("The new dV is negative."));
     }
     mDV = newDV;
+    recalculateSSConcentrations();
 }
 
 double ChromoConditions::delayTime() const
@@ -272,6 +287,12 @@ void ChromoConditions::setGradient(Gradient newGradient)
             "The gradient must contain at least two points.");
     }
     mGradient = newGradient;
+    recalculateSSConcentrations();
+}
+
+const std::vector<double> & ChromoConditions::SSConcentrations() const
+{
+    return mSSConcentrations;
 }
 
 void ChromoConditions::recalculateVolumes()
@@ -283,6 +304,53 @@ void ChromoConditions::recalculateVolumes()
                                 (columnPorosity() -  columnVpToVtot());
 
     mColumnPoreVolume = mColumnTotalVolume * columnVpToVtot();
+}
+
+void ChromoConditions::recalculateSSConcentrations()
+{
+    mSSConcentrations.clear();
+    if (gradient().empty())
+    {
+        return;
+    }
+
+    double secondSolventConcentrationPump = 0.0;
+    double time = dV() / 2.0 / flowRate();
+    int segmentNum = -1;
+    double localSlope = 0.0;
+    double initialSSConcentration, finalSSConcentration, initialTime, finalTime;
+
+    while (true)
+    {
+        if (time > gradient()[segmentNum+1].time())
+        {
+            if (segmentNum < int(gradient().size() - 1))
+            {
+                segmentNum += 1;
+                initialSSConcentration =
+                    (100.0 - gradient()[segmentNum].concentrationB()) / 100.0 
+                    * secondSolventConcentrationA() 
+                    + gradient()[segmentNum].concentrationB() / 100.0
+                    * secondSolventConcentrationB();
+                finalSSConcentration =
+                    (100.0 - gradient()[segmentNum+1].concentrationB()) / 100.0 
+                    * secondSolventConcentrationA() 
+                    + gradient()[segmentNum+1].concentrationB() / 100.0
+                    * secondSolventConcentrationB();
+                initialTime = gradient()[segmentNum].time();
+                finalTime = gradient()[segmentNum+1].time();
+                localSlope = (finalSSConcentration - initialSSConcentration) 
+                    / (finalTime - initialTime);
+            }
+            else
+            {
+                break;
+            }
+        }
+        mSSConcentrations.push_back(
+            localSlope * (time - initialTime) + initialSSConcentration);
+        time += dV() / flowRate();
+    }
 }
 }
 

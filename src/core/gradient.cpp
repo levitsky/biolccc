@@ -10,13 +10,13 @@ Gradient::Gradient()
 {
 }
 
-Gradient::Gradient(double initialConcentration,
-                   double finalConcentration,
+Gradient::Gradient(double initialConcentrationB,
+                   double finalConcentrationB,
                    double time)
                    throw(GradientException, GradientPointException)
 {
-    this->addPoint(GradientPoint(0.0, initialConcentration));
-    this->addPoint(GradientPoint(time, finalConcentration));
+    this->addPoint(GradientPoint(0.0, initialConcentrationB));
+    this->addPoint(GradientPoint(time, finalConcentrationB));
 }
 
 Gradient Gradient::addPoint(GradientPoint iPoint)
@@ -40,10 +40,10 @@ Gradient Gradient::addPoint(GradientPoint iPoint)
     return (*this);
 }
 
-Gradient Gradient::addPoint(double iTime, double iConcentration)
+Gradient Gradient::addPoint(double iTime, double iConcentrationB)
     throw(GradientException, GradientPointException)
 {
-    this->addPoint(GradientPoint(iTime, iConcentration));
+    this->addPoint(GradientPoint(iTime, iConcentrationB));
     return (*this);
 }
 }

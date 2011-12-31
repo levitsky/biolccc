@@ -293,19 +293,19 @@
         def __getitem__(self, key):
             return {
                 'time' : self.time,
-                'concentration': self.concentration,
+                'concentrationB': self.concentrationB,
             }[key]()
 
         def __setitem__(self, key, value):
             {
                 'time' : self.setName,
-                'concentration': self.setConcentration,
+                'concentrationB': self.setConcentrationB,
             }[key](value)
 
         def __delitem__(self, key):
             pass
 
-        _keys = ['time', 'concentration']
+        _keys = ['time', 'concentrationB']
 
         def keys(self):
             return self._keys
@@ -400,7 +400,7 @@
             for point in state_dict['gradient']:
                 if type(point).__name__ == 'dict':
                     gradient.addPoint(
-                        point['time'], point['concentration'])
+                        point['time'], point['concentrationB'])
                 elif type(point).__name__ == 'pyBioLCCC.GradientPoint':
                     gradient.addPoint(point)
                 else:

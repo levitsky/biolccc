@@ -28,31 +28,31 @@ public:
     /*!
         Constructs a point of a gradient with at time = \a iTime and 
         with the concentration of component B of binary solution = \a
-        iConcentration.
+        iConcentrationB.
 
-        Valid values are \a iTime >= 0.0 and 0.0 <= \a iConcentration <= 100.0
+        Valid values are \a iTime >= 0.0 and 0.0 <= \a iConcentrationB <= 100.0
     */
     GradientPoint(double iTime = 0.0,
-                  double iConcentration = 0.0)
+                  double iConcentrationB = 0.0)
                   throw (GradientPointException);
 
     //! Returns the time of the point in minutes.
     double time() const;
 
     //! Returns the concentration of component B at the point in percents.
-    double concentration() const;
+    double concentrationB() const;
 
     //! Sets the time of the point in minutes.
     void setTime(double newTime)
         throw (GradientPointException);
 
     //! Sets the concentration of component B at the point in percents.
-    void setConcentration(double newConcentration)
+    void setConcentrationB(double newConcentrationB)
         throw (GradientPointException);
 
 private:
     double mTime;
-    double mConcentration;
+    double mConcentrationB;
 };
 
 }

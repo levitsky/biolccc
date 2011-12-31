@@ -176,8 +176,8 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                    const ChromoConditions &conditions,
                    const int numInterpolationPoints,
                    const bool continueGradient,
-                   const bool backwardCompatibility,
-                   const bool mixingCorrection) throw(BioLCCCException)
+                   const bool backwardCompatibility
+                   ) throw(BioLCCCException)
 {
     // Calculating column volumes.
     if (numInterpolationPoints < 0)
@@ -186,134 +186,32 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
             "The number of interpolation points must be non-negative.");
     }
 
-    // Recalculating dV. By default dV is calculated as the flow rate divided
-    // by 20.
-    double dV;
-    if (conditions.dV()!= 0.0)
-    {
-        dV = conditions.dV();
-    }
-    else
-    {
-        dV = conditions.flowRate() / 20.0;
-    }
-
-    // A gradient should contain at least two points.
-    if (conditions.gradient().size() < 2)
-    {
-        throw BioLCCCException(
-            "The gradient must contain at least two points.");
-    }
-
-    // Converting the x-coordinate of the gradient to the scale of iterations
-    // and the y-coordinate to the scale of second solvent concentration.
-    std::vector<std::pair<int, double> > convertedGradient;
-
-    double secondSolventConcentrationPump = 0.0;
-    for (Gradient::size_type i = 0;
-        i != conditions.gradient().size();
-        i++)
-    {
-        secondSolventConcentrationPump =                
-                (100.0 - conditions.gradient()[i].concentration()) / 100.0 *
-                conditions.secondSolventConcentrationA() +
-                conditions.gradient()[i].concentration() / 100.0 *
-                conditions.secondSolventConcentrationB();
-        convertedGradient.push_back(
-            std::pair<int,double>(
-                int(floor(conditions.gradient()[i].time() *
-                          conditions.flowRate() / dV)),
-                secondSolventConcentrationPump));
-    }
-
-    std::vector<std::pair<int, double> >::const_iterator currentGradientPoint=
-        convertedGradient.begin();
-    std::vector<std::pair<int, double> >::const_iterator previousGradientPoint=
-        convertedGradient.begin();
-
     KdCalculator kdCalculator(parsedSequence, chemBasis,
                               conditions.columnPoreSize(),
                               conditions.columnRelativeStrength(),
                               conditions.temperature(),
                               numInterpolationPoints);
 
-    double secondSolventConcentration = 0.0;
     // The part of a column passed by molecules. When it exceeds 1.0,
-    // molecule elute from the column.
+    // the analyte elutes from the column.
     double S = 0.0;
     double dS = 0.0;
     // The current iteration number.
     int j = 0;
-    while (S < 1.0)
+    while ((S < 1.0) && (j < conditions.SSConcentrations().size()))
     {
         j++;
-        if (j > currentGradientPoint->first)
-        {
-            if (currentGradientPoint != --convertedGradient.end())
-            {
-                previousGradientPoint = currentGradientPoint;
-                ++currentGradientPoint;
-
-                // We could calculate the isocratic part of gradient more
-                // efficiently due to the constancy of Kd.
-                if (currentGradientPoint->second ==
-                        previousGradientPoint->second)
-                {
-                    // One case is that a peptide elutes during this section or
-                    // the section is the last. Then we can calculate the
-                    // retention time directly.
-                    bool peptideElutes = 
-                        ((1.0 - S) / dV
-                            * kdCalculator(currentGradientPoint->second)
-                            * conditions.columnPoreVolume() < 
-                        (currentGradientPoint->first - j + 1));
-
-                    if (peptideElutes ||
-                        (currentGradientPoint == --convertedGradient.end()))
-                    {
-                        dS = dV / kdCalculator(currentGradientPoint->second) 
-                            / conditions.columnPoreVolume();
-                        j += (int) ceil((1.0 - S) / dS);
-                        S += (int) ceil((1.0 - S) / dS) * dS;
-                        break;
-                    }
-
-                    // Another case is that this section is not long enough for
-                    // a peptide to elute. In this case we calculate the
-                    // increase of S during this section.
-                    else
-                    {
-                        S += dV / kdCalculator(currentGradientPoint->second)
-                             / conditions.columnPoreVolume() 
-                             * (currentGradientPoint->first -
-                                previousGradientPoint->first);
-                        j = currentGradientPoint->first;
-                    }
-                }
-            }
-            // If j exceeds the last point of a gradient, the value of the
-            // second solvent concentration is calculated by a prolongation of
-            // the last gradient section.
-            else if (!continueGradient)
-            {
-                break;
-            }
-        }
-
-        secondSolventConcentration = currentGradientPoint->second -
-            (currentGradientPoint->second - previousGradientPoint->second) /
-            (currentGradientPoint->first - previousGradientPoint->first) *
-            (currentGradientPoint->first - (double) (j-0.5));
-        dS = dV / kdCalculator(secondSolventConcentration) 
+        dS = conditions.dV() / kdCalculator(conditions.SSConcentrations()[j]) 
              / conditions.columnPoreVolume();
         S += dS;
     }
 
-    double RT = j * dV / conditions.flowRate() + conditions.delayTime() +
-                conditions.columnInterstitialVolume() / conditions.flowRate();
-    if (!backwardCompatibility)
+    double RT = j * conditions.dV() / conditions.flowRate() 
+                + conditions.delayTime() 
+                + conditions.columnInterstitialVolume() / conditions.flowRate();
+    if ((!backwardCompatibility) && (S > 1.0))
     {
-        RT -= (S - 1.0) / dS * dV / conditions.flowRate();
+        RT -= (S - 1.0) / dS * conditions.dV() / conditions.flowRate();
     }
     return RT;
 }
@@ -324,8 +222,7 @@ double calculateRT(const std::string &sequence,
                    const ChromoConditions &conditions,
                    const int numInterpolationPoints,
                    const bool continueGradient,
-                   const bool backwardCompatibility,
-                   const bool mixingCorrection) 
+                   const bool backwardCompatibility) 
                    throw(BioLCCCException)
 {
     std::vector<ChemicalGroup> parsedSequence = 
@@ -335,8 +232,7 @@ double calculateRT(const std::string &sequence,
                        conditions,
                        numInterpolationPoints,
                        continueGradient,
-                       backwardCompatibility,
-                       mixingCorrection);
+                       backwardCompatibility);
 }
 
 double calculateKd(const std::string &sequence,

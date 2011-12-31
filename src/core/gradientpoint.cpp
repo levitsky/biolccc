@@ -6,11 +6,12 @@ GradientPointException::GradientPointException(std::string message):
         BioLCCCException(message) {};
 
 GradientPoint::GradientPoint(double time,
-                             double concentration)
+                             double concentrationB)
                              throw (GradientPointException)
 {
+
     setTime(time);
-    setConcentration(concentration);
+    setConcentrationB(concentrationB);
 }
 
 double GradientPoint::time() const
@@ -18,9 +19,9 @@ double GradientPoint::time() const
     return mTime;
 }
 
-double GradientPoint::concentration() const
+double GradientPoint::concentrationB() const
 {
-    return mConcentration;
+    return mConcentrationB;
 }
 
 void GradientPoint::setTime(double newTime) 
@@ -34,22 +35,22 @@ void GradientPoint::setTime(double newTime)
     mTime = newTime;
 }
 
-void GradientPoint::setConcentration(double newConcentration) 
+void GradientPoint::setConcentrationB(double newConcentrationB) 
     throw (GradientPointException)
 {
-    if (newConcentration < 0.0)
+    if (newConcentrationB < 0.0)
     {
         throw GradientPointException(
             "The concentration of B component is negative.");
     }
 
-    if (newConcentration > 100.0)
+    if (newConcentrationB > 100.0)
     {
         throw GradientPointException(
             "The concentration of B component is greater than 100%.");
     }
 
-    mConcentration = newConcentration;
+    mConcentrationB = newConcentrationB;
 }
 }
 

@@ -41,15 +41,15 @@ public:
     //! Constructs a linear elution gradient.
     /*!
         Constructs a gradient with two points: 
-        (0.0, \a initialConcentration) and (\a time, \a finalConcentration).
+        (0.0, \a initialConcentrationB) and (\a time, \a finalConcentrationB).
 
-        \param initialConcentration Concentration of component B at 0.0 min.
-        \param finalConcentration Concentration of component B at the end of
+        \param initialConcentrationB Concentration of component B at 0.0 min.
+        \param finalConcentrationB Concentration of component B at the end of
         the gradient.
         \param time The duration of the gradient.
     */
-    Gradient(double initialConcentration,
-             double finalConcentration,
+    Gradient(double initialConcentrationB,
+             double finalConcentrationB,
              double time)
              throw(GradientException, GradientPointException);
 
@@ -57,11 +57,11 @@ public:
     Gradient addPoint(GradientPoint iPoint)
         throw(GradientException, GradientPointException);
 
-    //! Extends the gradient with the point (\a iTime, \a iConcentration).
+    //! Extends the gradient with the point (\a iTime, \a iConcentrationB).
     /*!
-        Valid values are \a iTime >= 0.0 and 0.0 <= \a iConcentration <= 100.0
+        Valid values are \a iTime >= 0.0 and 0.0 <= \a iConcentrationB <= 100.0
      */
-    Gradient addPoint(double iTime, double iConcentration)
+    Gradient addPoint(double iTime, double iConcentrationB)
         throw(GradientException, GradientPointException);
 };
 

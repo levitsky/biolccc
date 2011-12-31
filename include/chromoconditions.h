@@ -207,6 +207,9 @@ public:
     void setGradient(Gradient newGradient)
         throw(ChromoConditionsException);
 
+    //! Returns a time series of second solvent concentrations in a column.
+    const std::vector<double> & SSConcentrations() const;
+
 private:
     double mColumnLength;
     double mColumnDiameter;
@@ -225,7 +228,10 @@ private:
     double mSecondSolventConcentrationA;
     double mSecondSolventConcentrationB;
 
+    std::vector<double> mSSConcentrations;
+
     void recalculateVolumes();
+    void recalculateSSConcentrations();
 };
 
 }
