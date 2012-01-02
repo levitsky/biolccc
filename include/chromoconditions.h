@@ -207,7 +207,13 @@ public:
     void setGradient(Gradient newGradient)
         throw(ChromoConditionsException);
 
-    //! Returns a time series of second solvent concentrations in a column.
+    //! Returns the state of mixing correction.
+    bool mixingCorrection() const;
+    
+    //! Enable/disable the correction for solvent mixing in the column.
+    void setMixingCorrection(bool flag);
+
+    //! Returns a time series of second solvent concentrations in the column.
     const std::vector<double> & SSConcentrations() const;
 
 private:
@@ -227,6 +233,7 @@ private:
     Gradient mGradient;
     double mSecondSolventConcentrationA;
     double mSecondSolventConcentrationB;
+    bool mMixingCorrection;
 
     std::vector<double> mSSConcentrations;
 
