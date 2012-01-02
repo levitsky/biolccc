@@ -1,3 +1,20 @@
+How to install pyBioLCCC?
+-------------------------
+
+Linux:
+- Debian/Ubuntu:
+    sudo apt-get install python-setuptools python-dev
+    sudo easy_install pip
+    sudo pip install pyBioLCCC
+
+Windows:
+- Download pre-compiled binary packages from the list below 
+  OR
+- If you have Enthought Python Distribution / ActivePython, execute in the
+  command line:
+    easy_install pip
+    pip install pyBioLCCC
+
 What is BioLCCC?
 ----------------
 
