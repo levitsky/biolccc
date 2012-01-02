@@ -1,3 +1,22 @@
+1.4.0
+*****
+
+General:
+========
+
+- Add mixingCorrection option to ChromoConditions.
+  When mixingCorrection is true (default is false), immediate composition of
+  the solvent in the column does not equal to the composition of the pumped 
+  solution, but is calculated according to the differential equation of solute
+  accumulation:
+  d[SS] / dt = flow rate / (V0 + Vp) * ([SS]pump - [SS]),
+  where [SS] is the second solvent concentration in the column, and [SS]pump
+  is the concentration in the pumped solution,
+  V0 is the interstitial volume, Vp is the volume of pores.
+  
+- The code of calculateRT() is significantly simplified, a part of it is moved
+  to ChromoConditions.
+
 1.3.0
 *****
 

@@ -167,7 +167,7 @@ public:
         The physical interpretation could be a volume of the pump mixer.
         
         Note that if the dV is set to zero, than it is assumed to be equal to
-        flowRate*1 min/20.
+        flowRate * 1 min / 20.
      */
     void setDV(double newDV)
         throw(ChromoConditionsException);
@@ -213,7 +213,24 @@ public:
     //! Enable/disable the correction for solvent mixing in the column.
     void setMixingCorrection(bool flag);
 
-    //! Returns a time series of second solvent concentrations in the column.
+    //! Returns a time series of the second solvent concentration in the column.
+    /*
+        Returns the volume concentration of the second solvent at time points 
+        separated by dV / flowRate. 
+        If mixingCorrection==True the actual concentration 
+        of the second solvent is calculated from the differential equation
+        describing accumulation of a substance in a finite chamber with equal 
+        input and output flows:
+        d[SS] / dt = flowRate / (V0 + Vp) * ([SS]pump - [SS]),
+        where [SS] is the actual second solvent concentration in the column and
+        [SS]pump is the concentration of the second solvent in the pumped 
+        solution.
+        Otherwise, the solvent composition in the column corresponds to the 
+        immediate composition of the solvent pumped in the column, i.e.
+        [SS] = [SS]pump.
+        
+        If elution is isocratic, the series contains a single point.
+    */
     const std::vector<double> & SSConcentrations() const;
 
 private:

@@ -377,6 +377,10 @@ void ChromoConditions::recalculateSSConcentrations()
         pumpedConcentration = localSlope * (time - initialTime) 
                               + initialSSConcentration;
 
+        // If mixingCorrection is enabled calculate second solvent concentrations
+        // from the equation 
+        // d[SS] / dt = flowRate / (V0 + VP) * ([SS]pump - [SS])
+        // Otherwise, [SS] == [SS]pump
         if (mixingCorrection())
         {
             // Special case for the first time point.

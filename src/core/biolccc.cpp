@@ -215,6 +215,7 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
             }
             else
             {
+                // If continue gradient then use the slope of the last section.
                 if (continueGradient)
                 {
                     currentSSConcentration += 
@@ -227,20 +228,22 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                 }
             }
             dS = conditions.dV() 
-                 / kdCalculator(conditions.SSConcentrations()[j]) 
+                 / kdCalculator(currentSSConcentration) 
                  / conditions.columnPoreVolume();
             S += dS;
         }
 
         RT = j * conditions.dV() / conditions.flowRate();
+        // Correction for the discreteness of integration.
         if ((!backwardCompatibility) && (S > 1.0))
         {
             RT -= (S - 1.0) / dS * conditions.dV() / conditions.flowRate();
         }
     }
 
-    RT += conditions.delayTime() 
-          + conditions.columnInterstitialVolume() / conditions.flowRate();
+    RT += conditions.delayTime();
+    // Correction for V0.
+    RT += conditions.columnInterstitialVolume() / conditions.flowRate();
     return RT;
 }
 }
