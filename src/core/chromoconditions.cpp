@@ -23,6 +23,7 @@ ChromoConditions::ChromoConditions(double iColumnLength,
 {
     // Set an empty gradient to prevent recalculation of SSConcentrations.
     mGradient = Gradient();
+    setMixingCorrection(false);
     setColumnLength(iColumnLength);
     setColumnDiameter(iColumnDiameter);
     setColumnPoreSize(iColumnPoreSize);
@@ -306,6 +307,17 @@ void ChromoConditions::recalculateVolumes()
     mColumnPoreVolume = mColumnTotalVolume * columnVpToVtot();
 }
 
+bool ChromoConditions::mixingCorrection() const
+{
+    return mMixingCorrection;
+}
+    
+void ChromoConditions::setMixingCorrection(bool flag)
+{
+    mMixingCorrection = flag;
+    recalculateSSConcentrations();
+}
+
 void ChromoConditions::recalculateSSConcentrations()
 {
     mSSConcentrations.clear();
@@ -331,7 +343,8 @@ void ChromoConditions::recalculateSSConcentrations()
     double time = dV() / 2.0 / flowRate();
     int segmentNum = -1;
     double localSlope = 0.0;
-    double initialSSConcentration, finalSSConcentration, initialTime, finalTime;
+    double initialSSConcentration, finalSSConcentration, initialTime,
+           finalTime, pumpedConcentration;
 
     while (true)
     {
@@ -360,8 +373,32 @@ void ChromoConditions::recalculateSSConcentrations()
                 break;
             }
         }
-        mSSConcentrations.push_back(
-            localSlope * (time - initialTime) + initialSSConcentration);
+
+        pumpedConcentration = localSlope * (time - initialTime) 
+                              + initialSSConcentration;
+
+        if (mixingCorrection())
+        {
+            // Special case for the first time point.
+            if (time == dV() / 2.0 / flowRate())
+            {
+                mSSConcentrations.push_back(
+                    initialSSConcentration + 
+                    + dV() / (columnInterstitialVolume() + columnPoreVolume())
+                    * (pumpedConcentration - mSSConcentrations.back()) / 2.0);
+            }
+            else
+            {
+                mSSConcentrations.push_back(
+                    mSSConcentrations.back() 
+                    + dV() / (columnInterstitialVolume() + columnPoreVolume())
+                    * (pumpedConcentration - mSSConcentrations.back()));
+            }
+        }
+        else
+        {
+            mSSConcentrations.push_back(pumpedConcentration);
+        }
         time += dV() / flowRate();
     }
 }

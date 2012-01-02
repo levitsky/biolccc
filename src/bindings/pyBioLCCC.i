@@ -349,6 +349,7 @@
                 'secondSolventConcentrationB':
                     self.secondSolventConcentrationB,
                 'temperature': self.temperature,
+                'mixingCorrection': self.mixingCorrection,
             }[key]()
 
         def __setitem__(self, key, value):
@@ -368,6 +369,7 @@
                 'secondSolventConcentrationB':
                     self.setSecondSolventConcentrationB,
                 'temperature': self.setTemperature,
+                'mixingCorrection': self.setMixingCorrection,
             }[key](value)
 
         def __delitem__(self, key):
@@ -377,7 +379,7 @@
                  'gradient', 'secondSolventConcentrationA',
                  'secondSolventConcentrationB', 'delayTime', 'flowRate',
                  'dV', 'columnRelativeStrength', 'columnVpToVtot',
-                 'columnPorosity', 'temperature']
+                 'columnPorosity', 'temperature', 'mixingCorrection']
 
         def keys(self):
             return self._keys

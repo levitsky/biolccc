@@ -192,7 +192,8 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                               numInterpolationPoints);
 
     double RT = 0.0;
-    if (gradient().SSConcentrations.size() == 1)
+    // Use simplified expression for isocratic elution.
+    if (conditions.SSConcentrations().size() == 1)
     {
         RT = kdCalculator(conditions.SSConcentrations()[0]) 
              * conditions.columnPoreVolume() / conditions.flowRate();
@@ -217,8 +218,8 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                 if (continueGradient)
                 {
                     currentSSConcentration += 
-                        conditions.SSConcentrations.back()
-                        - *(conditions.SSConcentrations.end() - 2);
+                        conditions.SSConcentrations().back()
+                        - *(conditions.SSConcentrations().end() - 2);
                 }
                 else
                 {
