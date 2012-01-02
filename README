@@ -7,7 +7,7 @@ main application is retention time prediction in liquid chromatography, although
 the list of potential applications can be easily extended. Contrary to the other
 models of peptide/protein chromatography, BioLCCC starts from very basic
 assumptions regarding flexibility of a polypeptide chain, the shape of a pore,
-type of interactions neglected, etc. Given these assumptions, the coefficient of
+the type of interactions neglected, etc. Given these assumptions, the coefficient of
 distribution (Kd) of a peptide between the solid and mobile phases can be
 derived using the methods of statistical physics of macromolecules. Finally, the
 retention time of a peptide is calculated from Kd using the basic equation of
@@ -17,7 +17,7 @@ Owing to the physical basis of the BioLCCC model, it contains very few free
 parameters. The retention properties of an amino acid are characterized by a
 single number, which is essentially the energy of interaction between the amino
 acid and the surface of solid phase in pure water+ion paring agent. Given this
-small number of phenomenological parameters, the BioLCCC model can easily be
+small number of phenomenological parameters, the BioLCCC model can be easily
 adapted for an arbitrary type of chromatography not limited by phase or solvent
 types. Moreover, its extension to peptides with post-translational modifications
 is straightforward as it was shown for the phosphorylated amino acids.
