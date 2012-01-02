@@ -11,11 +11,11 @@ Welcome to the libBioLCCC/pyBioLCCC documentation
 =================================================
 
 libBioLCCC is an open source tool for prediction of peptide and protein
-retention time in liquid chromatography. It is based on BioLCCC (Liquid
+retention times in liquid chromatography. It is based on BioLCCC (Liquid
 Chromatography of Biomacromolecules at Critical Conditions) model of liquid
 chromatography of peptides and proteins.
 
-pyBioLCCC is set of Python wrappings around libBioLCCC. It allows to invoke
+pyBioLCCC is a set of Python wrappings around libBioLCCC. It allows to invoke
 libBioLCCC functions from Python programming language.
 
 Please go to the ":doc:`introduction`" section for more details.

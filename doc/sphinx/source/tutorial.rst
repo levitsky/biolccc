@@ -29,14 +29,14 @@ why we supply code snippets both for C++ and Python. Here is an example:
 The Python examples are specific to Python 2.x, since our project doesn't
 support Python 3.x.
 
-Basic conceptions
-*****************
+Basic concepts
+**************
 
-There are a few simple conceptions which are widely used in libBioLCCC. Most of
-them are represented by a corresponding class. Here they are:
+There are a few simple concepts which are widely used in libBioLCCC. Most of
+them are represented by corresponding classes. Here they are:
 
-**Polymer model** - the set of assumptions used to describe a polymer molecule.
-This version of the BioLCCC model contains two models:
+**Polymer model** - a set of assumptions used to describe a polymer molecule.
+This version of BioLCCC includes two polymer models:
 
     **ROD** - this model represents a peptide as an absolutely rigid rod.
     Amino acids are modelled as regularly spaced beads
@@ -61,7 +61,7 @@ terminal group in a peptide chain. Examples are a histidine residue,
 phosphoserine residue and N-Terminal hydrogen that closes a peptide chain. The
 properties of a chemical group are stored in the ChemicalGroup class. 
 
-**Chemical basis** - a set of all physicochemical constants involved into the
+**Chemical basis** - a set of all physicochemical constants involved in the
 BioLCCC equations. This set contains:
 
     - the list of all chemical groups, i.e. amino acids and terminal groups.
@@ -80,7 +80,7 @@ BioLCCC equations. This set contains:
 The properties of a chemical basis are stored in the 
 `ChemicalBasis class <./API/classBioLCCC_1_1ChemicalBasis.html>`_.
 
-A chemical basis is specific to a type of retention chemistry, solvents
+A chemical basis is specific to the type of retention chemistry, solvents
 and ion paring agent being used in the experiment. In addition, it must be used
 only with the same polymer model as the one used in the calibration of the
 chemical basis.
@@ -92,7 +92,7 @@ chemical bases:
 
     **rpAcnFaRod** - a ChemicalBasis calibrated for the reversed phase,
     ACN as a second solvent, 0.1% FA in both solvents and the ROD polymer model.
-    The data was obtained in the joint research of Harvard University and 
+    The data were obtained in the joint research of Harvard University and 
     Institute for Energy Problems for Chemical Physics, Russian Academy of
     Science.
 
@@ -104,14 +104,14 @@ chemical bases:
 **Chromatographic conditions** - a description of a chromatographic equipment 
 and its settings. Contains:
 
-    - the geometry of the column.
+    - the geometry of the column;
     - the properties of the adsorbent: average size of the pores, porosity
       (i.e. percentage of volume not filled with the solid phase),
       (volume of pores)/(total volume of column) ratio, relative adsorption
-      strength.
+      strength;
     - elution parameters: the shape of the gradient, the composition of
-      components, flow rate, delay time.
-    - the step of integration over volume.
+      components, flow rate, delay time;
+    - the step of integration over volume;
     - temperature of a column (EXPERIMENTAL).
 
 The default values were set rather arbitrarily.
@@ -121,7 +121,7 @@ Peptide sequence notation
 
 In libBioLCCC we use the extended peptide notation. It is based on the
 `one-letter IUPAC notation <http://www.chem.qmul.ac.uk/iupac/AminoAcid/>`_, 
-but borrows only letters for the standard 20 aminoacid (i.e. no B, Z, X). 
+but borrows only letters for the standard 20 aminoacids (i.e. no B, Z, X). 
 We extended it in the following way:
 
 - Modified amino acids are denoted as **xyzX**, i.e. their labels start with an 
@@ -161,7 +161,7 @@ Calculating retention time
 
 calculateRT is the first libBioLCCC function you may need.
 It requires three arguments: a peptide sequence,
-a chemical basis, and and a description of chromatographic conditions. Supplied 
+a chemical basis, and a description of chromatographic conditions. Supplied 
 with these data, it calculates the retention time of the peptide.
 
 .. list-table:: Calculating the retention time of a peptide
@@ -257,7 +257,7 @@ Getting the list of predefined chemical groups
 **********************************************
 
 Before you begin to work with libBioLCCC/pyBioLCCC, it is useful to know which
-amino acids and terminal groups are predefined in this version of library.
+amino acids and terminal groups are predefined in this version of the library.
 To get this information just iterate through the chemicalGroups() map of the
 predefined chemical bases.
 

@@ -37,7 +37,7 @@ General:
   the size of the chemical group. This size is defined as a number of
   binary solvent molecules which are desorbed when the chemical group
   is adsorbed to the surface. By default every chemical group has a
-  size of 1.0, except for the terminal groups, which has zero size.
+  size of 1.0, except for the terminal groups, that have zero size.
 
 - Add experimental option neglectPartiallyDesorbedStates.
   Corresponding citation from the documentation: "In BioLCCC model,
