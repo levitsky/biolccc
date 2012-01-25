@@ -3,7 +3,7 @@ import os
 current_dir = os.path.dirname(__file__)
 modified_file = []
 
-with open(os.path.join(current_dir, 'pyBioLCCC.py'), 'r') as f:
+with open(os.path.join(current_dir, 'biolccc.py'), 'r') as f:
     for line in f:
         modified_line = line
         modified_line = modified_line.replace(
@@ -27,6 +27,6 @@ if modified_file[0].count('import collections') == 0:
                             + (newlines or '\n'))
     modified_file.insert(0, 'import collections' + (newlines or '\n'))
 
-with open(os.path.join(current_dir, 'pyBioLCCC.py'), 'w') as f:
+with open(os.path.join(current_dir, 'biolccc.py'), 'w') as f:
     f.writelines(modified_file)
-    
+   
