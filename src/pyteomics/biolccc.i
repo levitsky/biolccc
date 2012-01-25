@@ -1,5 +1,5 @@
-// pyBioLCCC.i - SWIG interface
-%module pyBioLCCC 
+// biolccc.i - SWIG interface
+%module biolccc 
 
 %feature("autodoc", "0");
 
@@ -22,7 +22,7 @@
 %include "std_vector.i"
 %include "std_list.i"
 %include "carrays.i"
-%include "pyabc.i"
+%include <pyabc.i>
 %include "exception.i"
 
 %array_class(double, doubleArray);
@@ -263,10 +263,10 @@
                             value['averageMass'],
                             value['monoisotopicMass'],
                             value['bindArea']))
-                elif type(value).__name__ == 'pyBioLCCC.ChemicalBasis':
+                elif type(value).__name__ == 'pyteomics.biolccc.ChemicalBasis':
                     self.addChemicalGroup(value)
                 else:
-                    raise Exception('pyBioLCCC', 'wrong type for ChemicalGroup')
+                    raise Exception('pyteomics.biolccc', 'wrong type for ChemicalGroup')
     %}
 };
 
@@ -403,10 +403,10 @@
                 if type(point).__name__ == 'dict':
                     gradient.addPoint(
                         point['time'], point['concentrationB'])
-                elif type(point).__name__ == 'pyBioLCCC.GradientPoint':
+                elif type(point).__name__ == 'pyteomics.biolccc.GradientPoint':
                     gradient.addPoint(point)
                 else:
-                    raise Exception('pyBioLCCC', 'wrong type for GradientPoint')
+                    raise Exception('pyteomics.biolccc', 'wrong type for GradientPoint')
             self['gradient'] = gradient
 
         def __reduce__(self):

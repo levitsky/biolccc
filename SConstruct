@@ -132,41 +132,35 @@ Alias('tests', tests)
 
 # pyBioLCCC package.
 #-------------------
-pyBioLCCC = SConscript(
-    os.path.join('src', 'bindings', 'SConscript'),
+biolccc_py = SConscript(
+    os.path.join('src', 'pyteomics', 'SConscript'),
     exports = {'env':env},
     variant_dir=os.path.join(
-        'build', platform.name, env['BUILDTYPE'], 'bindings'), 
+        'build', platform.name, env['BUILDTYPE'], 'pyteomics'), 
     duplicate=True,
     )
 
 # Copying source files required for the python source package.
-env.AddPostAction(pyBioLCCC, Copy(
-    os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
-        'post_swig.py'),
-    os.path.join(Dir('#.').abspath, 'src', 'bindings', 'post_swig.py')))
-env.AddPostAction(pyBioLCCC, 'python ' +
-    os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
-        'post_swig.py') + ' ' + version)
-env.AddPostAction(pyBioLCCC, Copy(
-    os.path.join(Dir('#.').abspath, 'src', 'bindings', 'pyBioLCCC.py'),
-    os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
-        'pyBioLCCC.py')))
-env.AddPostAction(pyBioLCCC, Copy(
-    os.path.join(Dir('#.').abspath, 'src', 'bindings', 'pyBioLCCC_wrap.cc'),
-    os.path.join('build', platform.name, env['BUILDTYPE'], 'bindings',
-        'pyBioLCCC_wrap.cc')))
-env.AddPostAction(pyBioLCCC, Touch(
-    os.path.join(Dir('#.').abspath, 'src', 'bindings', '__init__.py')))
+build_dir_path = os.path.join(
+    'build', platform.name, env['BUILDTYPE'], 'pyteomics')
+src_dir_path = os.path.join(
+        os.path.join(Dir('#.').abspath, 'src', 'pyteomics'))
+
+env.AddPostAction(biolccc_py, 
+    Copy(src_dir_path, os.path.join(build_dir_path, 'biolccc.py')))
+env.AddPostAction(biolccc_py, 
+    Copy(src_dir_path,  os.path.join(build_dir_path, 'biolccc_wrap.cc')))
+env.AddPostAction(biolccc_py, 
+    'python ' + os.path.join(src_dir_path, 'post_swig.py') + ' ' + version)
 
 # Copying the remaining files for pyBioLCCC.
-Depends(pyBioLCCC, 'src/bindings/post_swig.py')
-Depends(pyBioLCCC, 'setup.py')
-Depends(pyBioLCCC, 'MANIFEST.in')
+Depends(biolccc_py, Glob('src/pyteomics/*'))
+Depends(biolccc_py, 'setup.py')
+Depends(biolccc_py, 'MANIFEST.in')
 # Copying the documentation to the build dir.
-Depends(pyBioLCCC, 'VERSION')
-Depends(pyBioLCCC, 'README')
-Alias('pyBioLCCC', pyBioLCCC)
+Depends(biolccc_py, 'VERSION')
+Depends(biolccc_py, 'README')
+Alias('biolccc_py', biolccc_py)
 
 # A test suite for pyBioLCCC.
 #----------------------------
@@ -234,8 +228,8 @@ Alias('doc', docs)
 
 # Final configuration of the build.
 #===================================
-env.Default([libBioLCCC_shared, pyBioLCCC])
+env.Default([libBioLCCC_shared, biolccc_py])
 Alias('all', 
-    [libBioLCCC_shared, libBioLCCC_shared, libgtest_static, pyBioLCCC,
+    [libBioLCCC_shared, libBioLCCC_shared, libgtest_static, biolccc_py,
      tests, test_pyBioLCCC, examples, docs])
 

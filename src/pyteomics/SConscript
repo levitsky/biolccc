@@ -7,8 +7,8 @@ local_env['SWIGPATH'] = local_env['CPPPATH']
 local_env['SWIGFLAGS'] = '-python -c++'
 local_env['SHLIBPREFIX'] = ''
 
-pyBioLCCC_so = local_env.SharedLibrary(
-    target = '_pyBioLCCC',
-    source = ['pyBioLCCC.i'] + Glob('../core/shared/*.os'))
+biolccc_so = local_env.SharedLibrary(
+    target = './_biolccc',
+    source = ['./biolccc.i'] + Glob('../core/shared/*.os'))
 
-Return('pyBioLCCC_so')
+Return('biolccc_so')
