@@ -5,7 +5,7 @@ Tutorial
 Before we begin
 ***************
 
-The following help is written both for libBioLCCC and pyBioLCCC. The only
+The following help is written both for libBioLCCC and pyteomics.biolccc. The only
 difference between two these packages lies in the syntax of commands. That is
 why we supply code snippets both for C++ and Python. Here is an example:
 
@@ -208,7 +208,7 @@ replace the default parameters with your own.
           :language: python
 
 
-pyBioLCCC adds another way to interact with ChromoConditions. You can use its
+pyteomics.biolccc adds another way to interact with ChromoConditions. You can use its
 instances as Python dictionaries:
 
 .. list-table:: Dict-like syntax of ChromoConditions
@@ -256,7 +256,7 @@ ChemicalBasis instance which contains the masses of amino acids.
 Getting the list of predefined chemical groups
 **********************************************
 
-Before you begin to work with libBioLCCC/pyBioLCCC, it is useful to know which
+Before you begin to work with libBioLCCC/pyteomics.biolccc, it is useful to know which
 amino acids and terminal groups are predefined in this version of the library.
 To get this information just iterate through the chemicalGroups() map of the
 predefined chemical bases.

@@ -98,8 +98,8 @@ Please, keep in mind a few rules on editing a ChemicalBasis instance:
  
   You cannot break this rule in C++, since the predefined bases are made constant
   there. But in Python there are no constants, and you can accidentally 
-  modify variables pyBioLCCC.rpAcnFaRod and 
-  pyBioLCCC.rpAcnTfaCoil. You should avoid this since you can easily
+  modify variables pyteomics.biolccc.rpAcnFaRod and 
+  pyteomics.biolccc.rpAcnTfaCoil. You should avoid this since you can easily
   forget about it later and use these bases as if they were intact.
 
   If you need to derive a new basis from a predefined one, use an alternative
