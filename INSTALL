@@ -1,35 +1,36 @@
-Installing pyBioLCCC from PyPi
-******************************
+Installing pyteomics.biolccc from the Python Package Index (PyPi)
+*****************************************************************
 
 GNU/Linux
 =========
 
-The preferred way to obtain pyBioLCCC is via pip Python package manager.
-Install pip and execute in the command line:
+The preferred way to obtain pyteomics.biolccc is via pip Python 
+package manager. The shell code for a freshly installed Ubuntu system:
 
 .. code-block:: bash
 
-    sudo apt-get install python-setuptools
+    sudo apt-get install python-setuptools python-dev build-essential
     sudo easy_install pip
-    sudo pip install pyBioLCCC
+    sudo pip install pyteomics.biolccc
 
 Windows
 =======
 
-The easiest way to install pyBioLCCC on Windows is by using a precompiled .exe package available for download from the pyBioLCCC page on
-PyPi: http://pypi.python.org/pypi/pyBioLCCC/
+The easiest way to install pyteomics.biolccc on Windows is by using a 
+precompiled .exe package available for download from the pyteomics.biolccc page
+on PyPi: http://pypi.python.org/pypi/pyteomics.biolccc/
 
 If a precompiled package for your version of Python is not available,
 you may compile it yourself. The ready-to-use Python distributions,
 like ActivePython Community Edition or Enthought Python Distribution,
 already contain all the tools required for package building. The
-latter is free for academic use. With these distributions, pyBioLCCC
+latter is free for academic use. With these distributions, pyteomics.biolccc
 can be installed via the standard routine:
 
 .. code-block:: bash
 
     easy_install pip
-    pip install pyBioLCCC
+    pip install pyteomics.biolccc
 
 If your distribution lacks building tools, you may try to install them
 yourself.
@@ -49,34 +50,31 @@ during the installation process.
     echo [build] > %HOMEPATH%\pydistutils.cfg
     echo compiler = mingw32 >> %HOMEPATH%\pydistutils.cfg
     c:\Python27\Scripts\easy_install.exe pip
-    c:\Python27\Scripts\pip.exe install pyBioLCCC
+    c:\Python27\Scripts\pip.exe install pyteomics.biolccc
  
 Do not forget to change the path to the python distribution according to your
 own directory structure.
 
-Building libBioLCCC/pyBioLCCC from sources
-******************************************
+Building libBioLCCC/pyteomics.biolccc from sources
+**************************************************
 
-The source code is available online at http://hg.theorchromo.ru/libbiolccc.
+The source code is available online at http://hg.theorchromo.ru/biolccc.
 You can download the archived source code or pull the mercurial repository:
 
 .. code-block:: bash
 
-    hg clone http://hg.theorchromo.ru/libbiolccc
+    hg clone http://hg.theorchromo.ru/biolccc
 
 GNU/Linux
 =========
 
-libBioLCCC
-----------
-
-In order to compile libBioLCCC you need the following tools to be installed:
+In order to compile pyteomics.biolccc you need the following tools to 
+be installed:
 
 * GNU C++ compiler
 * Python 2.6 or 2.7 (other versions 2.x are accepted, but not tested)
-* SCons build system
-* (pyBioLCCC) python-dev package
-* (pyBioLCCC) SWIG interface wrapper
+* (pyteomics.biolccc) python-dev package
+* (pyteomics.biolccc) SWIG interface wrapper
 * (documentation) Doxygen documentation system
 * (documentation) Sphinx documentation system, version >= 1.0.0
 * (documentation) DVIPNG converter
@@ -90,45 +88,20 @@ using the following command:
 
 .. code-block:: bash
 
-    sudo apt-get install build-essential python-dev scons swig \
+    sudo apt-get install build-essential python-dev swig \
                  doxygen python-sphinx python-matplotlib dvipng \
                  python-setuptools
 
-As for Lucid v10.10, Ubuntu supplies an older version of
-python-sphinx, which is not enough for libBioLCCC documentation. On
-these systems, python-sphinx may be updated via pip python package
-manager.
-
-.. code-block:: bash
-
-    sudo easy_install pip
-    sudo pip install sphinx --upgrade
-
-In order to build libBioLCCC, you need to download and extract the
-source code. Then make a separate build directory, e.g. if the source
-code is stored at ~/programming/libbiolccc/source then the build
-directory can be ~/programming/libbiolccc/build. Finally, execute in
-the build directory:
-
-.. code-block:: bash
-    
-    scons -Y /path/to/source/directory all
-
-The build scripts will do all the remaining work.
-
-pyBioLCCC
----------
-
 In order to compile and install the Python package:
 
-* In the build directory, compile the target 'pyBioLCCC' using SCons
-  build scripts.
+* Build the target 'pyteomics.biolccc' outside the source directory 
+  using the build script.:
 
   .. code-block:: bash
 
-      scons -Y /path/to/source/directory pyBioLCCC
+      python build.py -b /path/to/build/directory pyteomics.biolccc
 
-* After that, run setup.py:
+* Run setup.py then:
 
   .. code-block:: bash
 
@@ -142,66 +115,11 @@ In order to compile and install the Python package:
 
   In the latter case, the built library can be found in build/lib directory.
 
-
 Windows
 =======
 
-The main platform of libBioLCCC/pyBioLCCC development is Linux.
-However, we clearly understand importance of Windows and try to write 
-only platform-independent code and to use only cross-platform tools.
-In theory that means that it will make no difficulty to compile libBioLCCC
-under Windows.
+The main platform of libBioLCCC/pyteomics.biolccc development is Linux.
+However, we clearly understand importance of Windows and write 
+platform-independent code and use only the cross-platform tools.
+All the C++ code present in the project can be compiled under Windows platform.
 
-So far only the pyBioLCCC package was compiled for Windows using Wine+MinGW32.
-The instructions are the following:
-
-1. Install the latest Wine distribution. On Debian-based systems it is
-   done via:
-
-   .. code-block:: bash
-
-      sudo apt-get install wine
-
-2. Download and install the latest MinGW distribution UNDER Wine.
-
-   .. code-block:: bash
-
-        wget http://downloads.sourceforge.net/project/mingw/Automated%20MinGW%20Installer/mingw-get-inst/mingw-get-inst-20110211/mingw-get-inst-20110211.exe?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fmingw%2Ffiles%2FAutomated%2520MinGW%2520Installer%2Fmingw-get-inst%2Fmingw-get-inst-20110211%2F -P /tmp/ 
-        wine /tmp/MinGW-5.1.6.exe
-
-3. Compile the target 'pyBioLCCC' under Linux. This action will
-   generate a C++ code with Python wrappings.
-
-   .. code-block:: python
-
-        scons -Y /path/to/source/directory pyBioLCCC
-
-4. Using wine, mingw32 and setup.py build an installable pyBioLCCC Windows 
-   package.
-
-   .. code-block:: bash
-       
-       wine python setup.py build -c mingw32 bdist_wininst
-
-5. If you plan to upload the pyBioLCCC-derived packages to PyPi, then:
-
-   a. Set the HOME environment variable to C:\\users\\your_user", where 
-      replace your_user by your login name in Linux.
-      In order to set this variable print 'wine regedit' in console. Using 
-      the regedit window navigate to HKEY_CURRENT_USER/Environment and 
-      right-click on the right field choosing Add->String value.
-
-   b. Create .pypirc in C:\\users\\your_user and fill it with the following
-      text:
-
-      .. code-block:: python
-
-          [distutils]
-          index-servers =
-              pypi
-
-          [pypi]
-          username:<username>
-          password:<password>
-
-      There, <username> and <password> correspond to your account at PyPI.

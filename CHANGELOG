@@ -1,3 +1,15 @@
+1.5.0
+*****
+
+General:
+========
+
+- The Python interface to libBioLCCC has been renamed to pyteomics.biolccc.
+
+- The codes are now compiled with custom-built python scripts. In practice,
+  that means that the binary C++ library and C++ test suite temporarily lack 
+  building scripts. This functionality will be restored as soon as needed.
+
 1.4.0
 *****
 

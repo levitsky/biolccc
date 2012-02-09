@@ -4,11 +4,11 @@
 setup.py file for pyteomics.biolccc
 """
 
-from distutils.core import setup, Extension
 import glob
-#from setuptools import setup, Extension
+#from setuptools import setup, find_packages, Extension
+from distutils.core import setup, Extension
 
-sources = glob.glob("src/core/*.cpp") + ['./src/pyteomics/biolccc_wrap.cc']
+sources = glob.glob("src/core/*.cpp") + ['./pyteomics/biolccc_wrap.cc']
 version = open('./VERSION').readline().strip()
 
 biolccc_ext = Extension(
@@ -18,7 +18,10 @@ biolccc_ext = Extension(
     extra_compile_args=['-DVERSION=\"%s\"' % version,]
     )
 
-setup(name = 'pyteomics.biolccc',
+setup(
+    name = 'pyteomics.biolccc',
+    py_modules = ['pyteomics.biolccc'],
+    #namespace_packages = ['pyteomics'],
     version = version,
     description      = """Bindings for the libBioLCCC""",
     long_description = ''.join(open('README').readlines()),
@@ -26,11 +29,9 @@ setup(name = 'pyteomics.biolccc',
     author_email     = 'goloborodko.anton@gmail.com',
     url              = 'http://theorchromo.ru',
     ext_modules      = [biolccc_ext],
-    packages         = ['pyteomics'],
     classifiers      = ['Intended Audience :: Science/Research',
                       'Topic :: Scientific/Engineering :: Bio-Informatics',
                       'Topic :: Scientific/Engineering :: Chemistry',
                       'Topic :: Scientific/Engineering :: Physics',],
     license          = 'License :: Free for non-commercial use',
-    package_dir      = {'pyteomics': './src/pyteomics'},
     )
