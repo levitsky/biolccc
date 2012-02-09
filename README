@@ -1,25 +1,33 @@
-How to install pyBioLCCC?
--------------------------
+How to install pyteomics.biolccc?
+---------------------------------
 
-Linux:
-- Debian/Ubuntu:
+Linux (Debian/Ubuntu):
+
+.. code-block:: bash
+
     sudo apt-get install python-setuptools python-dev
     sudo easy_install pip
-    sudo pip install pyBioLCCC
+    sudo pip install pyteomics.biolccc
 
 Windows:
-- Download pre-compiled binary packages from the list below 
+
+* Download pre-compiled binary packages from the list below 
+
   OR
-- If you have Enthought Python Distribution / ActivePython, execute in the
+
+* If you have Enthought Python Distribution / ActivePython, execute in the
   command line:
-    easy_install pip
-    pip install pyBioLCCC
+
+  .. code-block:: bash
+
+      easy_install pip
+      pip install pyteomics.biolccc
 
 What is BioLCCC?
 ----------------
 
 BioLCCC (Liquid Chromatography of Biomacromolecules at Critical Conditions) is a
-model which describes the adsorption of protein molecules on porous media. Its
+model describing the adsorption of protein molecules on porous media. Its
 main application is retention time prediction in liquid chromatography, although
 the list of potential applications can be easily extended. Contrary to the other
 models of peptide/protein chromatography, BioLCCC starts from very basic
@@ -82,13 +90,13 @@ C++ programming language. It performs basic BioLCCC-related tasks, such as:
 
 libBioLCCC has a simple and well-documented API.
 
-What is pyBioLCCC?
-------------------
+What is pyteomics.biolccc?
+--------------------------
 
-pyBioLCCC is a set of Python wrappings around libBioLCCC. It allows to invoke
-libBioLCCC functions from Python programming language.
+pyteomics.biolccc is a set of Python wrappings around libBioLCCC. It allows to 
+invoke libBioLCCC functions from Python programming language.
 
-The main purpose of pyBioLCCC project is to make libBioLCCC available in a
+The main purpose of pyteomics.biolccc is to make libBioLCCC available in a
 programming language not so demanding as C++. The choice of Python is dictated
 by several points. Among them are simplicity, the great variety of libraries and
 the extreme speed of development which could be very well appreciated in the
@@ -99,6 +107,6 @@ Where can I find more information?
 
 The project documentation is hosted at http://theorchromo.ru/lib. 
 
-The source code of libBioLCCC/pyBioLCCC is open and hosted at
+The source code of libBioLCCC/pyteomics.biolccc is open and hosted at
 http://hg.theorchromo.ru.
 

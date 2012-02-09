@@ -1,4 +1,3 @@
 include include/*
 include VERSION
 include README
-include pyBioLCCC.README
