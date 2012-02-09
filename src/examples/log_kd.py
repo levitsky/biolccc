@@ -1,7 +1,7 @@
 import math
 import random
 import pylab
-import pyBioLCCC
+from pyteomics import biolccc
 
 peptides = []
 random.seed()
@@ -13,12 +13,12 @@ pylab.subplots_adjust(top=0.8, hspace=0.30, wspace=0.30, right=0.96)
 pylab.suptitle('The dependency of log(Kd) on the second solvent concentration '
                'for five random peptides')
 for chembasis, subplot_num, title in [
-(pyBioLCCC.rpAcnTfaChain, 121, 'rpAcnTfaChain'),
-(pyBioLCCC.rpAcnFaRod, 122, 'rpAcnFaRod')]:
+(biolccc.rpAcnTfaChain, 121, 'rpAcnTfaChain'),
+(biolccc.rpAcnFaRod, 122, 'rpAcnFaRod')]:
     pylab.subplot(subplot_num)
     for peptide in peptides:
         x = range(0, 101, 1)
-        y = [math.log(pyBioLCCC.calculateKd(peptide, i, chembasis))
+        y = [math.log(biolccc.calculateKd(peptide, i, chembasis))
              for i in x] 
         pylab.plot(x, y, label='%d aa residues' % (len(peptide)))
     pylab.rcParams['legend.fontsize'] = 10

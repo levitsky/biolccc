@@ -1,10 +1,10 @@
 import math
 import random
 import pylab
-import pyBioLCCC
+from pyteomics import biolccc
 
-nanocolumn = pyBioLCCC.ChromoConditions()
-macrocolumn = pyBioLCCC.ChromoConditions()
+nanocolumn = biolccc.ChromoConditions()
+macrocolumn = biolccc.ChromoConditions()
 macrocolumn.update({
     'columnLength'   : 250.0,
     'columnDiameter' : 4.6,
@@ -25,21 +25,21 @@ pylab.subplots_adjust(top=0.9, hspace=0.30, wspace=0.30, right=0.96)
 pylab.suptitle('The effect of changing dV for ten random peptides'
                ' of different length')
 for chembasis, chromoconditions, subplot_num, title in [
-(pyBioLCCC.rpAcnTfaChain, nanocolumn, 221, 'Nanocolumn, rpAcnTfaChain'),
-(pyBioLCCC.rpAcnFaRod, nanocolumn, 222, 'Nanocolumn, rpAcnFaRod'),
-(pyBioLCCC.rpAcnTfaChain, macrocolumn, 223, 'Macrocolumn, rpAcnTfaChain'),
-(pyBioLCCC.rpAcnFaRod, macrocolumn, 224, 'Macrocolumn, rpAcnFaRod')]:
+(biolccc.rpAcnTfaChain, nanocolumn, 221, 'Nanocolumn, rpAcnTfaChain'),
+(biolccc.rpAcnFaRod, nanocolumn, 222, 'Nanocolumn, rpAcnFaRod'),
+(biolccc.rpAcnTfaChain, macrocolumn, 223, 'Macrocolumn, rpAcnTfaChain'),
+(biolccc.rpAcnFaRod, macrocolumn, 224, 'Macrocolumn, rpAcnFaRod')]:
     pylab.subplot(subplot_num)
     for peptide in peptides:
         divisors = [(2.0 ** i) for i in range(11)]
         chromoconditions['dV'] = chromoconditions['flowRate'] / divisors[-1]
         reference_time = ( 
-                pyBioLCCC.calculateRT(peptide, chembasis, chromoconditions))
+                biolccc.calculateRT(peptide, chembasis, chromoconditions))
         y = []
         for divisor in divisors:
             chromoconditions['dV'] = chromoconditions['flowRate'] / divisor
             y.append(
-                (pyBioLCCC.calculateRT(peptide, chembasis, chromoconditions) /
+                (biolccc.calculateRT(peptide, chembasis, chromoconditions) /
                 reference_time - 1.0) * 100.0)
         pylab.plot(divisors, y, label=peptide)
     pylab.title(title)

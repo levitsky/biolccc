@@ -1,8 +1,8 @@
-import pyBioLCCC
+from pyteomics import biolccc
 
 # Deriving a new ChemicalBasis instance from a predefined one.
-myChemicalBasis = pyBioLCCC.ChemicalBasis(
-    pyBioLCCC.RP_ACN_FA_ROD)
+myChemicalBasis = biolccc.ChemicalBasis(
+    biolccc.RP_ACN_FA_ROD)
 
 # Changing the bind energy of a chemical group.
 myChemicalBasis.chemicalGroups()['E'].setBindEnergy(0.0)
@@ -15,7 +15,7 @@ print "The bind energy of -NH2 is", \
 
 # Adding a new chemical group. The energy is not valid.
 myChemicalBasis.addChemicalGroup(
-    pyBioLCCC.ChemicalGroup(
+    biolccc.ChemicalGroup(
         'Hydroxyproline',      # full name
         'hoP',                 # label
         0.40,                  # bind energy
@@ -24,14 +24,14 @@ myChemicalBasis.addChemicalGroup(
 
 # Setting a new type of model. Without a massive recalibration
 # it will ruin the accuracy of prediction.
-myChemicalBasis.setModel(pyBioLCCC.CHAIN);
+myChemicalBasis.setModel(biolccc.CHAIN);
 
 peptide = "Ac-PEhoPTIDE-NH2"
-RT = pyBioLCCC.calculateRT(peptide,
+RT = biolccc.calculateRT(peptide,
     myChemicalBasis,
-    pyBioLCCC.standardChromoConditions)
+    biolccc.standardChromoConditions)
 
-monoisotopicMass = pyBioLCCC.calculateMonoisotopicMass(
+monoisotopicMass = biolccc.calculateMonoisotopicMass(
     peptide, myChemicalBasis)
 
 print 'The retention time of', peptide, 'is', RT
