@@ -1,6 +1,6 @@
-import pyBioLCCC 
+from pyteomics import biolccc 
 
-for label, chemicalGroup in pyBioLCCC.rpAcnFaRod['chemicalGroups'].items():
+for label, chemicalGroup in biolccc.rpAcnFaRod['chemicalGroups'].items():
     print 'Name', chemicalGroup['name']
     print 'Label', chemicalGroup['label']
     print 'Bind energy', chemicalGroup['bindEnergy']
@@ -9,4 +9,4 @@ for label, chemicalGroup in pyBioLCCC.rpAcnFaRod['chemicalGroups'].items():
     print ''
 
 print 'More simple syntax:'
-print pyBioLCCC.rpAcnFaRod
+print biolccc.rpAcnFaRod

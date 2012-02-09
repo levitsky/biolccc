@@ -1,7 +1,7 @@
 import math
 import random
 import pylab
-import pyBioLCCC
+from pyteomics import biolccc
 
 peptides = []
 random.seed()
@@ -13,16 +13,16 @@ pylab.subplots_adjust(top=0.85, hspace=0.30, wspace=0.30, right=0.96)
 pylab.suptitle('The difference of RT calculated by the fast and standard '
                'algorithm for 20 random peptides')
 for chembasis, subplot_num, title in [
-(pyBioLCCC.rpAcnTfaChain, 121, 'rpAcnTfaChain'),
-(pyBioLCCC.rpAcnFaRod, 122, 'rpAcnFaRod')]:
+(biolccc.rpAcnTfaChain, 121, 'rpAcnTfaChain'),
+(biolccc.rpAcnFaRod, 122, 'rpAcnFaRod')]:
     pylab.subplot(subplot_num)
     for peptide in peptides:
         x = range(5, 31, 1)
-        RTs = [pyBioLCCC.calculateRT(peptide, chembasis,
-                 pyBioLCCC.standardChromoConditions, i)
+        RTs = [biolccc.calculateRT(peptide, chembasis,
+                 biolccc.standardChromoConditions, i)
                for i in x]
-        ref_RT = pyBioLCCC.calculateRT(peptide, chembasis,
-                     pyBioLCCC.standardChromoConditions)
+        ref_RT = biolccc.calculateRT(peptide, chembasis,
+                     biolccc.standardChromoConditions)
         y = [(RT / ref_RT ) * 100.0 - 100.0 for RT in RTs] 
         pylab.plot(x, y, label=peptide)
     pylab.title(title)
