@@ -3,7 +3,7 @@ How to install pyteomics.biolccc?
 
 Linux (Debian/Ubuntu):
 
-.. code-block:: bash
+::
 
     sudo apt-get install python-setuptools python-dev
     sudo easy_install pip
@@ -18,7 +18,7 @@ Windows:
 * If you have Enthought Python Distribution / ActivePython, execute in the
   command line:
 
-  .. code-block:: bash
+  ::
 
       easy_install pip
       pip install pyteomics.biolccc
@@ -75,11 +75,12 @@ Pridatchenko, Irina A. Tarasova, Alexander V. Gorshkov, Eugene Moskovets,
 Alexander R. Ivanov and Mikhail V. Gorshkov, Accepted to Proteomics.
 Link: http://dx.doi.org/10.1002/pmic.200900837.
 
-What is libBioLCCC?
--------------------
+What is pyteomics.biolccc?
+--------------------------
 
-libBioLCCC is an open source library, which implements the BioLCCC model in 
-C++ programming language. It performs basic BioLCCC-related tasks, such as:
+pyteomics.biolccc is an open source library, which implements the BioLCCC model
+in the combination of Python and C++ programming languages. 
+It performs most BioLCCC-related tasks, such as:
 
 * predicts the retention time of peptides and proteins in given 
   chromatographic conditions;
@@ -88,25 +89,18 @@ C++ programming language. It performs basic BioLCCC-related tasks, such as:
 * manages elution conditions and physicochemical constants;
 * calculates masses of peptides and proteins.
 
-libBioLCCC has a simple and well-documented API.
+What is libBioLCCC?
+-------------------
 
-What is pyteomics.biolccc?
---------------------------
-
-pyteomics.biolccc is a set of Python wrappings around libBioLCCC. It allows to 
-invoke libBioLCCC functions from Python programming language.
-
-The main purpose of pyteomics.biolccc is to make libBioLCCC available in a
-programming language not so demanding as C++. The choice of Python is dictated
-by several points. Among them are simplicity, the great variety of libraries and
-the extreme speed of development which could be very well appreciated in the
-modern scientific world.
+libBioLCCC is the C++ layer of pyteomics.biolccc. libBioLCCC can be used 
+separately from the Python wrappings and has a clean and well-documented API.
 
 Where can I find more information?
 ----------------------------------
 
-The project documentation is hosted at http://theorchromo.ru/lib. 
+The project documentation is hosted at 
+http://packages.python.org/pyteomics.biolccc/
 
-The source code of libBioLCCC/pyteomics.biolccc is open and hosted at
-http://hg.theorchromo.ru.
+The source code of pyteomics.biolccc and underlying libBioLCCC C++ library is 
+open and hosted at http://hg.theorchromo.ru.
 

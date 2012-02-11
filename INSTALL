@@ -72,7 +72,7 @@ In order to compile pyteomics.biolccc you need the following tools to
 be installed:
 
 * GNU C++ compiler
-* Python 2.6 or 2.7 (other versions 2.x are accepted, but not tested)
+* Python 2.7
 * (pyteomics.biolccc) python-dev package
 * (pyteomics.biolccc) SWIG interface wrapper
 * (documentation) Doxygen documentation system
