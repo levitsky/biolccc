@@ -21,7 +21,7 @@ precompiled .exe package available for download from the pyteomics.biolccc page
 on PyPi: http://pypi.python.org/pypi/pyteomics.biolccc/
 
 If a precompiled package for your version of Python is not available,
-you may compile it yourself. The ready-to-use Python distributions,
+ you may compile it yourself. The ready-to-use Python distributions,
 like ActivePython Community Edition or Enthought Python Distribution,
 already contain all the tools required for package building. The
 latter is free for academic use. With these distributions, pyteomics.biolccc
