@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# libBioLCCC documentation build configuration file, created by
+# pyteomics.biolccc documentation build configuration file, created by
 # sphinx-quickstart on Fri Aug 20 13:41:14 2010.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -28,7 +28,13 @@ import sys, os
 sys.path.append(os.path.abspath('_sphinxext'))
 extensions = ['sphinx.ext.pngmath', 'sphinx.ext.ifconfig',
     'only_directives',
-    'plot_directive']
+    'plot_directive',
+    'googleanalytics']
+
+# Enable Google Analytics via a script from
+# http://pypi.python.org/pypi/sphinxcontrib-googleanalytics
+googleanalytics_enabled = True
+googleanalytics_id = 'UA-29081129-1'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -43,8 +49,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'libBioLCCC'
-copyright = u'2010, Anton Goloborodko'
+project = u'pyteomics.biolccc'
+copyright = u'2010-2012, Anton Goloborodko'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

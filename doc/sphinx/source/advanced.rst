@@ -1,11 +1,11 @@
-=========================
-Advanced libBioLCCC usage
-=========================
+================================
+Advanced pyteomics.biolccc usage
+================================
 
 Calculating the coefficient of distribution
 *******************************************
 
-libBioLCCC allows to calculate the coefficient of distribution of a peptide.
+pyteomics.biolccc allows to calculate the coefficient of distribution of a peptide.
 It is a fundamental measure of adsorption which is expressed as:
 
 .. math::
@@ -107,7 +107,8 @@ Please, keep in mind a few rules on editing a ChemicalBasis instance:
   chemical basis and fills a newly created instance with the corresponding data.
 
   The names of predefined chemical bases are stored in the PredefinedChemicalBasis
-  type. For further information, please consult libBioLCCC documentation.
+  type. For further information, please consult 
+  `libBioLCCC C++ API documentation <./API/namespaceBioLCCC.html>`_
 
 - **Arbitrary changes in a chemical basis are likely to worsen the accuracy of 
   prediction.**
@@ -141,8 +142,8 @@ Here is an example of code modifying a ChemicalBasis instance:
           :language: python
 
 
-Once again, the libBioLCCC documentation contains the full list of available
-parameters of ChemicalBasis.
+Once again, `libBioLCCC C++ API documentation <./API/namespaceBioLCCC.html>`_
+contains the full list of available parameters of ChemicalBasis.
 
 Parsing a peptide sequence
 **************************

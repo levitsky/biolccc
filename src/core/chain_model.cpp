@@ -138,7 +138,7 @@ double calculateKdChain(
     {
         for (unsigned int j = 0; j < latticeSize; j++)
         {
-            switch (abs( j - i ))
+            switch ((int)abs((int)(j - i)))
             {
             case 0:
             {

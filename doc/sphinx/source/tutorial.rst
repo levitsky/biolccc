@@ -5,9 +5,10 @@ Tutorial
 Before we begin
 ***************
 
-The following help is written both for libBioLCCC and pyteomics.biolccc. The only
-difference between two these packages lies in the syntax of commands. That is
-why we supply code snippets both for C++ and Python. Here is an example:
+The following help is written both for pyteomics.biolccc and underlying
+libBioLCCC library, written in C++. The only difference between two these 
+packages lies in the syntax of commands. That is why we supply code snippets 
+both for C++ and Python. Here is an example:
 
 .. list-table:: Example of a code snippet
    :widths: 40 40
@@ -32,7 +33,8 @@ support Python 3.x.
 Basic concepts
 **************
 
-There are a few simple concepts which are widely used in libBioLCCC. Most of
+There are a few simple concepts which are widely used in
+pyteomics.biolccc/libBioLCCC. Most of
 them are represented by corresponding classes. Here they are:
 
 **Polymer model** - a set of assumptions used to describe a polymer molecule.
@@ -56,7 +58,8 @@ This version of BioLCCC includes two polymer models:
     Prediction'', Alexander V. Gorshkov et al, Analytical Chemistry, 2006, 78
     (22), 7770-7777. `Link <http://dx.doi.org/10.1021/ac060913x>`_.
 
-**Chemical group** - in libBioLCCC that is an amino acid residue OR a peptide
+**Chemical group** - in pyteomics.biolccc/libBioLCCC that is an amino acid 
+residue OR a peptide
 terminal group in a peptide chain. Examples are a histidine residue, 
 phosphoserine residue and N-Terminal hydrogen that closes a peptide chain. The
 properties of a chemical group are stored in the ChemicalGroup class. 
@@ -87,8 +90,8 @@ chemical basis.
 
 **Predefined chemical basis** - a chemical basis, calculated (or, more
 precisely, calibrated) for the specific retention chemistry and model of a
-polymer molecule. The current version of libBioLCCC contains two predefined
-chemical bases:
+polymer molecule. The current version of pyteomics.biolccc/libBioLCCC contains
+two predefined chemical bases:
 
     **rpAcnFaRod** - a ChemicalBasis calibrated for the reversed phase,
     ACN as a second solvent, 0.1% FA in both solvents and the ROD polymer model.
@@ -119,7 +122,8 @@ The default values were set rather arbitrarily.
 Peptide sequence notation
 *************************
 
-In libBioLCCC we use the extended peptide notation. It is based on the
+In pyteomics.biolccc/libBioLCCC we use the extended peptide notation.
+It is based on the
 `one-letter IUPAC notation <http://www.chem.qmul.ac.uk/iupac/AminoAcid/>`_, 
 but borrows only letters for the standard 20 aminoacids (i.e. no B, Z, X). 
 We extended it in the following way:
@@ -159,7 +163,7 @@ We extended it in the following way:
 Calculating retention time
 **************************
 
-calculateRT is the first libBioLCCC function you may need.
+calculateRT is the first pyteomics.biolccc function you may need.
 It requires three arguments: a peptide sequence,
 a chemical basis, and a description of chromatographic conditions. Supplied 
 with these data, it calculates the retention time of the peptide.
@@ -181,7 +185,7 @@ with these data, it calculates the retention time of the peptide.
           :language: python
 
 Please, consult with the 
-`libBioLCCC API documentation <./API/namespaceBioLCCC.html>`_
+`libBioLCCC C++ API documentation <./API/namespaceBioLCCC.html>`_
 for the details of calculateRT function.
 
 Specifying chromatographic conditions
@@ -228,14 +232,14 @@ to be pickled.
 If you want to see the full list of parameters stored in a ChromoConditions
 instance, please, take a look at the 
 `class description <./API/classBioLCCC_1_1ChromoConditions.html>`_ 
-in the libBioLCCC API documentation.
+in the libBioLCCC C++ API documentation.
 
 Calculating mass
 ****************
 
-libBioLCCC contains functions to calculate the monoisotopic and average masses
-of a peptide. Besides the sequence of a peptide, you need to specify a
-ChemicalBasis instance which contains the masses of amino acids. 
+pyteomics.biolccc contains functions to calculate the monoisotopic 
+and average masses of a peptide. Besides the sequence of a peptide, you need 
+to specify a ChemicalBasis instance which contains the masses of amino acids. 
 
 .. list-table:: Calculating mass of a peptide
    :widths: 40 40
@@ -256,7 +260,7 @@ ChemicalBasis instance which contains the masses of amino acids.
 Getting the list of predefined chemical groups
 **********************************************
 
-Before you begin to work with libBioLCCC/pyteomics.biolccc, it is useful to know which
+Before you begin to work with pyteomics.biolccc, it is useful to know which
 amino acids and terminal groups are predefined in this version of the library.
 To get this information just iterate through the chemicalGroups() map of the
 predefined chemical bases.

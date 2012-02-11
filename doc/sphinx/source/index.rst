@@ -7,16 +7,13 @@
 Home
 ====
 
-Welcome to the libBioLCCC/pyteomics.biolccc documentation
-=========================================================
+Welcome to the pyteomics.biolccc documentation
+==============================================
 
-libBioLCCC is an open source tool for prediction of peptide and protein
+pyteomics.biolccc is an open source tool for prediction of peptide and protein
 retention times in liquid chromatography. It is based on BioLCCC (Liquid
 Chromatography of Biomacromolecules at Critical Conditions) model of liquid
 chromatography of peptides and proteins.
-
-pyteomics.biolccc is a set of Python wrappings around libBioLCCC. It allows to invoke
-libBioLCCC functions from Python programming language.
 
 Please go to the ":doc:`introduction`" section for more details.
 
@@ -32,7 +29,7 @@ Documentation
    ./advanced
    ./changelog
 
-- `API documentation <./API/namespaceBioLCCC.html>`_
+- `C++ API documentation (libBioLCCC) <./API/namespaceBioLCCC.html>`_
 
 Mailing list
 ============

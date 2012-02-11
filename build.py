@@ -88,9 +88,13 @@ def _post_swig(conf):
 
 def _configure_distutils(conf):
     print 'Prepare sources for pyteomics.biolccc...'
+
     for filename in ['setup.py', 'MANIFEST.in', 'VERSION', 'README']:
-        shutil.copy(filename, 
+        shutil.copy(pjoin(conf['SRC_PATH'], filename), 
                     pjoin(conf['BUILD_PATH'], filename))
+    shutil.copy(pjoin(conf['SRC_PATH'], 'src', 'pyteomics', '__init__.py'), 
+                pjoin(conf['BUILD_PATH'], 'pyteomics', '__init__.py'))
+
     if not os.path.isdir(pjoin(conf['BUILD_PATH'], 'include')):
         shutil.copytree(pjoin(conf['SRC_PATH'], 'include'), 
                         pjoin(conf['BUILD_PATH'], 'include'))
@@ -138,6 +142,26 @@ def _doxygen_doc(conf):
     subprocess.call('cd %s; doxygen %s' % (
         conf['BUILD_PATH'], pjoin('doc', 'Doxyfile'),), shell=True)
 
+def _doc(conf):
+    _sphinx_doc(conf)
+    _doxygen_doc(conf)
+
+    if os.path.isdir(pjoin(conf['BUILD_PATH'], 'doc', 'finished')):
+        shutil.rmtree(pjoin(conf['BUILD_PATH'], 'doc', 'finished'))
+
+    shutil.move(
+        pjoin(conf['BUILD_PATH'], 'doc', 'sphinx', 'build', 'html'),
+        pjoin(conf['BUILD_PATH'], 'doc', 'finished'))
+
+    shutil.move(
+        pjoin(conf['BUILD_PATH'], 'doc', 'doxygen', 'html'),
+        pjoin(conf['BUILD_PATH'], 'doc', 'finished', 'API'))
+
+    shutil.make_archive(
+        pjoin(conf['BUILD_PATH'], 'doc', 'doc'),
+        'zip',
+        pjoin(conf['BUILD_PATH'], 'doc', 'finished'))
+
 conf = _configure()
 if 'pyteomics.biolccc' in conf['TASKS']:
     _swig(conf)
@@ -145,6 +169,5 @@ if 'pyteomics.biolccc' in conf['TASKS']:
     _configure_distutils(conf)
 
 if 'doc' in conf['TASKS']:
-    _sphinx_doc(conf)
-    _doxygen_doc(conf)
+    _doc(conf)
     

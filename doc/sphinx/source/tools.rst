@@ -1,6 +1,6 @@
-=====================================
-The choice of tools behind libBioLCCC
-=====================================
+============================================
+The choice of tools behind pyteomics.biolccc 
+============================================
 
 The main platform of libBioLCCC/pyteomics.biolccc development is Linux. We prefer it for
 its flexibility and vast automation capabilities.
