@@ -29,7 +29,7 @@ sys.path.append(os.path.abspath('_sphinxext'))
 extensions = ['sphinx.ext.pngmath', 'sphinx.ext.ifconfig',
     'only_directives',
     'plot_directive',
-    'googleanalytics']
+    'sphinxcontrib.googleanalytics']
 
 # Enable Google Analytics via a script from
 # http://pypi.python.org/pypi/sphinxcontrib-googleanalytics
