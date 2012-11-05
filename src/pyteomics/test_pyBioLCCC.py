@@ -3,31 +3,31 @@ import os
 import unittest
 
 sys.path.insert(0, os.path.dirname(__file__))
-import pyBioLCCC
+from pyteomics import biolccc
 
 class TestPicklingFacilities(unittest.TestCase):
     def test_chemicalbasis_pickling(self):
-        state = pyBioLCCC.rpAcnTfaChain.__getstate__()
-        new_chembasis = pyBioLCCC.ChemicalBasis()
+        state = biolccc.rpAcnTfaChain.__getstate__()
+        new_chembasis = biolccc.ChemicalBasis()
         new_chembasis.__setstate__(state)
-        self.assertEqual(new_chembasis, pyBioLCCC.rpAcnTfaChain)
+        self.assertEqual(new_chembasis, biolccc.rpAcnTfaChain)
 
         import pickle
         unpickled_chembasis = pickle.loads(pickle.dumps(
-            pyBioLCCC.ChemicalBasis(pyBioLCCC.RP_ACN_TFA_CHAIN)))
-        self.assertEqual(unpickled_chembasis, pyBioLCCC.rpAcnTfaChain)
+            biolccc.ChemicalBasis(biolccc.RP_ACN_TFA_CHAIN)))
+        self.assertEqual(unpickled_chembasis, biolccc.rpAcnTfaChain)
 
     def test_chromoconditions_pickling(self):
-        state = pyBioLCCC.standardChromoConditions.__getstate__()
-        new_chromatograph = pyBioLCCC.ChromoConditions()
+        state = biolccc.standardChromoConditions.__getstate__()
+        new_chromatograph = biolccc.ChromoConditions()
         new_chromatograph.__setstate__(state)
-        self.assertEqual(new_chromatograph, pyBioLCCC.standardChromoConditions)
+        self.assertEqual(new_chromatograph, biolccc.standardChromoConditions)
 
         import pickle
         unpickled_chromoconditions = pickle.loads(pickle.dumps(
-            pyBioLCCC.ChromoConditions()))
+            biolccc.ChromoConditions()))
         self.assertEqual(unpickled_chromoconditions,
-                         pyBioLCCC.standardChromoConditions)
+                         biolccc.standardChromoConditions)
 
 if __name__ == '__main__':
     unittest.main()
