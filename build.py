@@ -109,11 +109,11 @@ def _sphinx_doc(conf):
                         pjoin(conf['BUILD_PATH'], 'doc'),
                         symlinks=True)
 
-    if not os.path.isdir(pjoin(conf['BUILD_PATH'], 'doc', 'sphinx', 
-                               'source', 'examples')):
-        shutil.copytree(pjoin(conf['SRC_PATH'], 'src', 'examples'), 
-                        pjoin(conf['BUILD_PATH'], 'doc', 'sphinx', 
-                              'source', 'examples'))
+    #if not os.path.isdir(pjoin(conf['BUILD_PATH'], 'doc', 'sphinx', 
+    #                           'source', 'examples')):
+    #    shutil.copytree(pjoin(conf['SRC_PATH'], 'src', 'examples'), 
+    #                    pjoin(conf['BUILD_PATH'], 'doc', 'sphinx', 
+    #                          'source', 'examples'))
 
     for filename in ['VERSION', 'README', 'INSTALL', 'CHANGELOG']:
         shutil.copy(filename, 
