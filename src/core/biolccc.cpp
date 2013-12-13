@@ -97,7 +97,7 @@ public:
             // This points significantly increase the accuracy of spline
             // interpolation.
             int NETP = 1;
-            for (int i=0; i < mN; i++) 
+            for (int i=0; i < mN; i++)
             {
                 if (i <= NETP)
                 {
@@ -118,7 +118,7 @@ public:
                 }
                 mLogKds[i] = log(calculateKd(mParsedSequence,
                     mSecondSolventConcentrations[i],
-                    mChemicalBasis, 
+                    mChemicalBasis,
                     mColumnPoreSize,
                     mColumnRelativeStrength,
                     mTemperature));
@@ -140,19 +140,19 @@ public:
         }
     }
 
-    double operator()(double secondSolventConcentration) 
+    double operator()(double secondSolventConcentration)
         throw (BioLCCCException)
     {
-        if (mN == 0) 
+        if (mN == 0)
         {
             return calculateKd(mParsedSequence,
                                secondSolventConcentration,
-                               mChemicalBasis, 
+                               mChemicalBasis,
                                mColumnPoreSize,
                                mColumnRelativeStrength,
                                mTemperature);
         }
-        else 
+        else
         {
             return exp(calculateSpline(mSecondSolventConcentrations, mLogKds,
                 mSecondDers, mN, 
@@ -248,7 +248,7 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
             RT -= (S - 1.0) / dS * conditions.dV() / conditions.flowRate();
         }
         // Correction for Vp.
-        RT += conditions.columnPoreVolume();
+        RT += conditions.columnPoreVolume() / conditions.flowRate();
 
     }
 
