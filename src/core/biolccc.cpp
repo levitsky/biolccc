@@ -1,4 +1,3 @@
-#include <iostream>
 #include <vector>
 #include <cmath>
 #include <algorithm>
@@ -196,9 +195,6 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
     // Use simplified expression for isocratic elution.
     if (conditions.SSConcentrations().size() == 1 || kdCalculator(conditions.SSConcentrations()[0]) <= 1.)
     {
-        cout << "Bypassing integration" << endl;
-        cout << "SS concentration: " << conditions.SSConcentrations()[0] << endl;
-        cout << "Kd: " << kdCalculator(conditions.SSConcentrations()[0]) << endl;
         RT = kdCalculator(conditions.SSConcentrations()[0])
              * conditions.columnPoreVolume() / conditions.flowRate();
     }
@@ -206,12 +202,10 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
     {
         // The part of a column passed by molecules. When it exceeds 1.0,
         // the analyte elutes from the column.
-        cout << "Performing integration" << endl;
         double S = 0.0;
         double dS = 0.0;
         int j = 0;
         double currentSSConcentration = 0.0;
-        cout << "Initial Kd: " << kdCalculator(conditions.SSConcentrations()[0]) << endl;
         while (S < 1.0)
         {
             j++;
@@ -238,8 +232,6 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                  / conditions.columnPoreVolume();
             S += dS;
         }
-        cout << "Final Kd: " << kdCalculator(currentSSConcentration) << endl;
-        cout << "Final SS concentration: " << currentSSConcentration << endl;
 
         RT = j * conditions.dV() / conditions.flowRate();
         // Correction for the discreteness of integration.
