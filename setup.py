@@ -5,8 +5,8 @@ setup.py file for pyteomics.biolccc
 """
 
 import glob
-#from setuptools import setup, find_packages, Extension
-from distutils.core import setup, Extension
+from setuptools import setup, find_packages, Extension
+#from distutils.core import setup, Extension
 
 sources = glob.glob("src/core/*.cpp") + ['./pyteomics/biolccc_wrap.cxx']
 version = open('./VERSION').readline().strip()
@@ -21,7 +21,7 @@ biolccc_ext = Extension(
 setup(
     name = 'pyteomics.biolccc',
     py_modules = ['pyteomics.biolccc'],
-    #namespace_packages = ['pyteomics'],
+    namespace_packages = ['pyteomics'],
     version = version,
     description      = """Bindings for the libBioLCCC""",
     long_description = ''.join(open('README').readlines()),
