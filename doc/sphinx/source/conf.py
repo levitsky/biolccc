@@ -26,10 +26,9 @@ import sys, os
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 sys.path.append(os.path.abspath('_sphinxext'))
-extensions = ['sphinx.ext.pngmath', 'sphinx.ext.ifconfig',
-    'only_directives',
-    'plot_directive',
-    'sphinxcontrib.googleanalytics']
+extensions = ['sphinx.ext.imgmath', 'sphinx.ext.ifconfig',
+        'matplotlib.sphinxext.only_directives', 'matplotlib.sphinxext.plot_directive',
+        'sphinxcontrib.googleanalytics']
 
 # Enable Google Analytics via a script from
 # http://pypi.python.org/pypi/sphinxcontrib-googleanalytics
@@ -50,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pyteomics.biolccc'
-copyright = u'2010-2012, Anton Goloborodko'
+copyright = u'2010-2018, Anton Goloborodko'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
