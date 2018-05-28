@@ -11,8 +11,8 @@ Linux (Debian/Ubuntu):
 
 Windows:
 
-* Download pre-compiled binary packages from the 
-`list <http://pypi.python.org/pypi/pyteomics.biolccc#downloads>`_. 
+* Download pre-compiled binary packages from the
+  `list <http://pypi.python.org/pypi/pyteomics.biolccc#downloads>`_.
 
   OR
 
@@ -59,14 +59,14 @@ Zubarev, and Mikhail V. Gorshkov, Analytical Chemistry, 2006, 78 (22),
 2. Applicability of the critical chromatography concept to proteomics problems:
 Dependence of retention time on the sequence of amino acids, Alexander V.
 Gorshkov A., Victor V. Evreinov V., Irina A. Tarasova, Mikhail V. Gorshkov,
-Polymer Science B, 2007, 49 (3-4), 93-107. 
+Polymer Science B, 2007, 49 (3-4), 93-107.
 Link: http://dx.doi.org/10.1134/S1560090407030098.
 
 3. Applicability of the critical chromatography concept to proteomics problems:
 Experimental study of the dependence of peptide retention time on the sequence
 of amino acids in the chain, Irina A. Tarasova, Alexander V. Gorshkov, Victor V.
 Evreinov, Chris Adams, Roman A. Zubarev, and Mikhail V. Gorshkov, Polymer
-Science A, 2008, 50 (3), 309. 
+Science A, 2008, 50 (3), 309.
 Link: http://www.springerlink.com/content/gnh84v62w960747n/.
 
 4. Retention time prediction using the model of liquid chromatography of
@@ -80,10 +80,10 @@ What is pyteomics.biolccc?
 --------------------------
 
 pyteomics.biolccc is an open source library, which implements the BioLCCC model
-in the combination of Python and C++ programming languages. 
+in the combination of Python and C++ programming languages.
 It performs most BioLCCC-related tasks, such as:
 
-* predicts the retention time of peptides and proteins in given 
+* predicts the retention time of peptides and proteins in given
   chromatographic conditions;
 * predicts the adsorption properties of protein molecules, namely coefficient of
   distribution between mobile and solid phase;
@@ -93,15 +93,15 @@ It performs most BioLCCC-related tasks, such as:
 What is libBioLCCC?
 -------------------
 
-libBioLCCC is the C++ layer of pyteomics.biolccc. libBioLCCC can be used 
+libBioLCCC is the C++ layer of pyteomics.biolccc. libBioLCCC can be used
 separately from the Python wrappings and has a clean and well-documented API.
 
 Where can I find more information?
 ----------------------------------
 
-The project documentation is hosted at 
-http://packages.python.org/pyteomics.biolccc/
+The project documentation is hosted at
+http://theorchromo.ru/docs
 
-The source code of pyteomics.biolccc and underlying libBioLCCC C++ library is 
+The source code of pyteomics.biolccc and underlying libBioLCCC C++ library is
 open and hosted at http://hg.theorchromo.ru.
 
