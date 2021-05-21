@@ -4,7 +4,7 @@ Installing pyteomics.biolccc from the Python Package Index (PyPi)
 GNU/Linux
 =========
 
-The preferred way to obtain pyteomics.biolccc is via pip Python 
+The preferred way to obtain pyteomics.biolccc is via pip Python
 package manager. The shell code for a freshly installed Ubuntu system:
 
 .. code-block:: bash
@@ -16,12 +16,12 @@ package manager. The shell code for a freshly installed Ubuntu system:
 Windows
 =======
 
-The easiest way to install pyteomics.biolccc on Windows is by using a 
+The easiest way to install pyteomics.biolccc on Windows is by using a
 precompiled .exe package available for download from the pyteomics.biolccc page
 on PyPi: http://pypi.python.org/pypi/pyteomics.biolccc/
 
 If a precompiled package for your version of Python is not available,
- you may compile it yourself. The ready-to-use Python distributions,
+you may compile it yourself. The ready-to-use Python distributions,
 like ActivePython Community Edition or Enthought Python Distribution,
 already contain all the tools required for package building. The
 latter is free for academic use. With these distributions, pyteomics.biolccc
@@ -44,41 +44,40 @@ during the installation process.
 2) Download and install the setuptools package (http://pypi.python.org/pypi/setuptools).
 
 3) Execute the following commands in the command line:
-         
+
 .. code-block:: bash
-   
+
     echo [build] > %HOMEPATH%\pydistutils.cfg
     echo compiler = mingw32 >> %HOMEPATH%\pydistutils.cfg
     c:\Python27\Scripts\easy_install.exe pip
     c:\Python27\Scripts\pip.exe install pyteomics.biolccc
- 
+
 Do not forget to change the path to the python distribution according to your
 own directory structure.
 
 Building libBioLCCC/pyteomics.biolccc from sources
 **************************************************
 
-The source code is available online at http://hg.theorchromo.ru/biolccc.
-You can download the archived source code or pull the mercurial repository:
+The source code is available online at https://github.com/levitsky/biolccc.
+You can download the archived source code or pull the Git repository:
 
 .. code-block:: bash
 
-    hg clone http://hg.theorchromo.ru/biolccc
+    git clone https://github.com/levitsky/biolccc
 
 GNU/Linux
 =========
 
-In order to compile pyteomics.biolccc you need the following tools to 
-be installed:
+In order to compile pyteomics.biolccc you need the following tools to be installed:
 
 * GNU C++ compiler
-* Python 2.7
+* Python
 * (pyteomics.biolccc) python-dev package
 * (pyteomics.biolccc) SWIG interface wrapper
 * (documentation) Doxygen documentation system
 * (documentation) Sphinx documentation system, version >= 1.0.0
 * (documentation) DVIPNG converter
-* (documentation) matplotlib Python library 
+* (documentation) matplotlib Python library
 * (optional) Mercurial version control system
 
 All these tools can be installed from the main repository of your
@@ -94,7 +93,7 @@ using the following command:
 
 In order to compile and install the Python package:
 
-* Build the target 'pyteomics.biolccc' outside the source directory 
+* Build the target 'pyteomics.biolccc' outside the source directory
   using the build script.:
 
   .. code-block:: bash
@@ -119,7 +118,7 @@ Windows
 =======
 
 The main platform of libBioLCCC/pyteomics.biolccc development is Linux.
-However, we clearly understand importance of Windows and write 
+However, we clearly understand importance of Windows and write
 platform-independent code and use only the cross-platform tools.
 All the C++ code present in the project can be compiled under Windows platform.
 

@@ -1,4 +1,3 @@
-#include <iostream>
 #include <vector>
 #include <cmath>
 #include <algorithm>
@@ -17,22 +16,22 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
                    const double columnRelativeStrength,
                    const double temperature) throw(BioLCCCException)
 {
-    // assymetricCalculations shows whether the Kd for the reversed molecule 
+    // assymetricCalculations shows whether the Kd for the reversed molecule
     // will differ. It happens when a molecule cannot be divided into an integer
     // number of Kuhn segments.
-    bool assymetricCalculations = 
-        (fmod(chemBasis.monomerLength() * parsedSequence.size(), 
+    bool assymetricCalculations =
+        (fmod(chemBasis.monomerLength() * parsedSequence.size(),
               chemBasis.kuhnLength()) != 0);
     // Choosing the appropriate polymerModel.
     if (chemBasis.polymerModel()==CHAIN)
     {
         double Kd = calculateKdChain(parsedSequence,
-                                    secondSolventConcentration, 
+                                    secondSolventConcentration,
                                     chemBasis, columnPoreSize,
                                     columnRelativeStrength, temperature);
-        if (assymetricCalculations) 
+        if (assymetricCalculations)
         {
-            std::vector<ChemicalGroup> revParsedSequence = 
+            std::vector<ChemicalGroup> revParsedSequence =
                 parsedSequence;
             std::reverse(revParsedSequence.begin(),
                          revParsedSequence.end());
@@ -40,7 +39,7 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
                                        secondSolventConcentration,
                                        chemBasis,
                                        columnPoreSize,
-                                       columnRelativeStrength, 
+                                       columnRelativeStrength,
                                        temperature)) / 2.0 ;
         }
         return Kd;
@@ -48,12 +47,12 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
     else if (chemBasis.polymerModel() == ROD)
     {
         double Kd = calculateKdRod(parsedSequence,
-                                   secondSolventConcentration, 
+                                   secondSolventConcentration,
                                    chemBasis, columnPoreSize,
                                    columnRelativeStrength, temperature);
-        if (assymetricCalculations) 
+        if (assymetricCalculations)
         {
-            std::vector<ChemicalGroup> revParsedSequence = 
+            std::vector<ChemicalGroup> revParsedSequence =
                 parsedSequence;
             std::reverse(revParsedSequence.begin(),
                          revParsedSequence.end());
@@ -61,7 +60,7 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
                                       secondSolventConcentration,
                                       chemBasis,
                                       columnPoreSize,
-                                      columnRelativeStrength, 
+                                      columnRelativeStrength,
                                       temperature)) / 2.0 ;
         }
         return Kd;
@@ -96,7 +95,7 @@ public:
             // This points significantly increase the accuracy of spline
             // interpolation.
             int NETP = 1;
-            for (int i=0; i < mN; i++) 
+            for (int i=0; i < mN; i++)
             {
                 if (i <= NETP)
                 {
@@ -117,7 +116,7 @@ public:
                 }
                 mLogKds[i] = log(calculateKd(mParsedSequence,
                     mSecondSolventConcentrations[i],
-                    mChemicalBasis, 
+                    mChemicalBasis,
                     mColumnPoreSize,
                     mColumnRelativeStrength,
                     mTemperature));
@@ -139,19 +138,19 @@ public:
         }
     }
 
-    double operator()(double secondSolventConcentration) 
+    double operator()(double secondSolventConcentration)
         throw (BioLCCCException)
     {
-        if (mN == 0) 
+        if (mN == 0)
         {
             return calculateKd(mParsedSequence,
                                secondSolventConcentration,
-                               mChemicalBasis, 
+                               mChemicalBasis,
                                mColumnPoreSize,
                                mColumnRelativeStrength,
                                mTemperature);
         }
-        else 
+        else
         {
             return exp(calculateSpline(mSecondSolventConcentrations, mLogKds,
                 mSecondDers, mN, 
@@ -193,9 +192,9 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
 
     double RT = 0.0;
     // Use simplified expression for isocratic elution.
-    if (conditions.SSConcentrations().size() == 1)
+    if (conditions.SSConcentrations().size() == 1 || kdCalculator(conditions.SSConcentrations()[0]) <= 1.)
     {
-        RT = kdCalculator(conditions.SSConcentrations()[0]) 
+        RT = kdCalculator(conditions.SSConcentrations()[0])
              * conditions.columnPoreVolume() / conditions.flowRate();
     }
     else
@@ -218,7 +217,7 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                 // If continue gradient then use the slope of the last section.
                 if (continueGradient)
                 {
-                    currentSSConcentration += 
+                    currentSSConcentration +=
                         conditions.SSConcentrations().back()
                         - *(conditions.SSConcentrations().end() - 2);
                 }
@@ -227,8 +226,8 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                     break;
                 }
             }
-            dS = conditions.dV() 
-                 / kdCalculator(currentSSConcentration) 
+            dS = conditions.dV()
+                 / (kdCalculator(currentSSConcentration) - 1.0)
                  / conditions.columnPoreVolume();
             S += dS;
         }
@@ -239,6 +238,9 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
         {
             RT -= (S - 1.0) / dS * conditions.dV() / conditions.flowRate();
         }
+        // Correction for Vp.
+        RT += conditions.columnPoreVolume() / conditions.flowRate();
+
     }
 
     RT += conditions.delayTime();
@@ -253,10 +255,10 @@ double calculateRT(const std::string &sequence,
                    const ChromoConditions &conditions,
                    const int numInterpolationPoints,
                    const bool continueGradient,
-                   const bool backwardCompatibility) 
+                   const bool backwardCompatibility)
                    throw(BioLCCCException)
 {
-    std::vector<ChemicalGroup> parsedSequence = 
+    std::vector<ChemicalGroup> parsedSequence =
         parseSequence(sequence, chemBasis);
     return calculateRT(parsedSequence,
                        chemBasis,

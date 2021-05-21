@@ -248,6 +248,7 @@ void ChromoConditions::setSecondSolventConcentrationA(
             "is greater than 100%."));
     }
     mSecondSolventConcentrationA = newSecondSolventConcentrationA;
+    recalculateSSConcentrations();
 }
 
 double ChromoConditions::secondSolventConcentrationB() const
@@ -272,6 +273,7 @@ void ChromoConditions::setSecondSolventConcentrationB(
             "is greater than 100%."));
     }
     mSecondSolventConcentrationB = newSecondSolventConcentrationB;
+    recalculateSSConcentrations();
 }
 
 Gradient ChromoConditions::gradient() const
@@ -301,7 +303,7 @@ void ChromoConditions::recalculateVolumes()
     mColumnTotalVolume = columnDiameter() * columnDiameter() * 3.1415 / 4.0 *
                          columnLength() / 1000.0;
 
-    mColumnInterstitialVolume = mColumnTotalVolume * 
+    mColumnInterstitialVolume = mColumnTotalVolume *
                                 (columnPorosity() -  columnVpToVtot());
 
     mColumnPoreVolume = mColumnTotalVolume * columnVpToVtot();
@@ -311,7 +313,7 @@ bool ChromoConditions::mixingCorrection() const
 {
     return mMixingCorrection;
 }
-    
+
 void ChromoConditions::setMixingCorrection(bool flag)
 {
     mMixingCorrection = flag;
@@ -325,15 +327,15 @@ void ChromoConditions::recalculateSSConcentrations()
     {
         return;
     }
-    
+
     // If the gradient is isocratic, add a single point only.
-    if ((gradient().size() == 2) 
-         && (gradient().front().concentrationB() 
+    if ((gradient().size() == 2)
+         && (gradient().front().concentrationB()
              == gradient().back().concentrationB()))
     {
         mSSConcentrations.push_back(
-            (100.0 - gradient().front().concentrationB()) / 100.0 
-            * secondSolventConcentrationA() 
+            (100.0 - gradient().front().concentrationB()) / 100.0
+            * secondSolventConcentrationA()
             + gradient().front().concentrationB() / 100.0
             * secondSolventConcentrationB());
         return;
@@ -354,18 +356,18 @@ void ChromoConditions::recalculateSSConcentrations()
             {
                 segmentNum += 1;
                 initialSSConcentration =
-                    (100.0 - gradient()[segmentNum].concentrationB()) / 100.0 
-                    * secondSolventConcentrationA() 
+                    (100.0 - gradient()[segmentNum].concentrationB()) / 100.0
+                    * secondSolventConcentrationA()
                     + gradient()[segmentNum].concentrationB() / 100.0
                     * secondSolventConcentrationB();
                 finalSSConcentration =
-                    (100.0 - gradient()[segmentNum+1].concentrationB()) / 100.0 
-                    * secondSolventConcentrationA() 
+                    (100.0 - gradient()[segmentNum+1].concentrationB()) / 100.0
+                    * secondSolventConcentrationA()
                     + gradient()[segmentNum+1].concentrationB() / 100.0
                     * secondSolventConcentrationB();
                 initialTime = gradient()[segmentNum].time();
                 finalTime = gradient()[segmentNum+1].time();
-                localSlope = (finalSSConcentration - initialSSConcentration) 
+                localSlope = (finalSSConcentration - initialSSConcentration)
                     / (finalTime - initialTime);
             }
             else
@@ -374,11 +376,11 @@ void ChromoConditions::recalculateSSConcentrations()
             }
         }
 
-        pumpedConcentration = localSlope * (time - initialTime) 
+        pumpedConcentration = localSlope * (time - initialTime)
                               + initialSSConcentration;
 
         // If mixingCorrection is enabled calculate second solvent concentrations
-        // from the equation 
+        // from the equation
         // d[SS] / dt = flowRate / (V0 + VP) * ([SS]pump - [SS])
         // Otherwise, [SS] == [SS]pump
         if (mixingCorrection())
@@ -387,14 +389,14 @@ void ChromoConditions::recalculateSSConcentrations()
             if (time == dV() / 2.0 / flowRate())
             {
                 mSSConcentrations.push_back(
-                    initialSSConcentration + 
+                    initialSSConcentration +
                     + dV() / (columnInterstitialVolume() + columnPoreVolume())
                     * (pumpedConcentration - mSSConcentrations.back()) / 2.0);
             }
             else
             {
                 mSSConcentrations.push_back(
-                    mSSConcentrations.back() 
+                    mSSConcentrations.back()
                     + dV() / (columnInterstitialVolume() + columnPoreVolume())
                     * (pumpedConcentration - mSSConcentrations.back()));
             }
