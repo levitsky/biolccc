@@ -22,7 +22,7 @@ jobs:
       with:
         system-packages: 'swig3'
         python-versions: 'cp36-cp36m cp37-cp37m cp38-cp38m cp39-cp39m'
-        pre-build-command: 'python build.py -b build pyteomics.biolccc && cd build'
+        pre-build-command: 'python build.py -b build pyteomics.biolccc; cd build'
     - name: Upload wheels and source distribution
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
