@@ -24,7 +24,7 @@ setup(
     namespace_packages = ['pyteomics'],
     version = version,
     description      = """Bindings for the libBioLCCC""",
-    long_description = ''.join(open('README').readlines()),
+    long_description = ''.join(open('README.rst').readlines()),
     author           = 'Anton Goloborodko',
     author_email     = 'goloborodko.anton@gmail.com',
     url              = 'http://theorchromo.ru',

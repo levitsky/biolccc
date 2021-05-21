@@ -91,7 +91,7 @@ def _post_swig(conf):
 def _configure_distutils(conf):
     print('Prepare sources for pyteomics.biolccc...')
 
-    for filename in ['setup.py', 'MANIFEST.in', 'VERSION', 'README']:
+    for filename in ['setup.py', 'MANIFEST.in', 'VERSION', 'README.rst']:
         shutil.copy(pjoin(conf['SRC_PATH'], filename),
                     pjoin(conf['BUILD_PATH'], filename))
     shutil.copy(pjoin(conf['SRC_PATH'], 'src', 'pyteomics', '__init__.py'),
@@ -117,7 +117,7 @@ def _sphinx_doc(conf):
                         pjoin(conf['BUILD_PATH'], 'doc', 'sphinx',
                               'source', 'examples'))
 
-    for filename in ['VERSION', 'README', 'INSTALL', 'CHANGELOG']:
+    for filename in ['VERSION', 'README.rst', 'INSTALL', 'CHANGELOG']:
         shutil.copy(filename,
                     pjoin(conf['BUILD_PATH'], filename))
 
