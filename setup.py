@@ -8,7 +8,7 @@ import glob
 from setuptools import setup, Extension
 #from distutils.core import setup, Extension
 
-sources = glob.glob("src/core/*.cpp")
+sources = glob.glob("src/core/*.cpp") + ['pyteomics/biolccc_wrap.cxx']
 version = open('./VERSION').readline().strip()
 
 biolccc_ext = Extension(
