@@ -5,10 +5,10 @@ setup.py file for pyteomics.biolccc
 """
 
 import glob
-from setuptools import setup, find_packages, Extension
+from setuptools import setup, Extension
 #from distutils.core import setup, Extension
 
-sources = glob.glob("src/core/*.cpp") + ['./pyteomics/biolccc_wrap.cxx']
+sources = glob.glob("src/core/*.cpp")
 version = open('./VERSION').readline().strip()
 
 biolccc_ext = Extension(

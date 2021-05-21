@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os, sys, shutil, argparse, subprocess
 
 pjoin = os.path.join
@@ -29,13 +31,13 @@ def _configure():
     conf = {}
     args = parser.parse_args()
     if args.b == None:
-        print 'Please specify the build directory'
+        print('Please specify the build directory')
         sys.exit()
     conf['BUILD_PATH'] = os.path.abspath(args.b[0])
     conf['SRC_PATH'] = os.path.abspath(os.getcwd())
     if conf['BUILD_PATH'] == conf['SRC_PATH']:
-        print 'Building in the source directory is forbidden.'
-        print 'Please specify another build directory.'
+        print('Building in the source directory is forbidden.')
+        print('Please specify another build directory.')
     _mkdir(conf['BUILD_PATH'])
     conf['VERSION'] = open('./VERSION').readline().strip()
     conf['TASKS'] = args.tasks
@@ -46,12 +48,12 @@ def _swig(conf):
     _mkdir(pjoin(conf['BUILD_PATH'], 'pyteomics'))
     shutil.copy(pjoin('.', 'src', 'pyteomics', 'biolccc.i'),
                 pjoin(conf['BUILD_PATH'], 'pyteomics'))
-    print 'Generate Python wrappers... '
+    print('Generate Python wrappers... ')
     subprocess.call('cd %s; swig -python -c++ -I%s biolccc.i' % (
             pjoin(conf['BUILD_PATH'], 'pyteomics'),
             pjoin(conf['SRC_PATH'], 'include')),
         shell=True)
-    print 'Done!'
+    print('Done!')
 
 def _post_swig(conf):
     '''Inherit MutableMapping explicitly since SWIG does not allow to do that
@@ -87,7 +89,7 @@ def _post_swig(conf):
         f.writelines(modified_file)
 
 def _configure_distutils(conf):
-    print 'Prepare sources for pyteomics.biolccc...'
+    print('Prepare sources for pyteomics.biolccc...')
 
     for filename in ['setup.py', 'MANIFEST.in', 'VERSION', 'README']:
         shutil.copy(pjoin(conf['SRC_PATH'], filename),
@@ -101,7 +103,7 @@ def _configure_distutils(conf):
     if not os.path.isdir(pjoin(conf['BUILD_PATH'], 'src')):
         shutil.copytree(pjoin(conf['SRC_PATH'], 'src'),
                         pjoin(conf['BUILD_PATH'], 'src'))
-    print 'Done!'
+    print('Done!')
 
 def _sphinx_doc(conf):
     if not os.path.isdir(pjoin(conf['BUILD_PATH'], 'doc')):

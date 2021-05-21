@@ -58,12 +58,12 @@ own directory structure.
 Building libBioLCCC/pyteomics.biolccc from sources
 **************************************************
 
-The source code is available online at http://hg.theorchromo.ru/biolccc.
-You can download the archived source code or pull the mercurial repository:
+The source code is available online at https://github.com/levitsky/biolccc.
+You can download the archived source code or pull the Git repository:
 
 .. code-block:: bash
 
-    hg clone http://hg.theorchromo.ru/biolccc
+    git clone https://github.com/levitsky/biolccc
 
 GNU/Linux
 =========
@@ -71,7 +71,7 @@ GNU/Linux
 In order to compile pyteomics.biolccc you need the following tools to be installed:
 
 * GNU C++ compiler
-* Python 2.7
+* Python
 * (pyteomics.biolccc) python-dev package
 * (pyteomics.biolccc) SWIG interface wrapper
 * (documentation) Doxygen documentation system
