@@ -15,7 +15,7 @@ biolccc_ext = Extension(
     'pyteomics._biolccc',
     sources=sources,
     include_dirs=['./include'],
-    extra_compile_args=['-DVERSION=\"%s\"' % version,]
+    extra_compile_args=['-DVERSION=\"%s\"' % version, '-std=c++14']
     )
 
 setup(

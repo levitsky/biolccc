@@ -78,7 +78,7 @@ In order to compile pyteomics.biolccc you need the following tools to be install
 * (documentation) Sphinx documentation system, version >= 1.0.0
 * (documentation) DVIPNG converter
 * (documentation) matplotlib Python library
-* (optional) Mercurial version control system
+* (optional) Git version control system
 
 All these tools can be installed from the main repository of your
 Linux distribution and/or via pip/easy_install packaging system of
@@ -104,7 +104,8 @@ In order to compile and install the Python package:
 
   .. code-block:: bash
 
-      python setup.py install
+      cd /path/to/build/directory
+      pip install .
 
   or
 
@@ -121,4 +122,3 @@ The main platform of libBioLCCC/pyteomics.biolccc development is Linux.
 However, we clearly understand importance of Windows and write
 platform-independent code and use only the cross-platform tools.
 All the C++ code present in the project can be compiled under Windows platform.
-

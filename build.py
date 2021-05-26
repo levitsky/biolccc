@@ -32,12 +32,13 @@ def _configure():
     args = parser.parse_args()
     if args.b == None:
         print('Please specify the build directory')
-        sys.exit()
+        sys.exit(1)
     conf['BUILD_PATH'] = os.path.abspath(args.b[0])
     conf['SRC_PATH'] = os.path.abspath(os.getcwd())
     if conf['BUILD_PATH'] == conf['SRC_PATH']:
         print('Building in the source directory is forbidden.')
         print('Please specify another build directory.')
+        sys.exit(1)
     _mkdir(conf['BUILD_PATH'])
     conf['VERSION'] = open('./VERSION').readline().strip()
     conf['TASKS'] = args.tasks
