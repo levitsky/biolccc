@@ -23,12 +23,12 @@ jobs:
         system-packages: 'swig python3'
         python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39'
         pre-build-command: 'python3 build.py -b build pyteomics.biolccc && cd build'
-        pip-wheel-args:
     - name: Upload wheels and source distribution
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
+        cd build
         twine upload dist/*-manylinux*.whl
         python setup.py sdist
         twine upload dist/*.tar.gz
