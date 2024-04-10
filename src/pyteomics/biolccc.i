@@ -372,6 +372,10 @@
                 'mixingCorrection': self.setMixingCorrection,
             }[key](value)
 
+        def update(self, mapping):
+            for key, value in mapping.items():
+                self[key] = value
+
         def __delitem__(self, key):
             pass
 
