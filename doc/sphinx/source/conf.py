@@ -27,8 +27,9 @@ import sys, os
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 sys.path.append(os.path.abspath('_sphinxext'))
 extensions = ['sphinx.ext.imgmath', 'sphinx.ext.ifconfig',
-        'matplotlib.sphinxext.only_directives', 'matplotlib.sphinxext.plot_directive',
-        'sphinxcontrib.googleanalytics']
+        # 'matplotlib.sphinxext.only_directives',
+              'matplotlib.sphinxext.plot_directive',
+              'sphinxcontrib.googleanalytics']
 
 # Enable Google Analytics via a script from
 # http://pypi.python.org/pypi/sphinxcontrib-googleanalytics
