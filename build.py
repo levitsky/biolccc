@@ -52,8 +52,8 @@ def _swig(conf):
                 pjoin(conf['BUILD_PATH'], 'pyteomics'))
     print('Generate Python wrappers... ')
     subprocess.call('cd %s; %s -python -c++ -I%s biolccc.i' % (
-            conf['SWIG'],
             pjoin(conf['BUILD_PATH'], 'pyteomics'),
+            conf['SWIG'],
             pjoin(conf['SRC_PATH'], 'include')),
         shell=True)
     print('Done!')
