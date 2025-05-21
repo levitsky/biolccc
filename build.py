@@ -35,6 +35,7 @@ def _configure():
         sys.exit(1)
     conf['BUILD_PATH'] = os.path.abspath(args.b[0])
     conf['SRC_PATH'] = os.path.abspath(os.getcwd())
+    conf['SWIG'] = os.environ.get('BIOLCCC_SWIG', 'swig')
     if conf['BUILD_PATH'] == conf['SRC_PATH']:
         print('Building in the source directory is forbidden.')
         print('Please specify another build directory.')
@@ -50,7 +51,8 @@ def _swig(conf):
     shutil.copy(pjoin('.', 'src', 'pyteomics', 'biolccc.i'),
                 pjoin(conf['BUILD_PATH'], 'pyteomics'))
     print('Generate Python wrappers... ')
-    subprocess.call('cd %s; swig -python -c++ -I%s biolccc.i' % (
+    subprocess.call('cd %s; %s -python -c++ -I%s biolccc.i' % (
+            conf['SWIG'],
             pjoin(conf['BUILD_PATH'], 'pyteomics'),
             pjoin(conf['SRC_PATH'], 'include')),
         shell=True)
