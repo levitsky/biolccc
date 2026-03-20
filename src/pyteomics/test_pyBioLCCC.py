@@ -2,7 +2,6 @@ import sys
 import os
 import unittest
 
-sys.path.insert(0, os.path.dirname(__file__))
 from pyteomics import biolccc
 
 class TestPicklingFacilities(unittest.TestCase):
