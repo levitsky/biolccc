@@ -1,28 +1,43 @@
 How to install pyteomics.biolccc?
 ---------------------------------
 
-Linux (Debian/Ubuntu):
+Install from PyPI:
 
-::
+.. code-block:: bash
 
-    sudo apt-get install python-setuptools python-dev
-    sudo easy_install pip
-    sudo pip install pyteomics.biolccc
+  python -m pip install pyteomics.biolccc
+
+Build from a source checkout:
+
+.. code-block:: bash
+
+  git clone https://github.com/levitsky/biolccc
+  cd biolccc
+  python -m pip install .
+
+For development, use an editable install instead:
+
+.. code-block:: bash
+
+  python -m pip install -e .
+
+To build from source you need a C++14 compiler toolchain and Python headers.
+On Debian/Ubuntu the typical system dependency set is:
+
+.. code-block:: bash
+
+  sudo apt-get install build-essential python3-dev
 
 Windows:
 
-* Download pre-compiled binary packages from the
-  `list <http://pypi.python.org/pypi/pyteomics.biolccc#downloads>`_.
+Use the standard Python packaging workflow:
 
-  OR
+.. code-block:: powershell
 
-* If you have Enthought Python Distribution / ActivePython, execute in the
-  command line:
+  py -m pip install pyteomics.biolccc
 
-  ::
-
-      easy_install pip
-      pip install pyteomics.biolccc
+If no wheel is available for your interpreter, install Visual Studio Build
+Tools and then rerun the same command.
 
 What is BioLCCC?
 ----------------

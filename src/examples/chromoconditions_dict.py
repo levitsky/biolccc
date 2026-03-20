@@ -1,7 +1,7 @@
 from pyteomics import biolccc
 
 myChromoConditions = biolccc.ChromoConditions()
-print myChromoConditions.keys()
+print(myChromoConditions.keys())
 
 myChromoConditions['columnLength'] = 100.0
 myChromoConditions['columnDiameter'] = 0.1
@@ -15,4 +15,4 @@ peptide = 'Ac-PEPTIDE-NH2'
 RT = biolccc.calculateRT(peptide,
     biolccc.rpAcnFaRod,
     myChromoConditions)
-print 'The retention time of', peptide, 'is', RT
+print('The retention time of', peptide, 'is', RT)

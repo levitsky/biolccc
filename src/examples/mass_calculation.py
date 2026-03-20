@@ -7,5 +7,5 @@ averageMass = biolccc.calculateAverageMass(
 monoisotopicMass = biolccc.calculateMonoisotopicMass(
     peptide, biolccc.rpAcnFaRod)
 
-print 'The average mass of', peptide, 'is', averageMass, 'Da'
-print 'The monoisotopic mass of', peptide, 'is', monoisotopicMass, 'Da'
+print('The average mass of', peptide, 'is', averageMass, 'Da')
+print('The monoisotopic mass of', peptide, 'is', monoisotopicMass, 'Da')

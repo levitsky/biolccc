@@ -13,4 +13,4 @@ myChromoConditions.setGradient(myGradient)
 RT = biolccc.calculateRT(peptide,
          biolccc.rpAcnFaRod,
          myChromoConditions)
-print 'The retention time of', peptide, 'in the custom gradient is',RT
+print('The retention time of', peptide, 'in the custom gradient is', RT)

@@ -27,8 +27,7 @@ both for C++ and Python. Here is an example:
           :language: python
 
 
-The Python examples are specific to Python 2.x, since our project doesn't
-support Python 3.x.
+The Python examples target modern Python 3.
 
 Basic concepts
 **************
