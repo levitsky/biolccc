@@ -90,6 +90,12 @@ class TestDocumentedPythonExamples(unittest.TestCase):
         self.assertGreater(interpolated, 0.0)
         self.assertLess(abs(standard - interpolated), 0.5)
 
+
+class TestCalculateRT(unittest.TestCase):
+    def test_calculate_rt_with_default_conditions(self):
+        rt = biolccc.calculateRT('PEPTIDE', biolccc.rpAcnTfaChain, biolccc.standardChromoConditions)
+        self.assertAlmostEqual(rt, 11.0013889, places=5)
+
 if __name__ == '__main__':
     unittest.main()
 
