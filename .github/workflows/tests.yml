@@ -27,4 +27,4 @@ jobs:
         pip install -e .
     - name: Run tests
       run: |
-        python -m unittest src/pyteomics/test_pyBioLCCC.py -v
+        python -m unittest tests/test_pyBioLCCC.py -v
