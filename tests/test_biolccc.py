@@ -7,7 +7,7 @@ import unittest
 from pyteomics import biolccc
 
 
-EXAMPLES_DIR = pathlib.Path(__file__).resolve().parents[1] / 'examples'
+EXAMPLES_DIR = pathlib.Path(__file__).resolve().parents[1] / 'src' / 'examples'
 
 class TestPicklingFacilities(unittest.TestCase):
     def test_chemicalbasis_pickling(self):
