@@ -1,0 +1,4 @@
+/* Fix code blocks in tables being center-aligned due to .align-default */
+table.docutils td {
+    text-align: left;
+}

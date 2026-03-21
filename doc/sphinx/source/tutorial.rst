@@ -6,8 +6,8 @@ Before we begin
 ***************
 
 The following help is written both for pyteomics.biolccc and underlying
-libBioLCCC library, written in C++. The only difference between two these 
-packages lies in the syntax of commands. That is why we supply code snippets 
+libBioLCCC library, written in C++. The only difference between two these
+packages lies in the syntax of commands. That is why we supply code snippets
 both for C++ and Python. Here is an example:
 
 .. list-table:: Example of a code snippet
@@ -16,14 +16,14 @@ both for C++ and Python. Here is an example:
 
    * - C++
      - Python
-   * - 
+   * -
 
-       .. literalinclude:: examples/snippet_example.cpp
+       .. literalinclude:: ../../../src/examples/snippet_example.cpp
           :language: cpp
 
-     - 
+     -
 
-       .. literalinclude:: examples/snippet_example.py
+       .. literalinclude:: ../../../src/examples/snippet_example.py
           :language: python
 
 
@@ -46,22 +46,22 @@ This version of BioLCCC includes two polymer models:
 
     The equations for the ROD model are to be published in the upcoming
     paper.
-    
+
     **CHAIN** - in this model a protein molecule is described as
-    a free-joint chain of rods. The conformations of this molecule in a pore 
+    a free-joint chain of rods. The conformations of this molecule in a pore
     can be modelled as a random walk in the field of adsorbing walls.
     This assumption should work better for long protein molecules.
 
-    The CHAIN model was described in ''Liquid Chromatography at Critical 
-    Conditions: Comprehensive Approach to Sequence-Dependent Retention Time 
+    The CHAIN model was described in ''Liquid Chromatography at Critical
+    Conditions: Comprehensive Approach to Sequence-Dependent Retention Time
     Prediction'', Alexander V. Gorshkov et al, Analytical Chemistry, 2006, 78
     (22), 7770-7777. `Link <http://dx.doi.org/10.1021/ac060913x>`_.
 
-**Chemical group** - in pyteomics.biolccc/libBioLCCC that is an amino acid 
+**Chemical group** - in pyteomics.biolccc/libBioLCCC that is an amino acid
 residue OR a peptide
-terminal group in a peptide chain. Examples are a histidine residue, 
+terminal group in a peptide chain. Examples are a histidine residue,
 phosphoserine residue and N-Terminal hydrogen that closes a peptide chain. The
-properties of a chemical group are stored in the ChemicalGroup class. 
+properties of a chemical group are stored in the ChemicalGroup class.
 
 **Chemical basis** - a set of all physicochemical constants involved in the
 BioLCCC equations. This set contains:
@@ -76,10 +76,10 @@ BioLCCC equations. This set contains:
     - the model of a polymer molecule being used in calculations and
       approximations used in the equations;
     - peptide geometry: the length of amino acid and the Kuhn length;
-    - the range of an interaction between an amino acid and the surface of 
+    - the range of an interaction between an amino acid and the surface of
       the solid phase (a.k.a. the width of the adsorbing layer).
-       
-The properties of a chemical basis are stored in the 
+
+The properties of a chemical basis are stored in the
 `ChemicalBasis class <./API/classBioLCCC_1_1ChemicalBasis.html>`_.
 
 A chemical basis is specific to the type of retention chemistry, solvents
@@ -94,16 +94,16 @@ two predefined chemical bases:
 
     **rpAcnFaRod** - a ChemicalBasis calibrated for the reversed phase,
     ACN as a second solvent, 0.1% FA in both solvents and the ROD polymer model.
-    The data were obtained in the joint research of Harvard University and 
+    The data were obtained in the joint research of Harvard University and
     Institute for Energy Problems for Chemical Physics, Russian Academy of
     Science.
 
     **rpAcnTfaChain** - a chemical basis calibrated for the reversed phase,
-    ACN as a second solvent, 0.1% TFA in both solvents and the CHAIN model. 
-    The initial data were taken from Guo et al, Journal of 
+    ACN as a second solvent, 0.1% TFA in both solvents and the CHAIN model.
+    The initial data were taken from Guo et al, Journal of
     Chromatography, 359 (1986) 449-517.
 
-**Chromatographic conditions** - a description of a chromatographic equipment 
+**Chromatographic conditions** - a description of a chromatographic equipment
 and its settings. Contains:
 
     - the geometry of the column;
@@ -123,11 +123,11 @@ Peptide sequence notation
 
 In pyteomics.biolccc/libBioLCCC we use the extended peptide notation.
 It is based on the
-`one-letter IUPAC notation <http://www.chem.qmul.ac.uk/iupac/AminoAcid/>`_, 
-but borrows only letters for the standard 20 aminoacids (i.e. no B, Z, X). 
+`one-letter IUPAC notation <http://www.chem.qmul.ac.uk/iupac/AminoAcid/>`_,
+but borrows only letters for the standard 20 aminoacids (i.e. no B, Z, X).
 We extended it in the following way:
 
-- Modified amino acids are denoted as **xyzX**, i.e. their labels start with an 
+- Modified amino acids are denoted as **xyzX**, i.e. their labels start with an
   arbitrary number of lower-case letters and terminate with a single
   upper-case letter. The upper-case letter shows the base amino acid, while the
   lower-case letters describe the type of modification. The examples are:
@@ -140,12 +140,12 @@ We extended it in the following way:
 - The non-standard peptide terminal groups are denoted as **XxXx-** and
   **-XxXx**
   for N-terminal and C-terminal groups correspondingly. The label could contain
-  an arbitrary number of mixed lower-case and upper-case letters and numbers, 
+  an arbitrary number of mixed lower-case and upper-case letters and numbers,
   but it should not be
   a valid peptide sequence. If a terminal group is not specified, it is
   assumed to be the standard one (i.e. an N-terminal hydrogen atom or C-terminal
   acidic group). The examples:
-  
+
     - **Ac-** for N-Terminal acetylation
     - **H-** for N-Terminal hydrogen
     - **-NH2** for C-Terminal amidation
@@ -164,7 +164,7 @@ Calculating retention time
 
 calculateRT is the first pyteomics.biolccc function you may need.
 It requires three arguments: a peptide sequence,
-a chemical basis, and a description of chromatographic conditions. Supplied 
+a chemical basis, and a description of chromatographic conditions. Supplied
 with these data, it calculates the retention time of the peptide.
 
 .. list-table:: Calculating the retention time of a peptide
@@ -173,17 +173,17 @@ with these data, it calculates the retention time of the peptide.
 
    * - C++
      - Python
-   * - 
+   * -
 
-       .. literalinclude:: examples/rt_calculation.cpp
+       .. literalinclude:: ../../../src/examples/rt_calculation.cpp
           :language: cpp
 
-     - 
+     -
 
-       .. literalinclude:: examples/rt_calculation.py
+       .. literalinclude:: ../../../src/examples/rt_calculation.py
           :language: python
 
-Please, consult with the 
+Please, consult with the
 `libBioLCCC C++ API documentation <./API/namespaceBioLCCC.html>`_
 for the details of calculateRT function.
 
@@ -200,14 +200,14 @@ replace the default parameters with your own.
 
    * - C++
      - Python
-   * - 
+   * -
 
-       .. literalinclude:: examples/chromoconditions.cpp
+       .. literalinclude:: ../../../src/examples/chromoconditions.cpp
           :language: cpp
 
-     - 
+     -
 
-       .. literalinclude:: examples/chromoconditions.py
+       .. literalinclude:: ../../../src/examples/chromoconditions.py
           :language: python
 
 
@@ -219,26 +219,26 @@ instances as Python dictionaries:
    :header-rows: 1
 
    * - Python
-   * - 
+   * -
 
-       .. literalinclude:: examples/chromoconditions_dict.py
+       .. literalinclude:: ../../../src/examples/chromoconditions_dict.py
           :language: python
 
 
-Besides being more convenient and compact, this syntax allows ChromoConditions 
-to be pickled. 
+Besides being more convenient and compact, this syntax allows ChromoConditions
+to be pickled.
 
 If you want to see the full list of parameters stored in a ChromoConditions
-instance, please, take a look at the 
-`class description <./API/classBioLCCC_1_1ChromoConditions.html>`_ 
+instance, please, take a look at the
+`class description <./API/classBioLCCC_1_1ChromoConditions.html>`_
 in the libBioLCCC C++ API documentation.
 
 Calculating mass
 ****************
 
-pyteomics.biolccc contains functions to calculate the monoisotopic 
-and average masses of a peptide. Besides the sequence of a peptide, you need 
-to specify a ChemicalBasis instance which contains the masses of amino acids. 
+pyteomics.biolccc contains functions to calculate the monoisotopic
+and average masses of a peptide. Besides the sequence of a peptide, you need
+to specify a ChemicalBasis instance which contains the masses of amino acids.
 
 .. list-table:: Calculating mass of a peptide
    :widths: 40 40
@@ -246,14 +246,14 @@ to specify a ChemicalBasis instance which contains the masses of amino acids.
 
    * - C++
      - Python
-   * - 
+   * -
 
-       .. literalinclude:: examples/mass_calculation.cpp
+       .. literalinclude:: ../../../src/examples/mass_calculation.cpp
           :language: cpp
 
-     - 
+     -
 
-       .. literalinclude:: examples/mass_calculation.py
+       .. literalinclude:: ../../../src/examples/mass_calculation.py
           :language: python
 
 Getting the list of predefined chemical groups
@@ -270,14 +270,14 @@ predefined chemical bases.
 
    * - C++
      - Python
-   * - 
+   * -
 
-       .. literalinclude:: examples/chemicalbasis.cpp
+       .. literalinclude:: ../../../src/examples/chemicalbasis.cpp
           :language: cpp
 
-     - 
+     -
 
-       .. literalinclude:: examples/chemicalbasis.py
+       .. literalinclude:: ../../../src/examples/chemicalbasis.py
           :language: python
 
 ..
@@ -287,12 +287,12 @@ predefined chemical bases.
 
        * - C++
          - Python
-       * - 
+       * -
 
            .. literalinclude:: ../../../src/examples/
               :language: cpp
 
-         - 
+         -
 
            .. literalinclude:: ../../../src/examples/
               :language: python
