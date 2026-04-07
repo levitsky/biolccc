@@ -26,14 +26,14 @@ keep in mind that they are experimental.
 
    * - C++
      - Python
-   * - 
+   * -
 
-       .. literalinclude:: examples/kd_calculation.cpp
+       .. literalinclude:: ../../../src/examples/kd_calculation.cpp
           :language: cpp
 
-     - 
+     -
 
-       .. literalinclude:: examples/kd_calculation.py
+       .. literalinclude:: ../../../src/examples/kd_calculation.py
           :language: python
 
 Non-linear gradients
@@ -44,7 +44,7 @@ over time. It is implemented as a list of points, each point telling what the
 concentration of component B should be at given time. The solvent composition
 between these points is calculated using linear interpolation.
 
-.. list-table:: 
+.. list-table::
    :widths: 40 40
    :header-rows: 0
 
@@ -67,21 +67,21 @@ The following code does that:
 
    * - C++
      - Python
-   * - 
+   * -
 
-       .. literalinclude:: examples/gradient.cpp
+       .. literalinclude:: ../../../src/examples/gradient.cpp
           :language: cpp
 
-     - 
+     -
 
-       .. literalinclude:: examples/gradient.py
+       .. literalinclude:: ../../../src/examples/gradient.py
           :language: python
 
 Changing a chemical basis
 *************************
 
 If you need to change the predefined values of physicochemical constants, you
-may edit an instance of ChemicalBasis. The 
+may edit an instance of ChemicalBasis. The
 `ChemicalBasis class documentation <./API/classBioLCCC_1_1ChemicalBasis.html>`_
 contains further information on all the parameters it contains.
 
@@ -90,16 +90,16 @@ Please, keep in mind a few rules on editing a ChemicalBasis instance:
 - **You cannot change the label of a ChemicalGroup.**
 
   This is the case because the label of a ChemicalGroup is also used in a
-  ChemicalGroups map of ChemicalBasis. If you still want 
+  ChemicalGroups map of ChemicalBasis. If you still want
   to modify it, remove this group and add a new one with the
   same chemical properties but another label.
 
 - **Do not modify the predefined chemical bases.**
- 
+
   You cannot break this rule in C++, since the predefined bases are made constant
-  there. But in Python there are no constants, and you can accidentally 
-  modify variables pyteomics.biolccc.rpAcnFaRod and 
-  pyteomics.biolccc.rpAcnTfaCoil. You should avoid this since you can easily
+  there. But in Python there are no constants, and you can accidentally
+  modify variables pyteomics.biolccc.rpAcnFaRod and
+  pyteomics.biolccc.rpAcnTfaChain. You should avoid this since you can easily
   forget about it later and use these bases as if they were intact.
 
   If you need to derive a new basis from a predefined one, use an alternative
@@ -107,10 +107,10 @@ Please, keep in mind a few rules on editing a ChemicalBasis instance:
   chemical basis and fills a newly created instance with the corresponding data.
 
   The names of predefined chemical bases are stored in the PredefinedChemicalBasis
-  type. For further information, please consult 
+  type. For further information, please consult
   `libBioLCCC C++ API documentation <./API/namespaceBioLCCC.html>`_
 
-- **Arbitrary changes in a chemical basis are likely to worsen the accuracy of 
+- **Arbitrary changes in a chemical basis are likely to worsen the accuracy of
   prediction.**
 
   The constants stored in a chemical basis were found using a combination
@@ -131,14 +131,14 @@ Here is an example of code modifying a ChemicalBasis instance:
 
    * - C++
      - Python
-   * - 
+   * -
 
-       .. literalinclude:: examples/advanced_chembasis.cpp
+       .. literalinclude:: ../../../src/examples/advanced_chembasis.cpp
           :language: cpp
 
-     - 
+     -
 
-       .. literalinclude:: examples/advanced_chembasis.py
+       .. literalinclude:: ../../../src/examples/advanced_chembasis.py
           :language: python
 
 
@@ -158,14 +158,14 @@ continues with the amino acids and ends with the C-Terminal group.
 
    * - C++
      - Python
-   * - 
+   * -
 
-       .. literalinclude:: examples/sequence_parsing.cpp
+       .. literalinclude:: ../../../src/examples/sequence_parsing.cpp
           :language: cpp
 
-     - 
+     -
 
-       .. literalinclude:: examples/sequence_parsing.py
+       .. literalinclude:: ../../../src/examples/sequence_parsing.py
           :language: python
 
 Changing the precision of calculation
@@ -181,9 +181,9 @@ pumped volume of binary solvent:
 
    \int_{0}^{V_R - V_0}{\frac{dV}{V_P \, K_D(V)}} = 1
 
-where *V* is the volume of binary solvent pumped through the column, 
+where *V* is the volume of binary solvent pumped through the column,
 *V*\ :sub:`R` is the
-retention volume of a substance, *V*\ :sub:`P` is the volume of pores and 
+retention volume of a substance, *V*\ :sub:`P` is the volume of pores and
 *V*\ :sub:`0` is the dead volume of the chromatographic system.
 
 libBioLCCC computes this integral as a sum over values of V. The step of
@@ -196,15 +196,15 @@ RT prediction for ten random peptides of different length, from 5 to 40 amino
 acid residues. The x axis denotes the divisor used to calculate dV as dV =
 flow rate / x.
 
-.. plot:: examples/dV_accuracy.py
+.. plot:: ../../../src/examples/dV_accuracy.py
 
 As you can see, for most peptides dV = flow rate / 20 is enough for the most
 accurate result. However, for those who use non-standard gradients with sharp
 or short steps, we recommend to find the required dV using the code from this
 example.
 
-Also, starting from the version 1.2.0 a new integration routine is used. 
-In the previous version of calculateRT, the expression under the 
+Also, starting from the version 1.2.0 a new integration routine is used.
+In the previous version of calculateRT, the expression under the
 integral was summed until it was greater than 1.0. The obtained value of
 retention volume was therefore a multiple of dV and the RT was a multiple of
 dV / flow rate. Now the integral is taken until the sum equals 1.0 precisely,
@@ -212,13 +212,13 @@ i.e. the last dV increment can be taken partially.
 It significantly increases the accuracy of prediction for big values of dV. If
 you need for some reason to emulate the old behaviour of calculateRT, set the
 backwardCompatibility argument to true.
-      
+
 Using the fast RT calculation algorithm
 =======================================
 
 The standard RT calculating procedure recalculates the coefficient of
 distribution at each step of integration. There is no need to invoke
-these computationally-intensive formulas for each value of second solvent 
+these computationally-intensive formulas for each value of second solvent
 concentration. The value of Kd can be calculated only in several points
 distributed uniformly all over the concentration range, and than the whole
 function can be reconstructed using the interpolation.
@@ -226,18 +226,18 @@ function can be reconstructed using the interpolation.
 Because log(Kd) is a slowly changing function with a narrow range of values (see
 the figure below), we interpolate it and then recalculate Kd itself.
 
-.. plot:: examples/log_kd.py
+.. plot:: ../../../src/examples/log_kd.py
 
 The accuracy of this fast algorithm depends strongly on the number of
 interpolation points. The figure below shows how the difference between the new
 and the standard algorithms depends on the number of interpolation points.
 
-.. plot:: examples/interpolation_accuracy.py
+.. plot:: ../../../src/examples/interpolation_accuracy.py
 
 We recommend to use 21 interpolation point for both fast and accurate
 calculation procedure.
 
-To enable the interpolation, set the number of interpolation points in the 
+To enable the interpolation, set the number of interpolation points in the
 numInterpolationPoints argument of calculateRT. The default value of
 numInterpolationPoints means that interpolation is disabled.
 
@@ -247,14 +247,14 @@ numInterpolationPoints means that interpolation is disabled.
 
    * - C++
      - Python
-   * - 
+   * -
 
-       .. literalinclude:: examples/interpolation.cpp
+       .. literalinclude:: ../../../src/examples/interpolation.cpp
           :language: cpp
 
-     - 
+     -
 
-       .. literalinclude:: examples/interpolation.py
+       .. literalinclude:: ../../../src/examples/interpolation.py
           :language: python
 
 Advanced customization
@@ -263,7 +263,7 @@ Advanced customization
 Segmentation mechanism
 ======================
 
-BioLCCC uses two units to divide a polymer molecule into blocks. 
+BioLCCC uses two units to divide a polymer molecule into blocks.
 The first one is a
 conventional monomer, the building block of a molecule. In case of proteins
 it is an amino acid residue. The terminal groups are not considered as monomers,
@@ -272,24 +272,24 @@ rather they are modifiers attached to monomers.
 But when we want to describe the conformations of a molecule, a monomer is not
 always a good unit. The standard model of a long polymer molecule is a chain of
 free jointed rigid rods, or Kuhn segments. The length of a Kuhn segment does not
-necessarily equal to the length of a monomer, and it even may not be its 
+necessarily equal to the length of a monomer, and it even may not be its
 multiple.
 That is why we use another unit, the Kuhn length of a polymer.
 The Kuhn length is a minimal distance between two chemical bonds in a polymer
 backbone, whose orientations are *almost* independent of each other.
 
 The calculation procedure is the following. At first, we define the sequence of
-monomers in a polymer chain and calculate their effective adsorption energies. 
+monomers in a polymer chain and calculate their effective adsorption energies.
 Then we divide the chain into Kuhn segments and assign each monomer to the
 corresponding segment. If a boundary between Kuhn segments crosses the monomer
 then the monomer itself is divided into two parts, and each is assigned to the
 corresponding segment. The effective adsorption of a Kuhn segment is a sum of
 effective energies of monomers it contains. If a segment contains only a part of
-monomer then its energy is taken proportional to its length. 
+monomer then its energy is taken proportional to its length.
 
 In the case of CHAIN model, the centers of this segments are modelled as
-adsorbing beads which are connected by freely jointed rods. 
-For the ROD model, the centers of segments become the beads threaded regularly 
+adsorbing beads which are connected by freely jointed rods.
+For the ROD model, the centers of segments become the beads threaded regularly
 on a single rigid rod. The distance between the beads in both cases equals to
 the Kuhn length.
 
@@ -297,14 +297,14 @@ Adsorption factors in the CHAIN model
 =====================================
 
 The standard CHAIN model assumes that adsorption occurs only in
-a single layer, which is closest to the wall. 
+a single layer, which is closest to the wall.
 This assumption can be generalized to the case when several near-wall layers
 adsorb the segments of a polymer chain. In terms of translational matrices it
 means that the second and further rows would contain the exponential terms.
 Because the energy of binding to these layers may differ, we introduce
-the vector of layer-specific values of adsorption strength. It is contained in 
-adsorptionLayerFactors() function of a ChemicalBasis instance. 
-The first element of the vector corresponds to the layer closest to the wall, 
+the vector of layer-specific values of adsorption strength. It is contained in
+adsorptionLayerFactors() function of a ChemicalBasis instance.
+The first element of the vector corresponds to the layer closest to the wall,
 second to the next and so on. The vector may contain an arbitrary number of
 elements, but it must be less than a half of the number of rows in the
 transitional matrix. This number is calculated as (pore size / kuhn length).

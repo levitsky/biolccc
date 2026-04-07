@@ -2,5 +2,5 @@
 Introduction
 ============
 
-.. include:: ../../../README
+.. include:: ../../../README.rst
 

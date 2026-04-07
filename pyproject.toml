@@ -1,0 +1,46 @@
+[build-system]
+requires = [
+  "setuptools>=64",
+  "wheel",
+  "pybind11>=2.11",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyteomics.biolccc"
+dynamic = ["version"]
+description = "Bindings for the libBioLCCC"
+readme = "README.rst"
+requires-python = ">=3.8"
+authors = [
+  { name = "Anton Goloborodko", email = "goloborodko.anton@gmail.com" }
+]
+license = { text = "Free for non-commercial use" }
+classifiers = [
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "Topic :: Scientific/Engineering :: Physics"
+]
+
+[project.urls]
+Homepage = "http://theorchromo.ru"
+Repository = "https://github.com/levitsky/biolccc"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["pyteomics*"]
+namespaces = true
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+
+[tool.cibuildwheel]
+build = "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
+skip = "*-win32 *-musllinux_*"
+test-command = "python -m unittest {package}/src/pyteomics/test_pyBioLCCC.py -v"
+test-skip = ""

@@ -30,4 +30,4 @@ peptide = 'Ac-PEPTIDE-NH2'
 RT = biolccc.calculateRT(peptide,
     biolccc.rpAcnFaRod,
     myChromoConditions)
-print 'The retention time of', peptide, 'is', RT
+print('The retention time of', peptide, 'is', RT)

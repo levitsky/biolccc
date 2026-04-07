@@ -323,20 +323,21 @@ void ChromoConditions::setMixingCorrection(bool flag)
 void ChromoConditions::recalculateSSConcentrations()
 {
     mSSConcentrations.clear();
-    if (gradient().empty())
+    const Gradient &gradient_points = mGradient;
+    if (gradient_points.empty())
     {
         return;
     }
 
     // If the gradient is isocratic, add a single point only.
-    if ((gradient().size() == 2)
-         && (gradient().front().concentrationB()
-             == gradient().back().concentrationB()))
+    if ((gradient_points.size() == 2)
+         && (gradient_points.front().concentrationB()
+             == gradient_points.back().concentrationB()))
     {
         mSSConcentrations.push_back(
-            (100.0 - gradient().front().concentrationB()) / 100.0
+            (100.0 - gradient_points.front().concentrationB()) / 100.0
             * secondSolventConcentrationA()
-            + gradient().front().concentrationB() / 100.0
+            + gradient_points.front().concentrationB() / 100.0
             * secondSolventConcentrationB());
         return;
     }
@@ -350,23 +351,24 @@ void ChromoConditions::recalculateSSConcentrations()
 
     while (true)
     {
-        if (time > gradient()[segmentNum+1].time())
+        if (segmentNum + 1 >= static_cast<int>(gradient_points.size())
+            || time > gradient_points[segmentNum + 1].time())
         {
-            if (segmentNum < int(gradient().size() - 1))
+            if (segmentNum + 2 < static_cast<int>(gradient_points.size()))
             {
                 segmentNum += 1;
                 initialSSConcentration =
-                    (100.0 - gradient()[segmentNum].concentrationB()) / 100.0
+                    (100.0 - gradient_points[segmentNum].concentrationB()) / 100.0
                     * secondSolventConcentrationA()
-                    + gradient()[segmentNum].concentrationB() / 100.0
+                    + gradient_points[segmentNum].concentrationB() / 100.0
                     * secondSolventConcentrationB();
                 finalSSConcentration =
-                    (100.0 - gradient()[segmentNum+1].concentrationB()) / 100.0
+                    (100.0 - gradient_points[segmentNum + 1].concentrationB()) / 100.0
                     * secondSolventConcentrationA()
-                    + gradient()[segmentNum+1].concentrationB() / 100.0
+                    + gradient_points[segmentNum + 1].concentrationB() / 100.0
                     * secondSolventConcentrationB();
-                initialTime = gradient()[segmentNum].time();
-                finalTime = gradient()[segmentNum+1].time();
+                initialTime = gradient_points[segmentNum].time();
+                finalTime = gradient_points[segmentNum + 1].time();
                 localSlope = (finalSSConcentration - initialSSConcentration)
                     / (finalTime - initialTime);
             }
@@ -390,8 +392,8 @@ void ChromoConditions::recalculateSSConcentrations()
             {
                 mSSConcentrations.push_back(
                     initialSSConcentration +
-                    + dV() / (columnInterstitialVolume() + columnPoreVolume())
-                    * (pumpedConcentration - mSSConcentrations.back()) / 2.0);
+                    dV() / (columnInterstitialVolume() + columnPoreVolume())
+                    * (pumpedConcentration - initialSSConcentration) / 2.0);
             }
             else
             {
