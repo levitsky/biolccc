@@ -9,8 +9,8 @@ build:
   os: ubuntu-24.04
   tools:
     python: "3.14"
-    apt-packages:
-      - texlive-latex-extra
+  apt-packages:
+    - texlive-latex-extra
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
