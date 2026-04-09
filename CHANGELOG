@@ -1,3 +1,13 @@
+1.6
+***
+
+General:
+========
+
+- Python packaging system updated to use `pybind11` to support modern Python versions.
+
+- Fix sporadic crashes at import time.
+
 1.5.0
 *****
 
@@ -7,7 +17,7 @@ General:
 - The Python interface to libBioLCCC has been renamed to pyteomics.biolccc.
 
 - The codes are now compiled with custom-built python scripts. In practice,
-  that means that the binary C++ library and C++ test suite temporarily lack 
+  that means that the binary C++ library and C++ test suite temporarily lack
   building scripts. This functionality will be restored as soon as needed.
 
 1.4.0
@@ -18,14 +28,14 @@ General:
 
 - Add mixingCorrection option to ChromoConditions.
   When mixingCorrection is true (default is false), immediate composition of
-  the solvent in the column does not equal to the composition of the pumped 
+  the solvent in the column does not equal to the composition of the pumped
   solution, but is calculated according to the differential equation of solute
   accumulation:
   d[SS] / dt = flow rate / (V0 + Vp) * ([SS]pump - [SS]),
   where [SS] is the second solvent concentration in the column, and [SS]pump
   is the concentration in the pumped solution,
   V0 is the interstitial volume, Vp is the volume of pores.
-  
+
 - The code of calculateRT() is significantly simplified, a part of it is moved
   to ChromoConditions.
 
@@ -43,7 +53,7 @@ General:
   is valid for polymers of any length, but requires more computational
   resources. The general expression is disabled by default and can be
   enabled by setting specialRodModel variable of a ChemicalBasis to
-  false. 
+  false.
 
 - Add bindArea variable to ChemicalGroup class. This variable contains
   the size of the chemical group. This size is defined as a number of
@@ -81,7 +91,7 @@ General:
   points and than use interpolation to find the remaining values.
 
 - Change the way dV is used. Now the accuracy of calculateRT is almost
-  independent of dV for shallow gradients. 
+  independent of dV for shallow gradients.
 
 - The introduced changes are documented in the chapter "Changing the precision
   of calculation".
@@ -148,7 +158,7 @@ Predefined chemical bases:
 API changes:
 ============
 
-- Functions do not return error codes now. 
+- Functions do not return error codes now.
 - Add the exception-based mechanism of error handling.
 - Merge Terminus and Aminoacid into ChemicalGroup class. Remove corresponding
   methods of ChemicalBasis. Add new chemicalGroups(), clearChemicalGroups(),
@@ -160,7 +170,7 @@ API changes:
 - Change setModel() method of ChemicalBasis.
 - Add PredefinedChemicalBasis type. It contains two values: RP_ACN_FA_ROD and
   RP_ACN_TFA_COIL.
-- Change the ChemicalBasis() constructor. The default constructor, which takes 
+- Change the ChemicalBasis() constructor. The default constructor, which takes
   no arguments, returns an empty chemical basis now. Add the new constructor
   which takes a PredefinedChemicalBasis argument.
 - No more standardChemicalBasis. Instead, there are two new const ChemicalBasis
@@ -169,10 +179,10 @@ API changes:
 - Add adsorbtionLayerFactors to ChemicalBasis.
 - segmentLength is monomerLength now.
 - Remove persistentLength parameter from ChemicalBasis class.
-- Add KuhnLength in angstroms to ChemicalBasis class. 
+- Add KuhnLength in angstroms to ChemicalBasis class.
 - Add methods to change the densities and the molar masses of the solvents to
   ChemicalBasis class.
-- Change the arguments and return value of parseSequence(). 
+- Change the arguments and return value of parseSequence().
 - Change the arguments of calculateRT, calculateKd. There is no more the default
   value for the ChemicalBasis argument.
 - Remove calibrateBioLCCC and calculatePeptideProperites methods.
