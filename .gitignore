@@ -6,3 +6,8 @@ dist/
 __pycache__/
 .venv/
 .vscode
+doc/html
+doc/latex
+doc/src/examples/*.py
+doc/src/examples/*.pdf
+doc/src/examples/*.png
