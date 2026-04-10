@@ -648,16 +648,16 @@ PYBIND11_MODULE(_biolccc, m) {
         .def("__str__", [](const BioLCCC::ChemicalBasis &self) {
             return py::str(chemical_basis_getstate(self)).cast<std::string>();
         })
-        .def("__getstate__", [](const BioLCCC::ChemicalBasis &self) {
-            return chemical_basis_getstate(self);
-        })
-        .def("__setstate__", [](BioLCCC::ChemicalBasis &self, const py::dict &state) {
-            chemical_basis_setstate(self, state);
-        })
-        .def("__reduce__", [](const BioLCCC::ChemicalBasis &self) {
-            py::object cls = py::module_::import("pyteomics.biolccc").attr("ChemicalBasis");
-            return py::make_tuple(cls, py::make_tuple(), chemical_basis_getstate(self));
-        });
+        .def(py::pickle(
+            [](const BioLCCC::ChemicalBasis &self) {
+                return chemical_basis_getstate(self);
+            },
+            [](const py::dict &state) {
+                BioLCCC::ChemicalBasis basis;
+                chemical_basis_setstate(basis, state);
+                return basis;
+            }
+        ));
 
     py::class_<BioLCCC::ChromoConditions>(m, "ChromoConditions")
         .def(py::init<double, double, double, BioLCCC::Gradient, double, double, double, double, double, double, double, double, double>(),
@@ -764,16 +764,16 @@ PYBIND11_MODULE(_biolccc, m) {
         .def("__str__", [](const BioLCCC::ChromoConditions &self) {
             return py::str(chromo_conditions_getstate(self)).cast<std::string>();
         })
-        .def("__getstate__", [](const BioLCCC::ChromoConditions &self) {
-            return chromo_conditions_getstate(self);
-        })
-        .def("__setstate__", [](BioLCCC::ChromoConditions &self, const py::dict &state) {
-            chromo_conditions_setstate(self, state);
-        })
-        .def("__reduce__", [](const BioLCCC::ChromoConditions &self) {
-            py::object cls = py::module_::import("pyteomics.biolccc").attr("ChromoConditions");
-            return py::make_tuple(cls, py::make_tuple(), chromo_conditions_getstate(self));
-        });
+        .def(py::pickle(
+            [](const BioLCCC::ChromoConditions &self) {
+                return chromo_conditions_getstate(self);
+            },
+            [](const py::dict &state) {
+                BioLCCC::ChromoConditions conditions;
+                chromo_conditions_setstate(conditions, state);
+                return conditions;
+            }
+        ));
 
     m.def("calculateRT", &BioLCCC::calculateRT,
         py::arg("sequence"),
