@@ -14,10 +14,10 @@ public:
     BioLCCCException(std::string message);
 
     //! A default destructor.
-    ~BioLCCCException() throw();
+    ~BioLCCCException() noexcept;
 
     //! Returns a message.
-    virtual const char* what() const throw();
+    virtual const char* what() const noexcept;
 private:
     std::string mMessage;
 };

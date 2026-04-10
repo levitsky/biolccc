@@ -43,8 +43,7 @@ double calculateRT(const std::string &sequence,
                        standardChromoConditions,
                    const int numInterpolationPoints = 0,
                    const bool continueGradient = true,
-                   const bool backwardCompatibility = false) 
-                   throw(BioLCCCException);
+                   const bool backwardCompatibility = false);
 
 //! Calculates the average (molar) mass of a peptide.
 /*!
@@ -52,16 +51,14 @@ double calculateRT(const std::string &sequence,
     \a sequence using the given set of physicochemical constants \a chemBasis.
 */
 double calculateAverageMass(const std::string &sequence,
-                            const ChemicalBasis &chemBasis)
-                            throw(BioLCCCException);
+                            const ChemicalBasis &chemBasis);
 //! Calculates the monoisotopic mass of a peptide.
 /*!
     Calculates the monoisotopic mass of a peptide with given
     \a sequence using the given set of physicochemical constants \a chemBasis.
 */
 double calculateMonoisotopicMass(const std::string &sequence,
-                                 const ChemicalBasis &chemBasis)
-                                 throw(BioLCCCException);
+                                 const ChemicalBasis &chemBasis);
 
 //! Calculates the coefficient of distribution Kd for the given peptide.
 /*!
@@ -81,7 +78,6 @@ double calculateKd(const std::string &sequence,
                    const ChemicalBasis &chemBasis,
                    const double columnPoreSize = 100.0,
                    const double columnRelativeStrength = 1.0,
-                   const double temperature = 293.0)
-                   throw(BioLCCCException);
+                   const double temperature = 293.0);
 }
 #endif

@@ -24,7 +24,7 @@ public:
 */
 std::vector<ChemicalGroup> parseSequence(
     const std::string &source,
-    const ChemicalBasis &chemBasis) throw(BioLCCCException);
+    const ChemicalBasis &chemBasis);
 
 //! Calculates the effective energy profile of monomers of the polymer chain.
 /*!
@@ -41,7 +41,7 @@ std::vector<double> calculateMonomerEnergyProfile(
     const ChemicalBasis & chemBasis,
     const double secondSolventConcentration,
     const double columnRelativeStrength, 
-    const double temperature) throw (BioLCCCException);
+    const double temperature);
 
 //! Calculates the effective energy profile of segments of the polymer chain.
 /*!

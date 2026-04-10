@@ -1,10 +1,12 @@
-1.6
-***
+1.6.1
+*****
 
 General:
 ========
 
-- Python packaging system updated to use `pybind11` to support modern Python versions.
+- Python packaging system updated to use `pybind11` to support modern Python versions. Provide Python wheels for all platforms and supported Python versions.
+
+- Update C++ code to the C++17 standard.
 
 - Fix sporadic crashes at import time.
 

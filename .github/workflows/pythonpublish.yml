@@ -24,8 +24,10 @@ jobs:
       run: |
         python -m cibuildwheel --output-dir dist
       env:
-        CIBW_BUILD: 'cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*'
+        CIBW_BUILD: 'cp310-* cp311-* cp312-* cp313-* cp314-*'
         CIBW_SKIP: '*-win32'
+        CIBW_ENVIRONMENT: 'CXXFLAGS="-std=c++17"'
+        CIBW_ENVIRONMENT_WINDOWS: 'CL="/std:c++17"'
         CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
         CIBW_MANYLINUX_AARCH64_IMAGE: manylinux2014
     - name: Upload wheels as artifacts

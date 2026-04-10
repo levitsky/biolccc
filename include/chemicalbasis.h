@@ -105,12 +105,10 @@ public:
     const std::map<std::string, ChemicalGroup> & chemicalGroups() const;
 
     //! Returns the default N-terminal group.
-    const ChemicalGroup & defaultNTerminus() const
-        throw(ChemicalBasisException);
+    const ChemicalGroup & defaultNTerminus() const;
 
     //! Returns the default C-terminal group.
-    const ChemicalGroup & defaultCTerminus() const
-        throw(ChemicalBasisException);
+    const ChemicalGroup & defaultCTerminus() const;
 
     //! Adds \a newChemicalGroup to the ChemicalBasis.
     /*!
@@ -124,8 +122,7 @@ public:
         Throws ChemicalBasisException if a chemical group with the given label
         is not found.
     */
-    void removeChemicalGroup(std::string label)
-        throw(ChemicalBasisException);
+    void removeChemicalGroup(std::string label);
 
     //! Removes all chemical groups in a ChemicalBasis.
     void clearChemicalGroups();
@@ -172,8 +169,7 @@ public:
         acid residue along backbone. In other terms, it is the length of 
         a backbone divided by the number of amino acid residues.
      */
-    void setMonomerLength(double newMonomerLength)
-        throw(ChemicalBasisException);
+    void setMonomerLength(double newMonomerLength);
 
     //! Returns the Kuhn length of a polymer molecule in angstroms.
     /*!
@@ -213,8 +209,7 @@ public:
         effective energy of a segment, with the same expression as in the CHAIN
         model.
     */
-    void setKuhnLength(double newKuhnLength)
-        throw(ChemicalBasisException);
+    void setKuhnLength(double newKuhnLength);
 
     //! Returns the width of a solid phase adsorption layer in ROD model.
     /*!
@@ -234,8 +229,7 @@ public:
 
         This value is used only in the ROD model.
     */
-    void setAdsorptionLayerWidth(double newAdsorptionLayerWidth)
-        throw(ChemicalBasisException);
+    void setAdsorptionLayerWidth(double newAdsorptionLayerWidth);
 
     //! Returns the absorption factors of the near-wall layers in CHAIN model.
     /*! 
@@ -326,29 +320,25 @@ public:
     double firstSolventDensity() const;
 
     //! Sets the density of the first solvent in kg/m^3.
-    void setFirstSolventDensity(double newFirstSolventDensity)
-        throw(ChemicalBasisException);
+    void setFirstSolventDensity(double newFirstSolventDensity);
 
     //! Returns the density of the second solvent in kg/m^3.
     double secondSolventDensity() const;
 
     //! Sets the density of the second solvent in kg/m^3.
-    void setSecondSolventDensity(double newSecondSolventDensity)
-        throw(ChemicalBasisException);
+    void setSecondSolventDensity(double newSecondSolventDensity);
 
     //! Returns the molecular mass of the first solvent in g/mol.
     double firstSolventAverageMass() const;
 
     //! Sets the molecular mass of the first solvent in g/mol.
-    void setFirstSolventAverageMass(double newFirstSolventAverageMass)
-        throw(ChemicalBasisException);
+    void setFirstSolventAverageMass(double newFirstSolventAverageMass);
 
     //! Returns the molecular mass of the second solvent in g/mol.
     double secondSolventAverageMass() const;
 
     //! Sets the molecular mass of the second solvent in g/mol.
-    void setSecondSolventAverageMass(double newSecondSolventAverageMass)
-        throw(ChemicalBasisException);
+    void setSecondSolventAverageMass(double newSecondSolventAverageMass);
 
     //! Sets one of predefined chemical basis.
     ChemicalBasis setPredefinedChemicalBasis(

@@ -1,7 +1,6 @@
 #include <cmath>
 #include <cfloat>
 #include <algorithm>
-#include <functional>
 #include <numeric>
 #include <vector>
 #include <utility>
@@ -17,7 +16,7 @@ namespace BioLCCC
 {
 
 double rodAdsorptionEnergy(const std::vector<double> & rodEnergyProfile,
-                           int n1, int n2) throw(BioLCCCException)
+                           int n1, int n2)
 {
     if ((n1 < 0) || (n1 > rodEnergyProfile.size())
         || (n2 < 0) || (n2 > rodEnergyProfile.size()))
@@ -61,7 +60,7 @@ namespace {
         std::pair<double, double> output;
         if (first_line.first != second_line.first)
         {
-            double x = (second_line.second - first_line.second) 
+            double x = (second_line.second - first_line.second)
                        / (first_line.first - second_line.first);
             x = ceil(x * 1.0e10) / 1.0e10;
             output = std::make_pair(x, first_line.first*x + first_line.second);
@@ -90,8 +89,8 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
     std::vector<std::pair<double, double> > upperLimits;
 
     // Calculating the limits of integration over theta.
-    // A limit is the minimal or maximal value of cos(theta) at which 
-    // a rod conformation is still acceptable. 
+    // A limit is the minimal or maximal value of cos(theta) at which
+    // a rod conformation is still acceptable.
 
     // The maximal angle at which the bead next to the n1-th one is still out
     // of the adsorbing layer.
@@ -115,12 +114,12 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
     }
     if (n2 != 0)
     {
-        // The minimal angle at which the last bead does not touch the wall.  
+        // The minimal angle at which the last bead does not touch the wall.
         lowerLimits.push_back(std::make_pair(
             -1.0 / (N - 1) / segmentLength,
             slitWidth / (N - 1) / segmentLength));
         // The maximal angle at which the n2-th bead is still in the adsorbing
-        // layer.  
+        // layer.
         upperLimits.push_back(std::make_pair(
             -1.0 / (N - n2) / segmentLength,
             (slitWidth - layerWidth) / (N - n2) / segmentLength));
@@ -152,11 +151,19 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
     critPoints.push_back(0.0);
 
     // Removing points lying out the range [0; layerWidth].
-    critPoints.erase(std::remove_if(critPoints.begin(), critPoints.end(),
-        bind2nd(std::less <double>(), 0)), critPoints.end());
+    critPoints.erase(
+        std::remove_if(
+            critPoints.begin(),
+            critPoints.end(),
+            [](double x) { return x < 0.0; }),
+        critPoints.end());
 
-    critPoints.erase(std::remove_if(critPoints.begin(), critPoints.end(),
-        bind2nd(std::greater <double>(), layerWidth)), critPoints.end());
+    critPoints.erase(
+        std::remove_if(
+            critPoints.begin(),
+            critPoints.end(),
+            [layerWidth](double x) { return x > layerWidth; }),
+        critPoints.end());
 
     // Excluding repeating points.
     std::sort(critPoints.begin(), critPoints.end());
@@ -165,7 +172,7 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
 
     // Finding the exact dependencies for each subrange of z.
     std::vector<std::pair<double, double> > terms;
-    for (int i = 0; i < critPoints.size() - 1; i++) 
+    for (int i = 0; i < critPoints.size() - 1; i++)
     {
         std::pair<double, double> lowerLimit = *(lowerLimits.begin());
         for (std::vector<std::pair<double, double> >::const_iterator lineIter =
@@ -201,7 +208,7 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
             {
                 upperLimit = *(lineIter);
             }
-            
+
         }
         if ((upperLimit.first * (critPoints[i] + critPoints[i+1]) / 2.0
                + upperLimit.second) > 1.0)
@@ -217,9 +224,9 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
 
     // Calculating the integral.
     double integral = 0.0;
-    for (int i = 0; i < critPoints.size() - 1; i++) 
+    for (int i = 0; i < critPoints.size() - 1; i++)
     {
-        double term = 
+        double term =
             (terms[i].first * (critPoints[i+1] + critPoints[i]) / 2.0
                 + terms[i].second)
             * (critPoints[i+1] - critPoints[i]);
@@ -237,7 +244,7 @@ double partitionFunctionRodPartiallySubmergedGeneral(
     double slitWidth,
     double layerWidth,
     const std::vector<double> & rodEnergyProfile,
-    bool reversed) throw(BioLCCCException)
+    bool reversed)
 {
     double partitionFunction = 0.0;
     const double N = rodEnergyProfile.size();
@@ -283,12 +290,12 @@ double partitionFunctionRodPartiallySubmergedTermSpecial(
         output = 2.0 * PI * rodLength * rodLength *
                              (layerWidth
                               - segmentLength * (double)(n1-1) / 2.0
-                              - layerWidth * layerWidth / 2.0 / 
+                              - layerWidth * layerWidth / 2.0 /
                                   (double)n1 / segmentLength);
     }
     else
     {
-        output = 2.0 * PI * rodLength * rodLength 
+        output = 2.0 * PI * rodLength * rodLength
                  * layerWidth * layerWidth / 2.0 / double(n1)
                  / double(n1-1) / segmentLength;
     }
@@ -300,7 +307,7 @@ double partitionFunctionRodPartiallySubmergedSpecial(
     double slitWidth,
     double layerWidth,
     const std::vector<double> & rodEnergyProfile,
-    bool reversed) throw(BioLCCCException)
+    bool reversed)
 {
     double partitionFunction = 0.0;
     for (unsigned int n1 = 1; n1 < rodEnergyProfile.size(); ++n1)
@@ -309,15 +316,15 @@ double partitionFunctionRodPartiallySubmergedSpecial(
         {
             partitionFunction +=
                 partitionFunctionRodPartiallySubmergedTermSpecial(
-                    segmentLength, slitWidth, layerWidth, 
+                    segmentLength, slitWidth, layerWidth,
                     rodEnergyProfile.size(), n1)
                 * exp(rodAdsorptionEnergy(rodEnergyProfile, 0, n1));
         }
         else
         {
-            partitionFunction += 
+            partitionFunction +=
                 partitionFunctionRodPartiallySubmergedTermSpecial(
-                    segmentLength, slitWidth, layerWidth, 
+                    segmentLength, slitWidth, layerWidth,
                     rodEnergyProfile.size(), n1)
                 * exp(rodAdsorptionEnergy(rodEnergyProfile, n1, 0));
         }
@@ -338,14 +345,14 @@ double calculateKdRod(
 					  const double columnPoreSize,
 					  const double columnRelativeStrength,
 					  const double temperature
-					  ) throw(BioLCCCException)
+					  )
 {
     if (parsedSequence.size() == 0)
     {
         return 0.0;
     }
 
-    std::vector<double> segmentEnergyProfile = 
+    std::vector<double> segmentEnergyProfile =
         calculateSegmentEnergyProfile(
             calculateMonomerEnergyProfile(
                 parsedSequence,
@@ -369,7 +376,7 @@ double calculateKdRod(
                 chemBasis.adsorptionLayerWidth())
             * exp(rodAdsorptionEnergy(
                 segmentEnergyProfile,
-                segmentEnergyProfile.size(), 
+                segmentEnergyProfile.size(),
                 0));
 
     if (!chemBasis.neglectPartiallyDesorbedStates())
