@@ -9,9 +9,9 @@ BioLCCCException::BioLCCCException(std::string message)
     mMessage = message;
 };
 
-BioLCCCException::~BioLCCCException() throw() {};
+BioLCCCException::~BioLCCCException() noexcept {};
 
-const char* BioLCCCException::what() const throw()
+const char* BioLCCCException::what() const noexcept
 {
     return mMessage.c_str();
 };

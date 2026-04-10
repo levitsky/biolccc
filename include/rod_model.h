@@ -19,7 +19,7 @@ double partitionFunctionRodPartiallySubmergedTermGeneral(
 
 //! Calculates the adsorption energy of the first n segments of a rod.
 double rodAdsorptionEnergy(const std::vector<double> & rodEnergyProfile,
-                           int n1, int n2) throw(BioLCCCException);
+                           int n1, int n2);
 
 //! Calculates the partition function of a rod in a slit with impenetrable walls.
 double partitionFunctionRodFreeSlit(double rodLength,
@@ -35,7 +35,7 @@ double partitionFunctionRodPartiallySubmergedGeneral(
     double slitWidth,
     double layerWidth,
     const std::vector<double> & rodEnergyProfile,
-    bool reversed = false) throw(BioLCCCException);
+    bool reversed = false);
 
 //! Calculates Z of the rod partially submerged into an adsorbing layer.
 /*!
@@ -47,7 +47,7 @@ double partitionFunctionRodPartiallySubmergedSpecial(
     double slitWidth,
     double layerWidth,
     const std::vector<double> & rodEnergyProfile,
-    bool reversed = false) throw(BioLCCCException);
+    bool reversed = false);
 
 //! Calculates the partition function of a rod in a slit without walls.
 double partitionFunctionRodFreeVolume(double rodLength,
@@ -61,7 +61,7 @@ double calculateKdRod(
     const double columnPoreSize,
     const double columnRelativeStrength,
     const double temperature
-    ) throw(BioLCCCException);
+    );
 }
 
 #endif

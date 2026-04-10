@@ -33,8 +33,7 @@ public:
         Valid values are \a iTime >= 0.0 and 0.0 <= \a iConcentrationB <= 100.0
     */
     GradientPoint(double iTime = 0.0,
-                  double iConcentrationB = 0.0)
-                  throw (GradientPointException);
+                  double iConcentrationB = 0.0);
 
     //! Returns the time of the point in minutes.
     double time() const;
@@ -43,12 +42,10 @@ public:
     double concentrationB() const;
 
     //! Sets the time of the point in minutes.
-    void setTime(double newTime)
-        throw (GradientPointException);
+    void setTime(double newTime);
 
     //! Sets the concentration of component B at the point in percents.
-    void setConcentrationB(double newConcentrationB)
-        throw (GradientPointException);
+    void setConcentrationB(double newConcentrationB);
 
 private:
     double mTime;

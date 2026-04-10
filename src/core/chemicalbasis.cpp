@@ -40,7 +40,6 @@ const std::map<std::string,ChemicalGroup> &
 }
 
 const ChemicalGroup & ChemicalBasis::defaultNTerminus() const
-    throw(ChemicalBasisException)
 {
     std::map<std::string, ChemicalGroup>::const_iterator NTerminusIterator =
         mChemicalGroups.find("H-");
@@ -52,7 +51,6 @@ const ChemicalGroup & ChemicalBasis::defaultNTerminus() const
 }
 
 const ChemicalGroup & ChemicalBasis::defaultCTerminus() const
-    throw(ChemicalBasisException)
 {
     std::map<std::string, ChemicalGroup>::const_iterator CTerminusIterator =
         mChemicalGroups.find("-OH");
@@ -79,7 +77,6 @@ double ChemicalBasis::monomerLength() const
 }
 
 void ChemicalBasis::setMonomerLength(double newMonomerLength)
-    throw(ChemicalBasisException)
 {
     if (newMonomerLength <= 0.0)
     {
@@ -96,7 +93,6 @@ double ChemicalBasis::kuhnLength() const
 }
 
 void ChemicalBasis::setKuhnLength(double newKuhnLength)
-    throw(ChemicalBasisException)
 {
     if (newKuhnLength <= 0)
     {
@@ -112,7 +108,6 @@ double ChemicalBasis::adsorptionLayerWidth() const
 }
 
 void ChemicalBasis::setAdsorptionLayerWidth(double newAdsorptionLayerWidth)
-    throw(ChemicalBasisException)
 {
     if (newAdsorptionLayerWidth < 0.0)
     {
@@ -139,7 +134,6 @@ void ChemicalBasis::addChemicalGroup(ChemicalGroup newChemicalGroup)
 }
 
 void ChemicalBasis::removeChemicalGroup(std::string label)
-    throw(ChemicalBasisException)
 {
     if (mChemicalGroups.erase(label) == (std::size_t)0)
     {
@@ -212,7 +206,6 @@ double ChemicalBasis::firstSolventDensity() const
 }
 
 void ChemicalBasis::setFirstSolventDensity(double newFirstSolventDensity)
-    throw(ChemicalBasisException)
 {
     if (newFirstSolventDensity < 0.0)
     {
@@ -228,7 +221,6 @@ double ChemicalBasis::secondSolventDensity() const
 }
 
 void ChemicalBasis::setSecondSolventDensity(double newSecondSolventDensity)
-    throw(ChemicalBasisException)
 {
     if (newSecondSolventDensity < 0.0)
     {
@@ -245,7 +237,6 @@ double ChemicalBasis::firstSolventAverageMass() const
 
 void ChemicalBasis::setFirstSolventAverageMass(
     double newFirstSolventAverageMass)
-    throw(ChemicalBasisException)
 {
     if (newFirstSolventAverageMass < 0.0)
     {
@@ -262,7 +253,6 @@ double ChemicalBasis::secondSolventAverageMass() const
 
 void ChemicalBasis::setSecondSolventAverageMass(
     double newSecondSolventAverageMass)
-    throw(ChemicalBasisException)
 {
     if (newSecondSolventAverageMass < 0.0)
     {

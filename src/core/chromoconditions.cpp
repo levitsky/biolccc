@@ -19,7 +19,6 @@ ChromoConditions::ChromoConditions(double iColumnLength,
                                    double iColumnVpToVtot,
                                    double iColumnPorosity,
                                    double iTemperature)
-                                   throw(ChromoConditionsException)
 {
     // Set an empty gradient to prevent recalculation of SSConcentrations.
     mGradient = Gradient();
@@ -45,7 +44,6 @@ double ChromoConditions::columnLength() const
 }
 
 void ChromoConditions::setColumnLength(double newColumnLength)
-    throw(ChromoConditionsException)
 {
     if (newColumnLength < 0.0)
     {
@@ -62,7 +60,6 @@ double ChromoConditions::columnDiameter() const
 }
 
 void ChromoConditions::setColumnDiameter(double newColumnDiameter)
-    throw(ChromoConditionsException)
 {
     if (newColumnDiameter < 0.0)
     {
@@ -80,7 +77,6 @@ double ChromoConditions::columnPoreSize() const
 }
 
 void ChromoConditions::setColumnPoreSize(double newColumnPoreSize)
-    throw(ChromoConditionsException)
 {
     if (newColumnPoreSize < 0.0)
     {
@@ -96,7 +92,6 @@ double ChromoConditions::columnVpToVtot() const
 }
 
 void ChromoConditions::setColumnVpToVtot(double newColumnVpToVtot)
-    throw(ChromoConditionsException)
 {
     if (newColumnVpToVtot < 0.0)
     {
@@ -119,7 +114,6 @@ double ChromoConditions::columnPorosity() const
 }
 
 void ChromoConditions::setColumnPorosity(double newColumnPorosity)
-    throw(ChromoConditionsException)
 {
     if (newColumnPorosity < 0.0)
     {
@@ -157,7 +151,6 @@ double ChromoConditions::temperature() const
 }
 
 void ChromoConditions::setTemperature(double newTemperature)
-    throw(ChromoConditionsException)
 {
     if (newTemperature < 0.0)
     {
@@ -183,7 +176,6 @@ double ChromoConditions::flowRate() const
 }
 
 void ChromoConditions::setFlowRate(double newFlowRate)
-    throw(ChromoConditionsException)
 {
     if (newFlowRate < 0.0)
     {
@@ -206,7 +198,6 @@ double ChromoConditions::dV() const
 }
 
 void ChromoConditions::setDV(double newDV)
-    throw(ChromoConditionsException)
 {
     if (newDV < 0.0)
     {
@@ -233,7 +224,6 @@ double ChromoConditions::secondSolventConcentrationA() const
 
 void ChromoConditions::setSecondSolventConcentrationA(
     double newSecondSolventConcentrationA)
-    throw(ChromoConditionsException)
 {
     if (newSecondSolventConcentrationA < 0.0)
     {
@@ -258,7 +248,6 @@ double ChromoConditions::secondSolventConcentrationB() const
 
 void ChromoConditions::setSecondSolventConcentrationB(
     double newSecondSolventConcentrationB)
-    throw(ChromoConditionsException)
 {
     if (newSecondSolventConcentrationB < 0.0)
     {
@@ -282,7 +271,6 @@ Gradient ChromoConditions::gradient() const
 }
 
 void ChromoConditions::setGradient(Gradient newGradient)
-    throw(ChromoConditionsException)
 {
     if (newGradient.size() < 2)
     {

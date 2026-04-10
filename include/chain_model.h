@@ -22,7 +22,7 @@ double calculateKdChain(
     const ChemicalBasis &chemBasis,
     const double columnPoreSize,
     const double columnRelativeStrength,
-    const double temperature) throw (BioLCCCException);
+    const double temperature);
 }
 
 #endif

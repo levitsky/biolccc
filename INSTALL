@@ -11,7 +11,7 @@ The preferred way to install pyteomics.biolccc is with pip:
     python -m pip install pyteomics.biolccc
 
 If a platform wheel is not available, pip will build the extension from source.
-That requires a C++14 compiler toolchain and Python development headers.
+That requires a C++17 compiler toolchain and Python development headers.
 
 GNU/Linux
 =========

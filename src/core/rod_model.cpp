@@ -17,7 +17,7 @@ namespace BioLCCC
 {
 
 double rodAdsorptionEnergy(const std::vector<double> & rodEnergyProfile,
-                           int n1, int n2) throw(BioLCCCException)
+                           int n1, int n2)
 {
     if ((n1 < 0) || (n1 > rodEnergyProfile.size())
         || (n2 < 0) || (n2 > rodEnergyProfile.size()))
@@ -237,7 +237,7 @@ double partitionFunctionRodPartiallySubmergedGeneral(
     double slitWidth,
     double layerWidth,
     const std::vector<double> & rodEnergyProfile,
-    bool reversed) throw(BioLCCCException)
+    bool reversed)
 {
     double partitionFunction = 0.0;
     const double N = rodEnergyProfile.size();
@@ -300,7 +300,7 @@ double partitionFunctionRodPartiallySubmergedSpecial(
     double slitWidth,
     double layerWidth,
     const std::vector<double> & rodEnergyProfile,
-    bool reversed) throw(BioLCCCException)
+    bool reversed)
 {
     double partitionFunction = 0.0;
     for (unsigned int n1 = 1; n1 < rodEnergyProfile.size(); ++n1)
@@ -338,7 +338,7 @@ double calculateKdRod(
 					  const double columnPoreSize,
 					  const double columnRelativeStrength,
 					  const double temperature
-					  ) throw(BioLCCCException)
+					  )
 {
     if (parsedSequence.size() == 0)
     {

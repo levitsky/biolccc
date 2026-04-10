@@ -13,7 +13,7 @@ std::vector<double> calculateMonomerEnergyProfile(
     const ChemicalBasis & chemBasis,
     const double secondSolventConcentration,
     const double columnRelativeStrength, 
-    const double temperature) throw (BioLCCCException)
+    const double temperature)
 {
     if (parsedSequence.size() < 3)
     {
@@ -133,7 +133,7 @@ std::vector<double> calculateSegmentEnergyProfile(
 
 std::vector<ChemicalGroup> parseSequence(
     const std::string &source,
-    const ChemicalBasis &chemBasis) throw(BioLCCCException)
+    const ChemicalBasis &chemBasis)
 {
     std::vector<ChemicalGroup> parsedSequence;
     ChemicalGroup NTerminus;

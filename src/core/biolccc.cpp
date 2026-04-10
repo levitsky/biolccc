@@ -14,7 +14,7 @@ double calculateKd(const std::vector<ChemicalGroup> &parsedSequence,
                    const ChemicalBasis &chemBasis,
                    const double columnPoreSize,
                    const double columnRelativeStrength,
-                   const double temperature) throw(BioLCCCException)
+                   const double temperature)
 {
     // assymetricCalculations shows whether the Kd for the reversed molecule
     // will differ. It happens when a molecule cannot be divided into an integer
@@ -139,7 +139,6 @@ public:
     }
 
     double operator()(double secondSolventConcentration)
-        throw (BioLCCCException)
     {
         if (mN == 0)
         {
@@ -176,7 +175,7 @@ double calculateRT(const std::vector<ChemicalGroup> &parsedSequence,
                    const int numInterpolationPoints,
                    const bool continueGradient,
                    const bool backwardCompatibility
-                   ) throw(BioLCCCException)
+                   )
 {
     if (numInterpolationPoints < 0)
     {
@@ -256,7 +255,6 @@ double calculateRT(const std::string &sequence,
                    const int numInterpolationPoints,
                    const bool continueGradient,
                    const bool backwardCompatibility)
-                   throw(BioLCCCException)
 {
     std::vector<ChemicalGroup> parsedSequence =
         parseSequence(sequence, chemBasis);
@@ -274,7 +272,6 @@ double calculateKd(const std::string &sequence,
                    const double columnPoreSize,
                    const double columnRelativeStrength,
                    const double temperature)
-                   throw(BioLCCCException)
 {
     return calculateKd(parseSequence(sequence, chemBasis),
                        secondSolventConcentration,
@@ -286,7 +283,6 @@ double calculateKd(const std::string &sequence,
 
 double calculateAverageMass(const std::string &sequence,
                             const ChemicalBasis &chemBasis)
-                            throw(BioLCCCException)
 {
     std::vector<ChemicalGroup> parsedSequence =
         parseSequence(sequence, chemBasis);
@@ -304,7 +300,6 @@ double calculateAverageMass(const std::string &sequence,
 
 double calculateMonoisotopicMass(const std::string &sequence,
                                  const ChemicalBasis &chemBasis)
-                                 throw(BioLCCCException)
 {
     std::vector<ChemicalGroup> parsedSequence =
         parseSequence(sequence, chemBasis);

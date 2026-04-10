@@ -14,7 +14,8 @@ ext_modules = [
         "pyteomics._biolccc",
         sources=sources,
         include_dirs=["./include"],
-        extra_compile_args=[f'-DVERSION=\"{version}\"', "-std=c++14"],
+        define_macros=[("VERSION", f'\"{version}\"')],
+        cxx_std=17,
     )
 ]
 

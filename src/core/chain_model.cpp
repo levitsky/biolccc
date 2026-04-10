@@ -29,7 +29,7 @@ double calculateKdChain(
 						const double columnPoreSize,
 						const double columnRelativeStrength,
 						const double temperature
-						) throw (BioLCCCException)
+						)
 {
     // At first, we need to convert the energy profile to a profile of 
     // distribution probabilities. Probability = exp(E_effective),

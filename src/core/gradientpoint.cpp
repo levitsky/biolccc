@@ -7,7 +7,6 @@ GradientPointException::GradientPointException(std::string message):
 
 GradientPoint::GradientPoint(double time,
                              double concentrationB)
-                             throw (GradientPointException)
 {
 
     setTime(time);
@@ -24,8 +23,7 @@ double GradientPoint::concentrationB() const
     return mConcentrationB;
 }
 
-void GradientPoint::setTime(double newTime) 
-    throw (GradientPointException)
+void GradientPoint::setTime(double newTime)
 {
     if (newTime < 0.0)
     {
@@ -35,8 +33,7 @@ void GradientPoint::setTime(double newTime)
     mTime = newTime;
 }
 
-void GradientPoint::setConcentrationB(double newConcentrationB) 
-    throw (GradientPointException)
+void GradientPoint::setConcentrationB(double newConcentrationB)
 {
     if (newConcentrationB < 0.0)
     {

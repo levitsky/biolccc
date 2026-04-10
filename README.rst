@@ -21,7 +21,7 @@ For development, use an editable install instead:
 
   python -m pip install -e .
 
-To build from source you need a C++14 compiler toolchain and Python headers.
+To build from source you need a C++17 compiler toolchain and Python headers.
 On Debian/Ubuntu the typical system dependency set is:
 
 .. code-block:: bash
