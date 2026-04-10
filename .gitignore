@@ -11,3 +11,4 @@ doc/latex
 doc/src/examples/*.py
 doc/src/examples/*.pdf
 doc/src/examples/*.png
+doc/sphinx/source/_extra

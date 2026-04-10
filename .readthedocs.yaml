@@ -10,7 +10,12 @@ build:
   tools:
     python: "3.14"
   apt_packages:
+    - doxygen
     - texlive-latex-extra
+  jobs:
+    pre_build:
+      # build the Doxygen documentation
+      - cd doc && doxygen Doxyfile
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
